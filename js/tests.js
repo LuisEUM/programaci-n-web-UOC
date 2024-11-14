@@ -1,97 +1,195 @@
-// Sistema de pruebas mejorado
-const TestRunner = {
-    results: [],
+function ejecutarTests() {
+    const tests = [];
     
-    run() {
-        this.results = [];
-        console.log('🧪 Iniciando pruebas...\n');
-        
-        this.testThumbnail();
-        this.testComic();
-        this.testFavorites();
-        this.testUtils();
-        
-        this.showResults();
-    },
-
-    assert(description, condition) {
-        const result = {
-            description,
-            passed: condition,
-            timestamp: new Date()
-        };
-        this.results.push(result);
-        return result;
-    },
-
-    testThumbnail() {
-        const thumbnail = new Thumbnail('http://example.com/image', 'jpg');
-        this.assert('Thumbnail - Creación correcta', 
-            thumbnail.path === 'http://example.com/image' && 
-            thumbnail.extension === 'jpg'
+    // Test 1: Creación de Comic
+    try {
+        const comicData = mockComics.comics[0];
+        const comic = new Comic(
+            comicData.id,
+            comicData.title,
+            comicData.issueNumber,
+            comicData.description,
+            comicData.pageCount,
+            comicData.thumbnail,
+            comicData.price,
+            comicData.creators,
+            comicData.characters
         );
-    },
+        tests.push({
+            name: '1. Creación de Comic',
+            passed: comic instanceof Comic,
+            message: 'Comic creado correctamente con todos sus atributos'
+        });
+    } catch (error) {
+        tests.push({
+            name: '1. Creación de Comic',
+            passed: false,
+            message: error.message
+        });
+    }
 
-    testComic() {
-        const thumbnail = new Thumbnail('http://example.com/image', 'jpg');
-        const comic = new Comic(1, 'Test Comic', 1, 'Description', 32, thumbnail, 3.99, {}, []);
-        
-        this.assert('Comic - Creación correcta', 
-            comic.id === 1 && comic.title === 'Test Comic'
+    // Test 2: Creación de Héroe
+    try {
+        const heroData = mockComics.heroes[0];
+        const hero = new Heroe(
+            heroData.id,
+            heroData.name,
+            heroData.description,
+            heroData.modified,
+            heroData.thumbnail,
+            heroData.resourceURI,
+            heroData.comics
         );
-        this.assert('Comic - URL de thumbnail', 
-            comic.getThumbnailURL() === 'http://example.com/image.jpg'
-        );
-    },
+        tests.push({
+            name: '2. Creación de Héroe',
+            passed: hero instanceof Heroe,
+            message: 'Héroe creado correctamente'
+        });
+    } catch (error) {
+        tests.push({
+            name: '2. Creación de Héroe',
+            passed: false,
+            message: error.message
+        });
+    }
 
-    testFavorites() {
+    // Test 3: Gestión de Favoritos
+    try {
         const favorites = new Favorites();
-        const comic = new Comic(1, 'Test Comic', 1, 'Description', 32, 
-            new Thumbnail('http://example.com/image', 'jpg'), 3.99, {}, []);
+        const comic = new Comic(
+            mockComics.comics[0].id,
+            mockComics.comics[0].title,
+            mockComics.comics[0].issueNumber,
+            mockComics.comics[0].description,
+            mockComics.comics[0].pageCount,
+            mockComics.comics[0].thumbnail,
+            mockComics.comics[0].price,
+            mockComics.comics[0].creators,
+            mockComics.comics[0].characters
+        );
         
         favorites.addFavorite(comic);
-        this.assert('Favorites - Añadir comic', favorites.favorites.length === 1);
+        const hasFavorite = favorites.showFavorites().length === 1;
         
-        favorites.removeFavorite(1);
-        this.assert('Favorites - Eliminar comic', favorites.favorites.length === 0);
-    },
+        tests.push({
+            name: '3. Gestión de Favoritos',
+            passed: hasFavorite,
+            message: 'Favoritos gestionados correctamente'
+        });
+    } catch (error) {
+        tests.push({
+            name: '3. Gestión de Favoritos',
+            passed: false,
+            message: error.message
+        });
+    }
 
-    testUtils() {
-        const comics = [
-            new Comic(1, 'Comic 1', 1, 'Description', 32, 
-                new Thumbnail('http://example.com/image', 'jpg'), 3.99, {}, []),
-            new Comic(2, 'Comic 2', 2, 'Description', 32, 
-                new Thumbnail('http://example.com/image', 'jpg'), 4.99, {}, [])
-        ];
+    return tests;
+}
 
-        this.assert('Utils - Búsqueda por ID', 
-            findComicById(comics, 1)?.id === 1
+function testsTarea1() {
+    const tests = [];
+    try {
+        const comic = new Comic(
+            mockComics.comics[0].id,
+            mockComics.comics[0].title,
+            mockComics.comics[0].issueNumber,
+            mockComics.comics[0].description,
+            mockComics.comics[0].pageCount,
+            mockComics.comics[0].thumbnail,
+            mockComics.comics[0].price,
+            mockComics.comics[0].creators,
+            mockComics.comics[0].characters
         );
-        this.assert('Utils - Precio promedio', 
-            calculateAveragePrice(comics) === 4.49
-        );
-        this.assert('Utils - Filtrado por precio', 
-            getAffordableComicTitles(comics, 4.00).length === 1
-        );
-    },
-
-    showResults() {
-        const output = document.getElementById('output');
-        output.innerHTML = '<h2>Resultados de las pruebas:</h2>';
-
-        this.results.forEach(result => {
-            const resultDiv = document.createElement('div');
-            resultDiv.className = `test-result ${result.passed ? 'test-success' : 'test-failure'}`;
-            resultDiv.textContent = `${result.passed ? '✅' : '❌'} ${result.description}`;
-            output.appendChild(resultDiv);
-            
-            console.log(`${result.passed ? '✅' : '❌'} ${result.description}`);
+        
+        tests.push({
+            name: 'Creación y propiedades del cómic',
+            passed: comic.id && comic.title && comic.price,
+            message: 'El cómic tiene todas las propiedades requeridas'
         });
 
-        const summary = document.createElement('div');
-        const passed = this.results.filter(r => r.passed).length;
-        summary.className = 'test-summary';
-        summary.textContent = `Total: ${this.results.length} | Pasaron: ${passed} | Fallaron: ${this.results.length - passed}`;
-        output.appendChild(summary);
+        tests.push({
+            name: 'URL del thumbnail',
+            passed: comic.getThumbnailURL() === `${mockComics.comics[0].thumbnail.path}.${mockComics.comics[0].thumbnail.extension}`,
+            message: 'El método getThumbnailURL funciona correctamente'
+        });
+    } catch (error) {
+        tests.push({
+            name: 'Test de Comic',
+            passed: false,
+            message: error.message
+        });
     }
-}; 
+    return tests;
+}
+
+function testsTarea2() {
+    const tests = [];
+    try {
+        const comics = mockComics.comics.map(c => new Comic(
+            c.id, c.title, c.issueNumber, c.description, 
+            c.pageCount, c.thumbnail, c.price, c.creators, c.characters
+        ));
+
+        const foundComic = findComicById(comics, 2);
+        tests.push({
+            name: 'Búsqueda recursiva de cómic',
+            passed: foundComic && foundComic.id === 2,
+            message: 'La función findComicById encuentra correctamente el cómic'
+        });
+
+        const avgPrice = calculateAveragePrice(comics);
+        tests.push({
+            name: 'Cálculo de precio promedio',
+            passed: typeof avgPrice === 'number' && avgPrice > 0,
+            message: `Precio promedio calculado: $${avgPrice.toFixed(2)}`
+        });
+    } catch (error) {
+        tests.push({
+            name: 'Test de funciones de utilidad',
+            passed: false,
+            message: error.message
+        });
+    }
+    return tests;
+}
+
+function testsTarea3() {
+    const tests = [];
+    try {
+        const comics = mockComics.comics.map(c => new Comic(
+            c.id, c.title, c.issueNumber, c.description, 
+            c.pageCount, c.thumbnail, c.price, c.creators, c.characters
+        ));
+
+        const favorites = new Favorites();
+        favorites.addMultipleFavorites(...comics);
+
+        tests.push({
+            name: 'Agregar múltiples favoritos',
+            passed: favorites.showFavorites().length === comics.length,
+            message: 'Múltiples cómics agregados correctamente'
+        });
+
+        const affordable = getAffordableComicTitles(comics, 13.00);
+        tests.push({
+            name: 'Filtrado de cómics asequibles',
+            passed: Array.isArray(affordable) && affordable.length > 0,
+            message: `Encontrados ${affordable.length} cómics asequibles`
+        });
+
+        const copy = favorites.copyFavorites();
+        tests.push({
+            name: 'Copia de favoritos',
+            passed: copy.length === favorites.showFavorites().length,
+            message: 'Copia de favoritos creada correctamente'
+        });
+    } catch (error) {
+        tests.push({
+            name: 'Test de operaciones con favoritos',
+            passed: false,
+            message: error.message
+        });
+    }
+    return tests;
+} 

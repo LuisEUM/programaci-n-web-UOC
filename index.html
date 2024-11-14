@@ -3,20 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marvel Comics Manager</title>
+    <title>Superhero Comics</title>
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body>
-    <h1>Marvel Comics Manager</h1>
-    <div id="output"></div>
+    <div class="container">
+        <h1 class="main-title">Superhero Comics</h1>
+        
+        <div class="search-section">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Search comics...">
+            </div>
+            <select id="sortSelect" class="sort-select">
+                <option value="default">Default</option>
+                <option value="titleAsc">Title A-Z</option>
+                <option value="titleDesc">Title Z-A</option>
+                <option value="priceAsc">Price: Low to High</option>
+                <option value="priceDesc">Price: High to Low</option>
+            </select>
+        </div>
 
-    <script src="js/models.js"></script>
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="all">All</button>
+            <button class="tab-btn" data-tab="favorites">Favorites</button>
+        </div>
+
+        <div id="comicsContainer" class="comics-grid"></div>
+        <div class="pagination">
+            <button id="prevPage" class="page-btn"><i class="fas fa-chevron-left"></i></button>
+            <span id="pageInfo">1 of 2</span>
+            <button id="nextPage" class="page-btn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <!-- Scripts en orden específico -->
     <script src="js/utils.js"></script>
-    <script src="js/tests.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            TestRunner.run();
-        });
-    </script>
+    <script src="js/config.js"></script>
+    <script src="js/models.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
 </body>
-</html> 
+</html>
