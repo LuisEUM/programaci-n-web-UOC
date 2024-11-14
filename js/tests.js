@@ -61,37 +61,31 @@ class Tests {
         console.group('Favorites Tests');
         try {
             const favorites = new Favorites();
-            
+            const comic1 = new Comic(1, "Test Comic 1", 1, "Description", 32, 
+                { path: "test", extension: "jpg" }, 9.99, [], []);
+            const comic2 = new Comic(2, "Test Comic 2", 2, "Description", 32, 
+                { path: "test", extension: "jpg" }, 19.99, [], []);
+
             // Test addFavorite
-            favorites.addFavorite('mock', 'general', 1);
-            console.assert(favorites.isFavorite('mock', 'general', 1), 'Add favorite test failed');
+            favorites.addFavorite(comic1);
+            console.assert(favorites.findComicById(1) === comic1, 'Add favorite failed');
 
-            // Test addMultipleFavorites
-            favorites.addMultipleFavorites('mock', 'general', 2, 3, 4);
-            console.assert(favorites.isFavorite('mock', 'general', 2), 'Add multiple favorites test failed');
+            // Test addMultipleFavorites (rest operator)
+            favorites.addMultipleFavorites(comic1, comic2);
+            console.assert(favorites.showFavorites().length === 2, 'Add multiple failed');
 
-            // Test copyFavorites
-            const newCollectionName = favorites.copyFavorites('mock', 'general');
-            console.assert(favorites.favorites.mock[newCollectionName], 'Copy favorites test failed');
+            // Test copyFavorites (spread operator)
+            const copy = favorites.copyFavorites();
+            console.assert(copy.length === 2, 'Copy favorites failed');
 
-            // Test calculateAveragePrice
-            const comics = [
-                { price: 10 },
-                { price: 20 },
-                { price: 30 }
-            ];
-            console.assert(favorites.calculateAveragePrice(comics) === 20, 'Calculate average price test failed');
+            // Test calculateAveragePrice (reduce)
+            console.assert(favorites.calculateAveragePrice() === 14.99, 'Average price failed');
 
-            // Test getAffordableComicTitles
-            const testComics = [
-                { title: "Comic 1", price: 5 },
-                { title: "Comic 2", price: 15 },
-                { title: "Comic 3", price: 25 }
-            ];
-            const affordable = favorites.getAffordableComicTitles(testComics, 20);
-            console.assert(affordable.length === 2, 'Get affordable comics test failed');
+            // Test getAffordableComicTitles (map & filter)
+            const affordable = favorites.getAffordableComicTitles(15);
+            console.assert(affordable.length === 1, 'Affordable titles failed');
 
-            console.log('✅ Favorites tests passed');
+            console.log('✅ All Favorites tests passed');
         } catch (error) {
             console.error('❌ Favorites tests failed:', error);
         }

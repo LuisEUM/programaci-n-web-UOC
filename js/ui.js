@@ -296,8 +296,9 @@ const UI = {
         if (this.heroesPagination) {
             await this.heroesPagination.updateHeroesView(
                 response.results,
-                this.heroesOffset || 0,
-                this.heroesPagination.itemsPerPage
+                response.total,
+                response.offset,
+                response.limit
             );
         }
     } catch (error) {

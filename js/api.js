@@ -110,7 +110,20 @@ const MarvelAPI = {
     async getHeroes(params = {}) {
         if (Config.USE_MOCK_DATA) {
             return new Promise((resolve) => {
-                resolve(mockComics.heroes.map(hero => Hero.fromAPI(hero)));
+                const allHeroes = mockComics.heroes;
+                const start = params.offset || 0;
+                const limit = params.limit || Config.LIMIT;
+                const paginatedHeroes = allHeroes.slice(start, start + limit);
+                
+                resolve({
+                    data: {
+                        results: paginatedHeroes,
+                        total: allHeroes.length,
+                        limit: limit,
+                        offset: start,
+                        count: paginatedHeroes.length
+                    }
+                });
             });
         }
 
@@ -131,7 +144,24 @@ const MarvelAPI = {
                 throw new Error('Network response was not ok');
             }
             const data = await response.json();
-            return data.data.results.map(hero => Hero.fromAPI(hero));
+
+            return {
+                data: {
+                    results: data.data.results.map(hero => ({
+                        id: hero.id,
+                        name: hero.name,
+                        description: hero.description || "No description available",
+                        modified: hero.modified,
+                        thumbnail: hero.thumbnail,
+                        resourceURI: hero.resourceURI,
+                        comics: hero.comics?.items?.map(comic => comic.name) || []
+                    })),
+                    total: data.data.total,
+                    limit: data.data.limit,
+                    offset: data.data.offset,
+                    count: data.data.count
+                }
+            };
         } catch (error) {
             console.error('Error fetching heroes:', error);
             throw error;

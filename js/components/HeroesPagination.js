@@ -6,8 +6,7 @@ class HeroesPagination extends Pagination {
         });
     }
 
-    // Método específico para actualizar la vista de héroes
-    async updateHeroesView(heroes, offset, limit) {
+    async updateHeroesView(heroes, total, offset, limit) {
         const container = document.getElementById("heroesContainer");
         container.innerHTML = "";
 
@@ -16,10 +15,7 @@ class HeroesPagination extends Pagination {
             return;
         }
 
-        // Mostrar solo los héroes de la página actual
-        const paginatedHeroes = heroes.slice(offset, offset + limit);
-
-        paginatedHeroes.forEach(hero => {
+        heroes.forEach(hero => {
             const cardElement = Card.createBasicCard(
                 hero,
                 {
@@ -31,7 +27,8 @@ class HeroesPagination extends Pagination {
             container.appendChild(cardElement);
         });
 
-        // Actualizar la paginación
-        this.update(heroes.length);
+        // Actualizar la paginación con el total real
+        this.update(total);
+        this.currentPage = Math.floor(offset / limit) + 1;
     }
 } 

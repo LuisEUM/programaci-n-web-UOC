@@ -35,19 +35,24 @@ class DataService {
                         
                         // Aplicar paginación a los datos mock
                         const start = (params.offset || 0);
-                        const end = start + (params.limit || Config.LIMIT);
-                        const paginatedHeroes = allHeroes.slice(start, end);
+                        const limit = (params.limit || Config.LIMIT);
+                        const paginatedHeroes = allHeroes.slice(start, start + limit);
                         
                         return {
                             results: paginatedHeroes,
-                            total: allHeroes.length
+                            total: allHeroes.length,
+                            limit: limit,
+                            offset: start,
+                            count: paginatedHeroes.length
                         };
                     } else {
-                        const heroes = await MarvelAPI.getHeroes(params);
-                        console.log('API Response for Heroes:', heroes);
+                        const response = await MarvelAPI.getHeroes(params);
                         return {
-                            results: heroes, // Los héroes ya vienen transformados desde MarvelAPI
-                            total: heroes.length
+                            results: response.data.results,
+                            total: response.data.total,
+                            limit: response.data.limit,
+                            offset: response.data.offset,
+                            count: response.data.count
                         };
                     }
                 default:
