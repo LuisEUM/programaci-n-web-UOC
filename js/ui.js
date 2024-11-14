@@ -71,10 +71,34 @@ const UI = {
   },
 
   bindEvents() {
-    // Asegurarnos de que los elementos existen antes de agregar los event listeners
+    // Búsqueda por nombre
     const searchInput = document.getElementById("searchInput");
+    const searchByNameBtn = document.getElementById("searchByNameBtn");
+    
     if (searchInput) {
-        searchInput.addEventListener("keydown", (e) => this.handleSearch(e));
+        searchInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                this.handleSearchByName();
+            }
+        });
+    }
+    if (searchByNameBtn) {
+        searchByNameBtn.addEventListener("click", () => this.handleSearchByName());
+    }
+
+    // Búsqueda por ID
+    const searchById = document.getElementById("searchById");
+    const searchByIdBtn = document.getElementById("searchByIdBtn");
+    
+    if (searchById) {
+        searchById.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                this.handleSearchById();
+            }
+        });
+    }
+    if (searchByIdBtn) {
+        searchByIdBtn.addEventListener("click", () => this.handleSearchById());
     }
 
     // Tabs principales
@@ -224,18 +248,18 @@ const UI = {
 
   async loadComics() {
     try {
-      const response = await DataService.fetchItems("comics", {
-        offset: this.offset,
-        titleStartsWith: this.currentSearchTerm,
-        limit: this.comicsPagination.itemsPerPage
-      });
+        const response = await DataService.fetchItems("comics", {
+            offset: this.offset,
+            titleStartsWith: this.currentSearchTerm,
+            limit: this.comicsPagination.itemsPerPage
+        });
 
-      this.currentComics = response.results;
-      this.comicsPagination.update(response.total);
-      this.renderItems("comics", response.results);
+        this.currentComics = response.results;
+        this.comicsPagination.update(response.total);
+        this.renderItems("comics", response.results);
     } catch (error) {
-      console.error("Error loading comics:", error);
-      this.showError("Error al cargar los cómics");
+        console.error("Error loading comics:", error);
+        this.showError("Error al cargar los cómics");
     }
   },
 
@@ -539,6 +563,70 @@ const UI = {
     });
 
     container.appendChild(table);
+  },
+
+  handleSearchByName() {
+    const searchTerm = document.getElementById("searchInput").value.trim();
+    this.currentSearchTerm = searchTerm;
+    this.offset = 0;
+    this.currentPage = 1;
+    this.loadComics();
+  },
+
+  handleSearchById() {
+    const searchId = document.getElementById("searchById").value.trim();
+    
+    if (!searchId) {
+        // Si el campo está vacío, mostrar todos los cómics
+        this.currentSearchTerm = '';
+        this.offset = 0;
+        this.currentPage = 1;
+        this.loadComics();
+        return;
+    }
+
+    // Filtrar cómics que contengan el número en su ID
+    const filteredComics = this.currentComics.filter(comic => {
+        const comicId = comic.id.toString();
+        return comicId.includes(searchId);
+    });
+
+    // En búsqueda con Enter o botón, si hay una coincidencia exacta, mostrar solo ese cómic
+    const exactMatch = this.currentComics.find(comic => comic.id === parseInt(searchId));
+    if (exactMatch) {
+        this.renderItems("comics", [exactMatch]);
+    } else {
+        // Si no hay coincidencia exacta, mostrar todas las coincidencias parciales
+        this.renderItems("comics", filteredComics);
+    }
+
+    if (filteredComics.length === 0) {
+        this.showMessage("No se encontraron cómics con ese ID");
+    }
+  },
+
+  findComicById(comicId, comics = this.currentComics) {
+    // Implementación recursiva de búsqueda por ID
+    if (comics.length === 0) {
+        this.showMessage("No se encontró ningún cómic con ese ID");
+        return null;
+    }
+    
+    if (comics[0].id === comicId) {
+        this.renderItems("comics", [comics[0]]); // Mostrar solo el cómic encontrado
+        return comics[0];
+    }
+    
+    return this.findComicById(comicId, comics.slice(1));
+  },
+
+  showMessage(message) {
+    const container = document.getElementById("comicsContainer");
+    container.innerHTML = `
+        <div class="message">
+            ${message}
+        </div>
+    `;
   },
 };
 

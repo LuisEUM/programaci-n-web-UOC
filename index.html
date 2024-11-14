@@ -36,8 +36,18 @@
     <div id="comicsTab" class="tab-content active">
       <div class="search-section">
         <div class="search-container">
+          <input type="text" id="searchInput" placeholder="Buscar por nombre...">
           <i class="fas fa-search search-icon"></i>
-          <input type="text" id="searchInput" placeholder="Search comics...">
+          <button class="search-btn" id="searchByNameBtn">
+            Buscar
+          </button>
+        </div>
+        <div class="search-container">
+          <input type="number" id="searchById" placeholder="Buscar por ID...">
+          <i class="fas fa-hashtag search-icon"></i>
+          <button class="search-btn" id="searchByIdBtn">
+            Buscar
+          </button>
         </div>
       </div>
       <div id="comicsContainer" class="comics-grid">

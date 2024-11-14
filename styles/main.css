@@ -50,28 +50,29 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: calc(var(--spacing) * 2);
   gap: var(--spacing);
-  flex-wrap: wrap;
+  margin-bottom: calc(var(--spacing) * 2);
 }
 
 .search-container {
   flex: 1;
-  min-width: 100%;
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* Search Input */
 .search-icon {
   position: absolute;
   left: 16px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-secondary);
+  z-index: 1;
 }
 
-#searchInput {
-  width: 100%;
+#searchInput, #searchById {
+  flex: 1;
   padding: 16px 16px 16px 48px;
   border: 2px solid transparent;
   border-radius: var(--border-radius);
@@ -82,7 +83,7 @@ body {
   color: white;
 }
 
-#searchInput:focus {
+#searchInput:focus, #searchById:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 4px 12px rgba(237, 29, 36, 0.1);
@@ -761,5 +762,31 @@ body {
 }
 
 .heroes-pagination .page-btn:hover:not(:disabled) {
+    background-color: var(--hover-red);
+}
+
+.message {
+    text-align: center;
+    padding: 20px;
+    background-color: var(--card-background);
+    border-radius: var(--border-radius);
+    color: var(--text-color);
+    margin: 20px 0;
+}
+
+.search-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 1rem;
+    font-weight: 500;
+    min-width: 80px;
+}
+
+.search-btn:hover {
     background-color: var(--hover-red);
 }
