@@ -47,9 +47,8 @@ body {
 
 /* Layout Components */
 .search-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
   gap: var(--spacing);
   margin-bottom: calc(var(--spacing) * 2);
 }
@@ -789,4 +788,101 @@ body {
 
 .search-btn:hover {
     background-color: var(--hover-red);
+}
+
+.collection-stats {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.collection-stat {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: var(--text-color);
+}
+
+.collection-stat span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.collection-stat .stat-icon {
+    color: var(--primary-color);
+    margin-right: 5px;
+}
+
+.collection-stat .stat-value {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+/* Contenedor del filtro de precio */
+.price-filter-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    min-width: 200px;
+}
+
+/* Input de precio */
+#maxPriceFilter {
+    width: 100%;
+    padding: 16px 16px 16px 48px;
+    border: 2px solid transparent;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    background-color: var(--card-background);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    color: white;
+}
+
+#maxPriceFilter:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(237, 29, 36, 0.1);
+}
+
+/* Icono del dólar */
+.price-filter-container .search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    z-index: 1;
+}
+
+/* Botón de filtrar */
+.price-filter-container .search-btn {
+    white-space: nowrap;
+}
+
+/* Ajuste del contenedor de búsqueda para acomodar los tres elementos */
+.search-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: var(--spacing);
+    margin-bottom: calc(var(--spacing) * 2);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .search-section {
+        grid-template-columns: 1fr;
+    }
+
+    .price-filter-container {
+        min-width: 100%;
+    }
 }

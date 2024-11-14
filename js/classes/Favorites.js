@@ -7,6 +7,7 @@ class Favorites {
     // Campos privados
     #favorites;
     #favoriteComics;
+    #collectionStats;
 
     // Propiedades estáticas
     static DEFAULT_COLLECTIONS = ["wishlist", "toread", "reading", "read", "favorites"];
@@ -27,6 +28,23 @@ class Favorites {
             api: {}
         };
         
+        // Inicializar estadísticas de colecciones
+        this.#collectionStats = {
+            mock: {},
+            api: {}
+        };
+
+        // Inicializar estadísticas para cada colección
+        ['mock', 'api'].forEach(dataSource => {
+            Favorites.DEFAULT_COLLECTIONS.forEach(collection => {
+                this.#collectionStats[dataSource][collection] = {
+                    total: 0,
+                    totalPrice: 0,
+                    averagePrice: 0
+                };
+            });
+        });
+        
         // Inicializar las colecciones por defecto
         this.#initializeDefaultCollections();
         
@@ -35,6 +53,7 @@ class Favorites {
         if (savedFavorites) {
             this.#favorites = savedFavorites;
         }
+        this.#updateAllCollectionStats();
     }
 
     #initializeDefaultCollections() {
@@ -61,22 +80,24 @@ class Favorites {
     }
 
     // Métodos públicos
-    addFavorite(dataSource, collection, comicId) {
+    async addFavorite(dataSource, collection, comicId) {
         this.#validateDataSource(dataSource);
         this.#validateCollection(collection);
 
         if (!this.#favorites[dataSource][collection].includes(comicId)) {
             this.#favorites[dataSource][collection].push(comicId);
+            await this.#updateCollectionStats(dataSource, collection);
             this.saveFavorites();
         }
     }
 
-    removeFavorite(dataSource, collection, comicId) {
+    async removeFavorite(dataSource, collection, comicId) {
         this.#validateDataSource(dataSource);
         this.#validateCollection(collection);
 
         this.#favorites[dataSource][collection] = 
             this.#favorites[dataSource][collection].filter(id => id !== comicId);
+        await this.#updateCollectionStats(dataSource, collection);
         this.saveFavorites();
     }
 
@@ -166,5 +187,76 @@ class Favorites {
         return this.#favoriteComics
             .filter(comic => comic.price <= maxPrice)
             .map(comic => comic.title);
+    }
+
+    async calculateCollectionAveragePrice(dataSource, collection) {
+        try {
+            const comicIds = this.#favorites[dataSource][collection];
+            if (!comicIds || comicIds.length === 0) return 0;
+
+            let totalPrice = 0;
+            let validComics = 0;
+
+            // Obtener los objetos Comic completos
+            for (const comicId of comicIds) {
+                const comic = await DataService.fetchItemById('comics', comicId);
+                if (comic && typeof comic.price === 'number') {
+                    totalPrice += comic.price;
+                    validComics++;
+                }
+            }
+
+            return validComics > 0 ? totalPrice / validComics : 0;
+        } catch (error) {
+            console.error('Error calculating average price:', error);
+            return 0;
+        }
+    }
+
+    // Método para obtener estadísticas de una colección
+    getCollectionStats(dataSource, collection) {
+        this.#validateDataSource(dataSource);
+        this.#validateCollection(collection);
+        return this.#collectionStats[dataSource][collection];
+    }
+
+    // Método para obtener todas las estadísticas
+    getAllCollectionStats(dataSource) {
+        this.#validateDataSource(dataSource);
+        return this.#collectionStats[dataSource];
+    }
+
+    // Método para actualizar las estadísticas de una colección específica
+    async #updateCollectionStats(dataSource, collection) {
+        const comicIds = this.#favorites[dataSource][collection];
+        let totalPrice = 0;
+        let validComics = 0;
+
+        for (const comicId of comicIds) {
+            try {
+                const comic = await DataService.fetchItemById('comics', comicId);
+                if (comic && typeof comic.price === 'number') {
+                    totalPrice += comic.price;
+                    validComics++;
+                }
+            } catch (error) {
+                console.error(`Error loading comic ${comicId}:`, error);
+            }
+        }
+
+        this.#collectionStats[dataSource][collection] = {
+            total: comicIds.length,
+            totalPrice: totalPrice,
+            averagePrice: validComics > 0 ? totalPrice / validComics : 0
+        };
+    }
+
+    // Actualizar todas las colecciones
+    async #updateAllCollectionStats() {
+        for (const dataSource of ['mock', 'api']) {
+            for (const collection of Favorites.DEFAULT_COLLECTIONS) {
+                await this.#updateCollectionStats(dataSource, collection);
+            }
+        }
     }
 }

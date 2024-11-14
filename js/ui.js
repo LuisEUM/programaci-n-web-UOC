@@ -19,40 +19,46 @@ const UI = {
     this.collectionModal = new CollectionModal();
 
     // Inicializar los tabs principales
-    const tabsContainer = document.querySelector('.tabs-container');
-    this.mainTabs = new MainTabs(tabsContainer, (tabName) => this.handleTabChange(tabName));
+    const tabsContainer = document.querySelector(".tabs-container");
+    this.mainTabs = new MainTabs(tabsContainer, (tabName) =>
+      this.handleTabChange(tabName)
+    );
 
     // Inicializar paginación para cómics
-    const comicsPaginationContainer = document.querySelector('#comicsTab .pagination');
+    const comicsPaginationContainer = document.querySelector(
+      "#comicsTab .pagination"
+    );
     this.comicsPagination = new Pagination(comicsPaginationContainer, {
-        itemsPerPage: Config.LIMIT,
-        onPageChange: async (page) => {
-            this.currentPage = page;
-            this.offset = (page - 1) * this.comicsPagination.itemsPerPage;
-            await this.loadComics();
-        },
-        onItemsPerPageChange: async (itemsPerPage) => {
-            Config.LIMIT = itemsPerPage;
-            this.offset = 0;
-            this.currentPage = 1;
-            await this.loadComics();
-        }
+      itemsPerPage: Config.LIMIT,
+      onPageChange: async (page) => {
+        this.currentPage = page;
+        this.offset = (page - 1) * this.comicsPagination.itemsPerPage;
+        await this.loadComics();
+      },
+      onItemsPerPageChange: async (itemsPerPage) => {
+        Config.LIMIT = itemsPerPage;
+        this.offset = 0;
+        this.currentPage = 1;
+        await this.loadComics();
+      },
     });
 
     // Inicializar paginación para héroes
-    const heroesPaginationContainer = document.querySelector('#heroesTab .heroes-pagination');
+    const heroesPaginationContainer = document.querySelector(
+      "#heroesTab .heroes-pagination"
+    );
     if (heroesPaginationContainer) {
-        this.heroesPagination = new HeroesPagination(heroesPaginationContainer, {
-            itemsPerPage: Config.LIMIT,
-            onPageChange: (page) => {
-                this.heroesOffset = (page - 1) * this.heroesPagination.itemsPerPage;
-                this.loadHeroes();
-            },
-            onItemsPerPageChange: (itemsPerPage) => {
-                this.heroesOffset = 0;
-                this.loadHeroes();
-            }
-        });
+      this.heroesPagination = new HeroesPagination(heroesPaginationContainer, {
+        itemsPerPage: Config.LIMIT,
+        onPageChange: (page) => {
+          this.heroesOffset = (page - 1) * this.heroesPagination.itemsPerPage;
+          this.loadHeroes();
+        },
+        onItemsPerPageChange: (itemsPerPage) => {
+          this.heroesOffset = 0;
+          this.loadHeroes();
+        },
+      });
     }
 
     // Cargar los cómics iniciales después de inicializar la paginación
@@ -74,66 +80,97 @@ const UI = {
     // Búsqueda por nombre
     const searchInput = document.getElementById("searchInput");
     const searchByNameBtn = document.getElementById("searchByNameBtn");
-    
+
     if (searchInput) {
-        searchInput.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                this.handleSearchByName();
-            }
-        });
+      searchInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          this.handleSearchByName();
+        }
+      });
     }
     if (searchByNameBtn) {
-        searchByNameBtn.addEventListener("click", () => this.handleSearchByName());
+      searchByNameBtn.addEventListener("click", () =>
+        this.handleSearchByName()
+      );
     }
 
     // Búsqueda por ID
     const searchById = document.getElementById("searchById");
     const searchByIdBtn = document.getElementById("searchByIdBtn");
-    
+
     if (searchById) {
-        searchById.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                this.handleSearchById();
-            }
-        });
+      searchById.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          this.handleSearchById();
+        }
+      });
     }
     if (searchByIdBtn) {
-        searchByIdBtn.addEventListener("click", () => this.handleSearchById());
+      searchByIdBtn.addEventListener("click", () => this.handleSearchById());
     }
 
     // Tabs principales
-    const mainTabsContainer = document.querySelector('.tabs-container');
+    const mainTabsContainer = document.querySelector(".tabs-container");
     if (mainTabsContainer) {
-        this.mainTabs = new MainTabs(mainTabsContainer, (tabName) => this.handleTabChange(tabName));
+      this.mainTabs = new MainTabs(mainTabsContainer, (tabName) =>
+        this.handleTabChange(tabName)
+      );
     }
 
     // Paginación
     const prevPageBtn = document.getElementById("prevPage");
     const nextPageBtn = document.getElementById("nextPage");
     if (prevPageBtn) {
-        prevPageBtn.addEventListener("click", () => this.handlePrevPage());
+      prevPageBtn.addEventListener("click", () => this.handlePrevPage());
     }
     if (nextPageBtn) {
-        nextPageBtn.addEventListener("click", () => this.handleNextPage());
+      nextPageBtn.addEventListener("click", () => this.handleNextPage());
     }
 
     // Botón de toggle de datos
     const toggleDataBtn = document.getElementById("toggleDataBtn");
     if (toggleDataBtn) {
-        toggleDataBtn.addEventListener("click", () => this.toggleDataSource());
+      toggleDataBtn.addEventListener("click", () => this.toggleDataSource());
     }
 
     // Botón de guardar favoritos
     const saveFavoritesBtn = document.querySelector(".save-favorites-btn");
     if (saveFavoritesBtn) {
-        saveFavoritesBtn.addEventListener("click", () => this.saveFavorites());
+      saveFavoritesBtn.addEventListener("click", () => this.saveFavorites());
     }
 
     // Botón de remover favoritos
     const removeFavoritesBtn = document.querySelector(".remove-favorites-btn");
     if (removeFavoritesBtn) {
-        removeFavoritesBtn.addEventListener("click", () => this.removeFavorites());
+      removeFavoritesBtn.addEventListener("click", () =>
+        this.removeFavorites()
+      );
     }
+
+    // Agregar filtro por precio
+    const priceFilterContainer = document.createElement("div");
+    priceFilterContainer.className = "price-filter-container";
+    priceFilterContainer.innerHTML = `
+        <i class="fas fa-dollar-sign search-icon"></i>
+        <input type="number" 
+               id="maxPriceFilter" 
+               placeholder="Precio máximo..." 
+               step="0.01" 
+               min="0">
+        <button class="search-btn" id="filterByPriceBtn">
+            Filtrar
+        </button>
+    `;
+    document.querySelector(".search-section").appendChild(priceFilterContainer);
+
+    document
+      .getElementById("filterByPriceBtn")
+      .addEventListener("click", () => this.handlePriceFilter());
+    document
+      .getElementById("maxPriceFilter")
+      .addEventListener("keydown", (e) => {
+        if (e.key === "Enter") this.handlePriceFilter();
+      });
   },
 
   handleSearch(e) {
@@ -148,39 +185,39 @@ const UI = {
 
   handleTabChange(tabName) {
     // Ocultar todos los contenedores de tabs
-    document.querySelectorAll('.tab-content').forEach(container => {
-        container.style.display = 'none';
+    document.querySelectorAll(".tab-content").forEach((container) => {
+      container.style.display = "none";
     });
 
     // Mostrar el contenedor correspondiente
     const tabContainer = document.getElementById(`${tabName}Tab`);
     if (tabContainer) {
-        tabContainer.style.display = 'block';
+      tabContainer.style.display = "block";
     }
 
     // Mostrar/ocultar la sección de búsqueda según el tab
-    const searchSection = document.querySelector('.search-section');
+    const searchSection = document.querySelector(".search-section");
     if (searchSection) {
-        searchSection.style.display = tabName === 'comics' ? 'flex' : 'none';
+      searchSection.style.display = tabName === "comics" ? "flex" : "none";
     }
 
     // Mostrar/ocultar la paginación según el tab
-    const pagination = document.querySelector('.pagination');
+    const pagination = document.querySelector(".pagination");
     if (pagination) {
-        pagination.style.display = tabName === 'comics' ? 'flex' : 'none';
+      pagination.style.display = tabName === "comics" ? "flex" : "none";
     }
 
     // Manejar la lógica específica de cada tab
-    switch(tabName) {
-        case 'comics':
-            this.loadComics();
-            break;
-        case 'heroes':
-            this.loadHeroes();
-            break;
-        case 'favorites':
-            this.loadFavorites();
-            break;
+    switch (tabName) {
+      case "comics":
+        this.loadComics();
+        break;
+      case "heroes":
+        this.loadHeroes();
+        break;
+      case "favorites":
+        this.loadFavorites();
+        break;
     }
   },
 
@@ -215,22 +252,22 @@ const UI = {
 
   async loadInitialComics() {
     try {
-        const response = await DataService.fetchItems("comics", {
-            offset: this.offset,
-            limit: Config.LIMIT
-        });
+      const response = await DataService.fetchItems("comics", {
+        offset: this.offset,
+        limit: Config.LIMIT,
+      });
 
-        this.currentComics = response.results;
-        
-        // Inicializar la paginación con los datos correctos
-        if (this.comicsPagination) {
-            this.comicsPagination.update(response.total);
-        }
-        
-        this.renderItems("comics", response.results);
+      this.currentComics = response.results;
+
+      // Inicializar la paginación con los datos correctos
+      if (this.comicsPagination) {
+        this.comicsPagination.update(response.total);
+      }
+
+      this.renderItems("comics", response.results);
     } catch (error) {
-        console.error("Error loading initial comics:", error);
-        this.showError("Error al cargar los cómics iniciales");
+      console.error("Error loading initial comics:", error);
+      this.showError("Error al cargar los cómics iniciales");
     }
   },
 
@@ -248,18 +285,18 @@ const UI = {
 
   async loadComics() {
     try {
-        const response = await DataService.fetchItems("comics", {
-            offset: this.offset,
-            titleStartsWith: this.currentSearchTerm,
-            limit: this.comicsPagination.itemsPerPage
-        });
+      const response = await DataService.fetchItems("comics", {
+        offset: this.offset,
+        titleStartsWith: this.currentSearchTerm,
+        limit: this.comicsPagination.itemsPerPage,
+      });
 
-        this.currentComics = response.results;
-        this.comicsPagination.update(response.total);
-        this.renderItems("comics", response.results);
+      this.currentComics = response.results;
+      this.comicsPagination.update(response.total);
+      this.renderItems("comics", response.results);
     } catch (error) {
-        console.error("Error loading comics:", error);
-        this.showError("Error al cargar los cómics");
+      console.error("Error loading comics:", error);
+      this.showError("Error al cargar los cómics");
     }
   },
 
@@ -288,22 +325,22 @@ const UI = {
 
   async loadHeroes() {
     try {
-        const response = await DataService.fetchItems("heroes", {
-            offset: this.heroesOffset || 0,
-            limit: this.heroesPagination?.itemsPerPage || Config.LIMIT
-        });
+      const response = await DataService.fetchItems("heroes", {
+        offset: this.heroesOffset || 0,
+        limit: this.heroesPagination?.itemsPerPage || Config.LIMIT,
+      });
 
-        if (this.heroesPagination) {
-            await this.heroesPagination.updateHeroesView(
-                response.results,
-                response.total,
-                response.offset,
-                response.limit
-            );
-        }
+      if (this.heroesPagination) {
+        await this.heroesPagination.updateHeroesView(
+          response.results,
+          response.total,
+          response.offset,
+          response.limit
+        );
+      }
     } catch (error) {
-        console.error("Error loading heroes:", error);
-        this.showError("Error al cargar héroes");
+      console.error("Error loading heroes:", error);
+      this.showError("Error al cargar héroes");
     }
   },
 
@@ -331,10 +368,25 @@ const UI = {
   updateActionsBar() {
     const actionsBar = document.getElementById("actionsBar");
     const selectedCount = actionsBar.querySelector(".selected-count");
+    const selectedComics = this.getSelectedComics();
 
     if (this.selectedComics.size > 0) {
       actionsBar.classList.add("visible");
       selectedCount.textContent = `${this.selectedComics.size} cómics seleccionados`;
+
+      // Agregar precio promedio de seleccionados
+      const avgPrice = this.calculateAveragePrice(selectedComics);
+      const priceInfo = document.createElement("span");
+      priceInfo.className = "average-price";
+      priceInfo.textContent = `Precio promedio: $${avgPrice.toFixed(2)}`;
+
+      // Reemplazar o agregar la información del precio
+      const existingPriceInfo = actionsBar.querySelector(".average-price");
+      if (existingPriceInfo) {
+        existingPriceInfo.replaceWith(priceInfo);
+      } else {
+        selectedCount.after(priceInfo);
+      }
     } else {
       actionsBar.classList.remove("visible");
       selectedCount.textContent = "0 cómics seleccionados";
@@ -507,35 +559,39 @@ const UI = {
 
   async loadFavorites() {
     try {
-        const container = document.getElementById("favoritesContainer");
-        
-        // Inicializar CollectionsTabs si no existe
-        if (!this.collectionsTabs) {
-            this.collectionsTabs = new CollectionsTabs(container, this.favoritesManager);
-        }
-        
-        // El componente CollectionsTabs se encarga de mostrar el contenido
+      const container = document.getElementById("favoritesContainer");
+
+      if (!this.collectionsTabs) {
+        this.collectionsTabs = new CollectionsTabs(
+          container,
+          this.favoritesManager
+        );
+      }
+
+      // Mostrar estadísticas de las colecciones
+      this.showCollectionsStats();
     } catch (error) {
-        console.error("Error loading favorites:", error);
-        this.showError("Error al cargar las colecciones");
+      console.error("Error loading favorites:", error);
+      this.showError("Error al cargar las colecciones");
     }
   },
 
   loadCollectionContent(collection) {
-    const container = document.getElementById('favoritesContainer');
-    container.innerHTML = '';
+    const container = document.getElementById("favoritesContainer");
+    container.innerHTML = "";
 
-    const dataSource = Config.USE_MOCK_DATA ? 'mock' : 'api';
-    const favorites = this.favoritesManager.getAllFavorites(dataSource)[collection] || [];
+    const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
+    const favorites =
+      this.favoritesManager.getAllFavorites(dataSource)[collection] || [];
 
     if (favorites.length === 0) {
-        container.innerHTML = `<div class="no-results">No hay cómics en esta colección</div>`;
-        return;
+      container.innerHTML = `<div class="no-results">No hay cómics en esta colección</div>`;
+      return;
     }
 
     // Crear una tabla para mostrar los cómics de la colección
-    const table = document.createElement('table');
-    table.className = 'favorites-table';
+    const table = document.createElement("table");
+    table.className = "favorites-table";
     table.innerHTML = `
         <tr>
             <th>ID</th>
@@ -545,22 +601,24 @@ const UI = {
         </tr>
     `;
 
-    favorites.forEach(async comicId => {
-        const comic = await DataService.fetchItemById('comics', comicId);
-        if (comic) {
-            const row = document.createElement('tr');
-            row.innerHTML = `
+    favorites.forEach(async (comicId) => {
+      const comic = await DataService.fetchItemById("comics", comicId);
+      if (comic) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
                 <td>${comic.id}</td>
                 <td>${comic.title}</td>
                 <td>${Utils.truncateText(comic.description, 50)}</td>
                 <td>
-                    <button class="remove-favorite-btn" onclick="UI.removeIndividualFavorite(${comic.id})">
+                    <button class="remove-favorite-btn" onclick="UI.removeIndividualFavorite(${
+                      comic.id
+                    })">
                         Remover
                     </button>
                 </td>
             `;
-            table.appendChild(row);
-        }
+        table.appendChild(row);
+      }
     });
 
     container.appendChild(table);
@@ -576,48 +634,50 @@ const UI = {
 
   handleSearchById() {
     const searchId = document.getElementById("searchById").value.trim();
-    
+
     if (!searchId) {
-        // Si el campo está vacío, mostrar todos los cómics
-        this.currentSearchTerm = '';
-        this.offset = 0;
-        this.currentPage = 1;
-        this.loadComics();
-        return;
+      // Si el campo está vacío, mostrar todos los cómics
+      this.currentSearchTerm = "";
+      this.offset = 0;
+      this.currentPage = 1;
+      this.loadComics();
+      return;
     }
 
     // Filtrar cómics que contengan el número en su ID
-    const filteredComics = this.currentComics.filter(comic => {
-        const comicId = comic.id.toString();
-        return comicId.includes(searchId);
+    const filteredComics = this.currentComics.filter((comic) => {
+      const comicId = comic.id.toString();
+      return comicId.includes(searchId);
     });
 
     // En búsqueda con Enter o botón, si hay una coincidencia exacta, mostrar solo ese cómic
-    const exactMatch = this.currentComics.find(comic => comic.id === parseInt(searchId));
+    const exactMatch = this.currentComics.find(
+      (comic) => comic.id === parseInt(searchId)
+    );
     if (exactMatch) {
-        this.renderItems("comics", [exactMatch]);
+      this.renderItems("comics", [exactMatch]);
     } else {
-        // Si no hay coincidencia exacta, mostrar todas las coincidencias parciales
-        this.renderItems("comics", filteredComics);
+      // Si no hay coincidencia exacta, mostrar todas las coincidencias parciales
+      this.renderItems("comics", filteredComics);
     }
 
     if (filteredComics.length === 0) {
-        this.showMessage("No se encontraron cómics con ese ID");
+      this.showMessage("No se encontraron cómics con ese ID");
     }
   },
 
   findComicById(comicId, comics = this.currentComics) {
     // Implementación recursiva de búsqueda por ID
     if (comics.length === 0) {
-        this.showMessage("No se encontró ningún cómic con ese ID");
-        return null;
+      this.showMessage("No se encontró ningún cómic con ese ID");
+      return null;
     }
-    
+
     if (comics[0].id === comicId) {
-        this.renderItems("comics", [comics[0]]); // Mostrar solo el cómic encontrado
-        return comics[0];
+      this.renderItems("comics", [comics[0]]); // Mostrar solo el cómic encontrado
+      return comics[0];
     }
-    
+
     return this.findComicById(comicId, comics.slice(1));
   },
 
@@ -628,6 +688,41 @@ const UI = {
             ${message}
         </div>
     `;
+  },
+
+  handlePriceFilter() {
+    const maxPrice = parseFloat(
+      document.getElementById("maxPriceFilter").value
+    );
+    if (!isNaN(maxPrice)) {
+      const affordableComics = this.currentComics.filter(
+        (comic) => comic.price <= maxPrice
+      );
+      this.renderItems("comics", affordableComics);
+
+      // Mostrar precio promedio de los cómics filtrados
+      const avgPrice = this.calculateAveragePrice(affordableComics);
+      this.showAveragePriceInfo(
+        `Precio promedio de cómics filtrados: $${avgPrice.toFixed(2)}`
+      );
+    }
+  },
+
+
+  calculateAveragePrice(comics) {
+    if (!comics || comics.length === 0) return 0;
+    const total = comics.reduce((sum, comic) => sum + comic.price, 0);
+    return total / comics.length;
+  },
+
+  showAveragePriceInfo(message) {
+    let priceInfo = document.querySelector(".price-info");
+    if (!priceInfo) {
+      priceInfo = document.createElement("div");
+      priceInfo.className = "price-info";
+      document.querySelector(".search-section").after(priceInfo);
+    }
+    priceInfo.textContent = message;
   },
 };
 
