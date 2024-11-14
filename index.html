@@ -2,71 +2,105 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UOC - Programación Web</title>
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UOC - Programación Web</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="js/classes/Comic.js"></script>
+  <script src="js/classes/Hero.js"></script>
+  <script src="js/classes/Favorites.js"></script>
+  <script src="js/services/DataService.js"></script>
+  <script src="js/components/Tabs.js"></script>
+  <script src="js/components/Card.js"></script>
+  <script src="js/components/CollectionModal.js"></script>
+  <script src="js/components/MainTabs.js"></script>
+  <script src="js/components/CollectionsTabs.js"></script>
+  <script src="js/components/Pagination.js"></script>
+  <script src="js/components/HeroesPagination.js"></script>
+
 </head>
 
 <body>
-    <div class="container">
-        <h1 class="main-title">UOC - Programación Web</h1>
+  <div class="container">
+    <button id="toggleDataBtn">Usar Data Mockeada</button>
 
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="comics">Comics</button>
-            <button class="tab-btn" data-tab="heroes">Heroes</button>
-            <button class="tab-btn" data-tab="favorites">Favorites</button>
-        </div>
+    <h1 class="main-title">UOC - Programación Web</h1>
 
-        <div class="search-section">
-            <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="searchInput" placeholder="Search comics...">
-            </div>
-        </div>
-        <div id="comicsContainer" class="comics-grid">
-            <!-- Las tarjetas se generarán dinámicamente aquí -->
-        </div>
-
-        <div class="pagination">
-            <button id="prevPage" class="page-btn"><i class="fas fa-chevron-left"></i></button>
-            <span id="pageInfo">1 of 2</span>
-            <button id="nextPage" class="page-btn"><i class="fas fa-chevron-right"></i></button>
-        </div>
-        <button id="toggleDataBtn">Usar Data Mockeada</button>
-
-        <!-- Barra de acciones -->
-        <div class="actions-bar" id="actionsBar">
-            <span class="selected-count">0 cómics seleccionados</span>
-            <button class="save-favorites-btn" onclick="UI.saveFavorites()">
-                Guardar en Favoritos
-            </button>
-            <button class="remove-favorites-btn" onclick="UI.removeFavorites()">
-                Remover de Favoritos
-            </button>
-        </div>
+    <div class="tabs-container">
+      <!-- Los tabs principales se generarán dinámicamente aquí -->
     </div>
 
-    <!-- Modal para selección de colección -->
-    <div id="collectionModal" class="modal">
-        <div class="modal-content">
-            <h2>Selecciona una colección</h2>
-            <button class="collection-btn" data-collection="gold">Favoritos de Oro</button>
-            <button class="collection-btn" data-collection="silver">Favoritos de Plata</button>
-            <button class="collection-btn" data-collection="bronze">Favoritos de Bronce</button>
-            <button id="closeModal" class="close-modal-btn">Cancelar</button>
+    <!-- Contenedor específico para Comics -->
+    <div id="comicsTab" class="tab-content active">
+      <div class="search-section">
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" id="searchInput" placeholder="Search comics...">
         </div>
+      </div>
+      <div id="comicsContainer" class="comics-grid">
+        <!-- Las tarjetas de cómics se generarán aquí -->
+      </div>
+      <div class="pagination">
+        <button id="prevPage" class="page-btn"><i class="fas fa-chevron-left"></i></button>
+        <span id="pageInfo">1 of 2</span>
+        <button id="nextPage" class="page-btn"><i class="fas fa-chevron-right"></i></button>
+      </div>
     </div>
 
-    <!-- Scripts en orden específico -->
-    <script src="js/utils.js"></script>
-    <script src="js/config.js"></script>
-    <script src="js/mock-data.js"></script>
-    <script src="js/models.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/ui.js"></script>
+    <!-- Contenedor específico para Heroes -->
+    <div id="heroesTab" class="tab-content">
+      <div id="heroesContainer" class="comics-grid">
+        <!-- Las tarjetas de héroes se generarán aquí -->
+      </div>
+      <div class="heroes-pagination">
+        <!-- La paginación de héroes se generará aquí -->
+      </div>
+    </div>
+
+    <!-- Contenedor específico para Favorites -->
+    <div id="favoritesTab" class="tab-content">
+      <div class="favorites-tabs">
+        <!-- Los tabs de colecciones se generarán aquí -->
+      </div>
+      <div id="favoritesContainer">
+        <!-- El contenido de las colecciones se generará aquí -->
+      </div>
+    </div>
+
+    <!-- Barra de acciones -->
+    <div class="actions-bar" id="actionsBar">
+      <span class="selected-count">0 cómics seleccionados</span>
+      <button class="save-favorites-btn" onclick="UI.saveFavorites()">
+        Guardar en Favoritos
+      </button>
+      <button class="remove-favorites-btn" onclick="UI.removeFavorites()">
+        Remover de Favoritos
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal para selección de colección -->
+  <div id="collectionModal" class="modal">
+    <div class="modal-content">
+      <h2>Selecciona una colección</h2>
+      <button class="collection-btn" data-collection="wishlist">Lista de Deseos</button>
+      <button class="collection-btn" data-collection="toread">Por Leer</button>
+      <button class="collection-btn" data-collection="reading">Leyendo</button>
+      <button class="collection-btn" data-collection="read">Leídos</button>
+      <button class="collection-btn" data-collection="favorites">Mis Favoritos</button>
+      <button id="closeModal" class="close-modal-btn">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Scripts en orden específico -->
+  <script src="js/utils.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/mock-data.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
 </body>
 
 </html>

@@ -14,15 +14,6 @@ const Utils = {
     },
 
     /**
-     * Formatea un precio a formato de moneda
-     * @param {number} price - Precio a formatear
-     * @returns {string} Precio formateado
-     */
-    formatPrice(price) {
-        return `$${price.toFixed(2)}`;
-    },
-
-    /**
      * Trunca un texto a una longitud máxima
      * @param {string} text - Texto a truncar
      * @param {number} maxLength - Longitud máxima
@@ -36,12 +27,39 @@ const Utils = {
     },
 
     /**
-     * Valida si un input está vacío
-     * @param {string} input - Texto a validar
-     * @returns {boolean} True si el input es válido
+     * Debounce para limitar la frecuencia de llamadas a una función
+     * @param {function} func - Función a llamar
+     * @param {number} wait - Tiempo de espera en milisegundos
+     * @returns {function} Función debounceada
      */
-    validateInput(input) {
-        return input && input.trim().length > 0;
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    },
+
+    /**
+     * Clona un objeto de manera profunda
+     * @param {object} obj - Objeto a clonar
+     * @returns {object} Objeto clonado
+     */
+    deepClone(obj) {
+        return JSON.parse(JSON.stringify(obj));
+    },
+
+    /**
+     * Formatea una fecha a formato legible
+     * @param {string} dateString - Fecha en formato ISO
+     * @returns {string} Fecha formateada
+     */
+    formatDate(dateString) {
+        return new Date(dateString).toLocaleDateString();
     },
 
     /**
