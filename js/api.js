@@ -28,30 +28,38 @@ const MarvelAPI = {
      * @returns {Promise<Array>} Lista de cómics
      */
     async getComics(params = {}) {
+        if (Config.USE_MOCK_DATA) {
+            return new Promise((resolve) => {
+                const filteredComics = mockComics.comics.filter(comic => 
+                    !params.titleStartsWith || comic.title.toLowerCase().includes(params.titleStartsWith.toLowerCase())
+                );
+                resolve({
+                    results: filteredComics.map(comic => this.transformComicData(comic)),
+                    total: filteredComics.length
+                });
+            });
+        }
+
         const timestamp = new Date().getTime().toString();
         const hash = Utils.generateMarvelHash(
             timestamp,
             Config.MARVEL_PRIVATE_KEY,
             Config.MARVEL_PUBLIC_KEY
         );
-
         const queryParams = new URLSearchParams({
             ts: timestamp,
             apikey: Config.MARVEL_PUBLIC_KEY,
             hash: hash,
             limit: params.limit || Config.LIMIT,
             offset: params.offset || 0,
-            ...(params.titleStartsWith && { titleStartsWith: params.titleStartsWith }),
-            ...(params.orderBy && { orderBy: params.orderBy })
+            ...(params.titleStartsWith && { titleStartsWith: params.titleStartsWith })
         });
-
         try {
             const response = await fetch(`${Config.MARVEL_API_BASE_URL}/comics?${queryParams}`);
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(`Marvel API error: ${response.status} - ${errorData.message || "Unknown error"}`);
             }
-
             const data = await response.json();
             return {
                 results: data.data.results.map(comic => this.transformComicData(comic)),
@@ -69,6 +77,13 @@ const MarvelAPI = {
      * @returns {Promise<Object>} Datos del cómic
      */
     async getComicById(comicId) {
+        if (Config.USE_MOCK_DATA) {
+            return new Promise((resolve) => {
+                const comic = mockComics.comics.find(c => c.id === comicId);
+                resolve(this.transformComicData(comic));
+            });
+        }
+
         const timestamp = new Date().getTime().toString();
         const hash = Utils.generateMarvelHash(
             timestamp,
@@ -95,5 +110,62 @@ const MarvelAPI = {
             console.error("Error fetching comic:", error);
             throw error;
         }
+    },
+
+    /**
+     * Obtiene una lista de héroes
+     * @param {Object} params - Parámetros adicionales para la búsqueda
+     * @returns {Promise<Array>} Lista de héroes
+     */
+    async getHeroes(params = {}) {
+        if (Config.USE_MOCK_DATA) {
+            return new Promise((resolve) => {
+                resolve(mockComics.heroes.map(hero => this.transformHeroData(hero)));
+            });
+        }
+
+        const timestamp = new Date().getTime().toString();
+        const hash = Utils.generateMarvelHash(
+            timestamp,
+            Config.MARVEL_PRIVATE_KEY,
+            Config.MARVEL_PUBLIC_KEY
+        );
+        const queryParams = new URLSearchParams({
+            ts: timestamp,
+            apikey: Config.MARVEL_PUBLIC_KEY,
+            hash: hash,
+            limit: params.limit || Config.LIMIT,
+            offset: params.offset || 0,
+            ...(params.nameStartsWith && { nameStartsWith: params.nameStartsWith })
+        });
+        try {
+            const response = await fetch(`${Config.MARVEL_API_BASE_URL}/characters?${queryParams}`);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Marvel API error: ${response.status} - ${errorData.message || "Unknown error"}`);
+            }
+            const data = await response.json();
+            return data.data.results.map(hero => this.transformHeroData(hero));
+        } catch (error) {
+            console.error("Error fetching heroes:", error);
+            throw error;
+        }
+    },
+
+    transformHeroData(apiHero) {
+        return {
+            id: apiHero.id || 0,
+            name: apiHero.name || "Sin nombre",
+            description: apiHero.description || "No description available",
+            modified: apiHero.modified || "",
+            thumbnail: {
+                path: apiHero.thumbnail?.path || "https://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available",
+                extension: apiHero.thumbnail?.extension || "jpg",
+            },
+            resourceURI: apiHero.resourceURI || "",
+            comics: apiHero.comics?.items?.map(comic => comic.name) || [],
+        };
     }
 };
+
+

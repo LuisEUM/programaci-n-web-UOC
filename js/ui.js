@@ -5,7 +5,6 @@
 const UI = {
     offset: 0,
     currentSearchTerm: '',
-    currentSort: 'default',
     totalPages: 0,
     currentPage: 1,
     favoritesManager: new Favorites(), // Crear una instancia de Favorites
@@ -24,59 +23,60 @@ const UI = {
      * @memberof UI
      */
     bindEvents() {
-        document.getElementById('searchInput').addEventListener('input', () => this.handleSearch());
-        document.getElementById('sortSelect').addEventListener('change', (e) => this.handleSort(e));
+        document.getElementById('searchInput').addEventListener('keydown', (e) => this.handleSearch(e));
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', (e) => this.handleTabChange(e));
         });
         document.getElementById('prevPage').addEventListener('click', () => this.handlePrevPage());
         document.getElementById('nextPage').addEventListener('click', () => this.handleNextPage());
+        document.getElementById('toggleDataBtn').addEventListener('click', () => this.toggleDataSource()); // Nuevo event listener
     },
 
     /**
      * Maneja el evento de búsqueda
      * @memberof UI
      */
-    handleSearch() {
-        const searchTerm = document.getElementById('searchInput').value.trim();
-        this.currentSearchTerm = searchTerm;
-        this.offset = 0;
-        this.currentPage = 1;
-        this.loadComics();
-    },
-
-    /**
-     * Maneja el evento de ordenamiento
-     * @param {Event} e - Evento de cambio
-     * @memberof UI
-     */
-    handleSort(e) {
-        this.currentSort = e.target.value;
-        this.loadComics(true);
-    },
-
-    /**
-     * Maneja el cambio de pestañas
-     * @param {Event} e - Evento de clic
-     * @memberof UI
-     */
-    handleTabChange(e) {
-        const tabs = document.querySelectorAll('.tab-btn');
-        tabs.forEach(tab => tab.classList.remove('active'));
-        e.target.classList.add('active');
-        
-        const tab = e.target.dataset.tab;
-        switch(tab) {
-            case 'random':
-                this.loadRandomComics();
-                break;
-            case 'favorites':
-                this.loadFavorites();
-                break;
-            default:
-                this.loadComics();
+    handleSearch(e) {
+        if (e.key === 'Enter') {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            this.currentSearchTerm = searchTerm;
+            this.offset = 0;
+            this.currentPage = 1;
+            this.loadComics();
         }
     },
+
+/**
+ * Maneja el cambio de pestañas
+ * @param {Event} e - Evento de clic
+ * @memberof UI
+ */
+handleTabChange(e) {
+    const tabs = document.querySelectorAll('.tab-btn');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    e.target.classList.add('active');
+    
+    const tab = e.target.dataset.tab;
+    const searchSection = document.querySelector('.search-section');
+    if (searchSection) {
+        searchSection.style.display = tab === 'comics' ? 'flex' : 'none';
+    }
+    
+    switch(tab) {
+        case 'random':
+            this.loadRandomComics();
+            break;
+        case 'favorites':
+            this.loadFavorites();
+            break;
+        case 'heroes':
+            this.loadHeroes();
+            break;
+        case 'comics':
+        default:
+            this.loadComics();
+    }
+},
 
     /**
      * Maneja el evento de página anterior
@@ -119,27 +119,6 @@ const UI = {
     },
 
     /**
-     * Ordena los cómics según el criterio actual
-     * @param {Array} comics - Lista de cómics
-     * @returns {Array} Lista de cómics ordenada
-     * @memberof UI
-     */
-    sortComics(comics) {
-        switch(this.currentSort) {
-            case 'titleAsc':
-                return comics.sort((a, b) => a.title.localeCompare(b.title));
-            case 'titleDesc':
-                return comics.sort((a, b) => b.title.localeCompare(a.title));
-            case 'priceAsc':
-                return comics.sort((a, b) => a.price - b.price);
-            case 'priceDesc':
-                return comics.sort((a, b) => b.price - a.price);
-            default:
-                return comics;
-        }
-    },
-
-    /**
      * Carga los cómics iniciales
      * @memberof UI
      */
@@ -174,9 +153,9 @@ const UI = {
                 limit: Config.LIMIT
             });
             
-            const sortedComics = this.sortComics(response.results);
+            console.log(response); // Agregar console.log para ver el objeto que viene de la API
             this.updatePagination(response.total);
-            this.renderComics(sortedComics);
+            this.renderComics(response.results);
         } catch (error) {
             console.error('Error loading comics:', error);
             this.showError('Error al cargar los cómics');
@@ -212,11 +191,16 @@ const UI = {
     createComicElement(comic) {
         const div = document.createElement('div');
         div.className = 'comic-card';
+        
+        // Crear la URL de la imagen con el modificador de portrait_xlarge
+        const imageUrl = `${comic.thumbnail.path}/portrait_xlarge.${comic.thumbnail.extension}`;
+        
         div.innerHTML = `
             <img class="comic-image" 
-                src="${comic.thumbnail.path}/portrait_xlarge.${comic.thumbnail.extension}" 
+                src="${imageUrl}" 
                 alt="${comic.title}"
-                loading="lazy">
+                loading="lazy"
+                onerror="this.src='https://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available/portrait_xlarge.jpg'">
             <div class="comic-info">
                 <h3 class="comic-title">${comic.title}</h3>
                 <p class="comic-description">${Utils.truncateText(comic.description || 'No hay descripción disponible.', 100)}</p>
@@ -250,7 +234,77 @@ const UI = {
     loadFavorites() {
         const favorites = this.favoritesManager.showFavorites();
         this.renderComics(favorites);
-    }
+    },
+
+    /**
+     * Alterna la fuente de datos entre mockeada y API
+     * @memberof UI
+     */
+    toggleDataSource() {
+        Config.USE_MOCK_DATA = !Config.USE_MOCK_DATA;
+        console.log(`USE_MOCK_DATA is now: ${Config.USE_MOCK_DATA}`); // Añadir un log para verificar el cambio
+        this.loadComics();
+    },
+
+    /**
+     * Carga y renderiza los héroes
+     * @memberof UI
+     */
+    async loadHeroes() {
+        try {
+            const heroes = await MarvelAPI.getHeroes(); // Asegúrate de tener esta función en MarvelAPI
+            this.renderHeroes(heroes);
+        } catch (error) {
+            console.error('Error loading heroes:', error);
+            this.showError('Error al cargar héroes');
+        }
+    },
+
+    /**
+     * Renderiza los héroes en el contenedor
+     * @param {Array} heroes - Lista de héroes
+     * @memberof UI
+     */
+    renderHeroes(heroes) {
+        const container = document.getElementById('comicsContainer');
+        container.innerHTML = '';
+        
+        if (heroes.length === 0) {
+            container.innerHTML = '<div class="no-results">No se encontraron héroes.</div>';
+            return;
+        }
+
+        heroes.forEach(hero => {
+            const heroElement = this.createHeroElement(hero);
+            container.appendChild(heroElement);
+        });
+    },
+
+    /**
+     * Crea un elemento HTML para un héroe
+     * @param {Object} hero - Datos del héroe
+     * @returns {HTMLElement} Elemento HTML del héroe
+     * @memberof UI
+     */
+    createHeroElement(hero) {
+        const div = document.createElement('div');
+        div.className = 'hero-card';
+        
+        const imageUrl = `${hero.thumbnail.path}/portrait_xlarge.${hero.thumbnail.extension}`;
+        
+        div.innerHTML = `
+            <img class="hero-image" 
+                src="${imageUrl}" 
+                alt="${hero.name}"
+                loading="lazy"
+                onerror="this.src='https://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available/portrait_xlarge.jpg'">
+            <div class="hero-info">
+                <h3 class="hero-name">${hero.name}</h3>
+                <p class="hero-description">${Utils.truncateText(hero.description || 'No description available.', 150)}</p>
+            </div>
+        `;
+        return div;
+    },
 };
 
 // Inicializa la interfaz de usuario cuando el DOM está completamente cargado
