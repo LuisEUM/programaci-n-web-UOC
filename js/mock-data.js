@@ -1,3 +1,8 @@
+/**
+ * Datos de prueba para desarrollo y testing
+ * Simula la estructura de respuesta de la API de Marvel
+ * Se utiliza cuando Config.USE_MOCK_DATA está activo
+ */
 const mockComics = {
   comics: [
     {

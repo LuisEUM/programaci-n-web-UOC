@@ -1,9 +1,12 @@
 /**
- * Funciones de utilidad para la aplicación
+ * Utilidades generales para la aplicación
+ * Proporciona funciones auxiliares reutilizables
  */
 const Utils = {
     /**
-     * Genera un hash MD5 para la autenticación de la API de Marvel
+     * Genera un hash MD5 para autenticación con la API de Marvel
+     * La API requiere un hash específico para validar las peticiones
+     * 
      * @param {string} timestamp - Marca de tiempo actual
      * @param {string} privateKey - Clave privada de la API
      * @param {string} publicKey - Clave pública de la API
@@ -14,10 +17,12 @@ const Utils = {
     },
 
     /**
-     * Trunca un texto a una longitud máxima
+     * Trunca un texto a una longitud máxima añadiendo "..."
+     * Útil para mostrar descripciones largas en espacios limitados
+     * 
      * @param {string} text - Texto a truncar
-     * @param {number} maxLength - Longitud máxima
-     * @returns {string} Texto truncado
+     * @param {number} maxLength - Longitud máxima deseada
+     * @returns {string} Texto truncado con elipsis si es necesario
      */
     truncateText(text, maxLength) {
         if (!text) return '';
@@ -27,10 +32,12 @@ const Utils = {
     },
 
     /**
-     * Debounce para limitar la frecuencia de llamadas a una función
-     * @param {function} func - Función a llamar
+     * Implementa el patrón debounce para limitar la frecuencia de llamadas
+     * Útil para optimizar eventos que se disparan frecuentemente (ej: scroll, resize)
+     * 
+     * @param {Function} func - Función a ejecutar
      * @param {number} wait - Tiempo de espera en milisegundos
-     * @returns {function} Función debounceada
+     * @returns {Function} Función con debounce aplicado
      */
     debounce(func, wait) {
         let timeout;
@@ -45,26 +52,32 @@ const Utils = {
     },
 
     /**
-     * Clona un objeto de manera profunda
-     * @param {object} obj - Objeto a clonar
-     * @returns {object} Objeto clonado
+     * Realiza una copia profunda de un objeto
+     * Evita referencias compartidas que podrían causar efectos secundarios
+     * 
+     * @param {Object} obj - Objeto a clonar
+     * @returns {Object} Copia profunda del objeto
      */
     deepClone(obj) {
         return JSON.parse(JSON.stringify(obj));
     },
 
     /**
-     * Formatea una fecha a formato legible
+     * Formatea una fecha ISO a formato legible
+     * Utiliza las configuraciones locales del navegador
+     * 
      * @param {string} dateString - Fecha en formato ISO
-     * @returns {string} Fecha formateada
+     * @returns {string} Fecha formateada según la localización
      */
     formatDate(dateString) {
         return new Date(dateString).toLocaleDateString();
     },
 
     /**
-     * Genera un ID único
-     * @returns {string} ID único generado
+     * Genera un ID único combinando timestamp y número aleatorio
+     * Útil para crear identificadores únicos para elementos DOM o datos temporales
+     * 
+     * @returns {string} ID único en base36
      */
     generateUniqueId() {
         return Date.now().toString(36) + Math.random().toString(36).substr(2);

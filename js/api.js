@@ -1,3 +1,24 @@
+/**
+ * Módulo que gestiona las llamadas a la API de Marvel
+ * Implementa cache para optimizar las peticiones repetidas
+ */
+
+/**
+ * Cache en memoria para almacenar resultados de peticiones previas
+ * Estructura: { endpoint: { params: result } }
+ */
+const apiCache = {};
+
+/**
+ * Realiza una petición a la API de Marvel con gestión de caché
+ * @param {string} endpoint - Ruta del endpoint
+ * @param {Object} params - Parámetros de la petición
+ * @returns {Promise<Object>} Respuesta de la API
+ */
+async function fetchFromAPI(endpoint, params = {}) {
+    // ... código existente ...
+}
+
 const MarvelAPI = {
     BASE_URL: Config.MARVEL_API_BASE_URL,
     PUBLIC_KEY: Config.MARVEL_PUBLIC_KEY,

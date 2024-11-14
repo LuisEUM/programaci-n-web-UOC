@@ -1,4 +1,26 @@
+/**
+ * Servicio que maneja la persistencia y recuperación de datos
+ * Utiliza localStorage como mecanismo de almacenamiento
+ */
 class DataService {
+    /**
+     * Guarda datos en localStorage con encriptación básica
+     * @param {string} key - Clave para identificar los datos
+     * @param {any} data - Datos a almacenar
+     */
+    static save(key, data) {
+        // ... código existente ...
+    }
+
+    /**
+     * Recupera y desencripta datos desde localStorage
+     * @param {string} key - Clave de los datos a recuperar
+     * @returns {any} Datos almacenados o null si no existen
+     */
+    static load(key) {
+        // ... código existente ...
+    }
+
     static async fetchItems(type, params = {}) {
         try {
             let response;
