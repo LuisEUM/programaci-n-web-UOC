@@ -9,7 +9,33 @@ const UI = {
 
     init() {
         this.bindEvents();
+        this.updateToggleButton();
         this.loadInitialComics();
+        this.isIndividualRemove = false;
+        this.isRemoveAction = false;
+        this.selectedComics = new Set();
+
+        // Inicializar elementos del modal
+        this.collectionModal = document.getElementById('collectionModal');
+        this.closeModalBtn = document.getElementById('closeModal');
+        this.collectionButtons = document.querySelectorAll('.collection-btn');
+
+        // Event listeners para el modal
+        this.closeModalBtn.addEventListener('click', () => this.closeCollectionModal());
+        this.collectionButtons.forEach(button => {
+            button.addEventListener('click', (e) => this.handleCollectionSelection(e));
+        });
+    },
+
+    updateToggleButton() {
+        const toggleBtn = document.getElementById('toggleDataBtn');
+        if (Config.USE_MOCK_DATA) {
+            toggleBtn.textContent = 'Usando Data Mockeada';
+            toggleBtn.classList.add('mock');
+        } else {
+            toggleBtn.textContent = 'Usando Data de la API';
+            toggleBtn.classList.remove('mock');
+        }
     },
 
     bindEvents() {
@@ -43,6 +69,10 @@ const UI = {
         if (searchSection) {
             searchSection.style.display = tab === 'comics' ? 'flex' : 'none';
         }
+        
+        // Mostrar u ocultar paginación según la pestaña
+        const pagination = document.querySelector('.pagination');
+        pagination.style.display = tab === 'comics' ? 'flex' : 'none';
         
         switch(tab) {
             case 'random':
@@ -136,8 +166,9 @@ const UI = {
     },
 
     createComicElement(comic) {
-        const isFavorite = this.favoritesManager.isFavorite(comic.id);
-        const isSelected = this.selectedComics.has(comic.id);
+        const dataSource = Config.USE_MOCK_DATA ? 'mock' : 'api';
+        const isFavorite = this.favoritesManager.isFavorite(dataSource, null, comic.id);
+    const isSelected = this.selectedComics.has(comic.id); // Agregar esta línea
 
         // Crear el contenedor principal
         const card = document.createElement('div');
@@ -191,25 +222,25 @@ const UI = {
 
         const favoriteBtn = document.createElement('button');
         favoriteBtn.className = `add-favorite-btn ${isFavorite ? 'added' : ''}`;
-        favoriteBtn.innerHTML = `<i class="${isFavorite ? 'fas' : 'far'} fa-heart"></i> ${isFavorite ? 'Añadido a Favoritos' : 'Añadir a Favoritos'}`;
-        favoriteBtn.addEventListener('click', () => this.toggleIndividualFavorite(comic.id, favoriteBtn));
+        favoriteBtn.innerHTML = `<i class="${isFavorite ? 'fas' : 'far'} fa-heart"></i> Añadir a Favoritos`;
+        favoriteBtn.addEventListener('click', () => this.toggleIndividualFavorite(comic.id));
         cardInfo.appendChild(favoriteBtn);
+
+        // **Nuevo: Botón de remover de favoritos**
+        const removeFavoriteBtn = document.createElement('button');
+        removeFavoriteBtn.className = `remove-favorite-btn`;
+        removeFavoriteBtn.innerHTML = `<i class="fas fa-trash-alt"></i> Remover de Favoritos`;
+        removeFavoriteBtn.addEventListener('click', () => this.removeIndividualFavorite(comic.id));
+        cardInfo.appendChild(removeFavoriteBtn);
 
         card.appendChild(cardInfo);
 
         return card;
     },
 
-    toggleIndividualFavorite(comicId, buttonElement) {
-        if (this.favoritesManager.isFavorite(comicId)) {
-            this.favoritesManager.removeFavorite(comicId);
-            buttonElement.classList.remove('added');
-            buttonElement.innerHTML = `<i class="far fa-heart"></i> Añadir a Favoritos`;
-        } else {
-            this.favoritesManager.addFavorite(comicId);
-            buttonElement.classList.add('added');
-            buttonElement.innerHTML = `<i class="fas fa-heart"></i> Añadido a Favoritos`;
-        }
+    toggleIndividualFavorite(comicId) {
+        this.tempComicId = comicId; // Almacenar temporalmente el ID del cómic
+        this.openCollectionModal(true); // Indicar que es un favorito individual
     },
 
     toggleFavorite(comicId) {
@@ -228,27 +259,21 @@ const UI = {
 
     updateActionsBar() {
         const actionsBar = document.getElementById('actionsBar');
-        const countDisplay = actionsBar.querySelector('.selected-count');
-        const count = this.selectedComics.size;
-        
-        countDisplay.textContent = `${count} cómic${count !== 1 ? 's' : ''} seleccionado${count !== 1 ? 's' : ''}`;
-        actionsBar.classList.toggle('visible', count > 0);
+        const selectedCount = actionsBar.querySelector('.selected-count');
+    
+        if (this.selectedComics.size > 0) {
+            actionsBar.classList.add('visible');
+            selectedCount.textContent = `${this.selectedComics.size} cómics seleccionados`;
+        } else {
+            actionsBar.classList.remove('visible');
+            selectedCount.textContent = '0 cómics seleccionados';
+        }
     },
 
     saveFavorites() {
-        const selectedComicsList = this.getSelectedComics();
-        this.favoritesManager.addMultipleFavorites(...selectedComicsList.map(comic => comic.id));
-
-        // Actualizar botones en las tarjetas agregadas a favoritos
-        selectedComicsList.forEach(comic => {
-            const card = document.querySelector(`.card[data-id="${comic.id}"]`);
-            const favoriteBtn = card.querySelector('.add-favorite-btn');
-            favoriteBtn.classList.add('added');
-            favoriteBtn.innerHTML = `<i class="fas fa-heart"></i> Añadido a Favoritos`;
-        });
-
-        this.selectedComics.clear();
-        this.updateActionsBar();
+        if (this.selectedComics.size > 0) {
+            this.openCollectionModal();
+        }
     },
 
     toggleSelect(comicId) {
@@ -270,16 +295,62 @@ const UI = {
                 ${message}<br>Por favor, intenta de nuevo.
             </div>`;
     },
-
-    loadFavorites() {
-        const favorites = this.favoritesManager.showFavorites();
-        this.renderComics(favorites);
+    
+    async loadFavorites() {
+        try {
+            const dataSource = Config.USE_MOCK_DATA ? 'mock' : 'api';
+            const collections = this.favoritesManager.getAllFavorites(dataSource);
+            let comicsData;
+    
+            if (dataSource === 'mock') {
+                comicsData = mockComics.comics;
+            } else {
+                comicsData = await MarvelAPI.getAllComics();
+            }
+    
+            const container = document.getElementById('comicsContainer');
+            container.innerHTML = '';
+    
+            for (const [collectionName, favoriteIds] of Object.entries(collections)) {
+                if (favoriteIds.length > 0) {
+                    // Agregar encabezado de la colección
+                    const header = document.createElement('h2');
+                    header.textContent = `Favoritos de ${collectionName.charAt(0).toUpperCase() + collectionName.slice(1)}`;
+                    header.className = 'collection-header';
+                    container.appendChild(header);
+    
+                    // Filtrar cómics de la colección
+                    const favorites = comicsData.filter(comic => favoriteIds.includes(comic.id));
+    
+                    // Renderizar cómics
+                    favorites.forEach(comic => {
+                        const comicElement = this.createComicElement(comic);
+                        container.appendChild(comicElement);
+                    });
+                }
+            }
+    
+            // Ocultar paginación en la pestaña de favoritos
+            document.querySelector('.pagination').style.display = 'none';
+        } catch (error) {
+            console.error('Error loading favorites:', error);
+            alert('Hubo un error al cargar los favoritos.');
+        }
     },
 
     toggleDataSource() {
         Config.USE_MOCK_DATA = !Config.USE_MOCK_DATA;
         console.log(`USE_MOCK_DATA is now: ${Config.USE_MOCK_DATA}`);
         this.loadComics();
+    
+        const toggleBtn = document.getElementById('toggleDataBtn');
+        if (Config.USE_MOCK_DATA) {
+            toggleBtn.textContent = 'Usando Data Mockeada';
+            toggleBtn.classList.add('mock');
+        } else {
+            toggleBtn.textContent = 'Usando Data de la API';
+            toggleBtn.classList.remove('mock');
+        }
     },
 
     async loadHeroes() {
@@ -325,7 +396,160 @@ const UI = {
             </div>
         `;
         return div;
+    },
+
+    openCollectionModal(isIndividual = false) {
+        this.isIndividualFavorite = isIndividual;
+
+        const dataSource = Config.USE_MOCK_DATA ? 'mock' : 'api';
+
+        if (isIndividual && this.tempComicId !== null) {
+            // Deshabilitar colecciones en las que ya está el cómic
+            this.collectionButtons.forEach(button => {
+                const collection = button.dataset.collection;
+                const isAlreadyFavorite = this.favoritesManager.isFavorite(dataSource, collection, this.tempComicId);
+                button.disabled = isAlreadyFavorite;
+            });
+        } else {
+            // Habilitar todas las colecciones
+            this.collectionButtons.forEach(button => {
+                button.disabled = false;
+            });
+        }
+
+        this.collectionModal.style.display = 'block';
+    },
+
+    closeCollectionModal() {
+        // Restablecer variables temporales
+        this.tempComicId = null;
+        this.isIndividualFavorite = false;
+        this.isIndividualRemove = false;
+        this.isRemoveAction = false;
+
+        // Habilitar todos los botones de colección
+        this.collectionButtons.forEach(button => {
+            button.disabled = false;
+        });
+
+        // Restablecer el título del modal
+        this.collectionModal.querySelector('h2').textContent = 'Selecciona una colección';
+
+        this.collectionModal.style.display = 'none';
+    },
+
+    handleCollectionSelection(e) {
+        const collection = e.target.dataset.collection;
+        const dataSource = Config.USE_MOCK_DATA ? 'mock' : 'api';
+
+        if (this.isIndividualFavorite && this.tempComicId !== null) {
+            // Agregar favorito individual
+            this.favoritesManager.addFavorite(dataSource, collection, this.tempComicId);
+
+            // Actualizar interfaz
+            this.updateFavoriteButtons(this.tempComicId);
+
+            // Resetear variables temporales
+            this.tempComicId = null;
+            this.isIndividualFavorite = false;
+
+        } else if (this.isIndividualRemove && this.tempComicId !== null) {
+            // Remover favorito individual
+            this.favoritesManager.removeFavorite(dataSource, collection, this.tempComicId);
+
+            // Actualizar interfaz
+            this.updateFavoriteButtons(this.tempComicId);
+
+            // Resetear variables temporales
+            this.tempComicId = null;
+            this.isIndividualRemove = false;
+
+        } else if (this.selectedComics.size > 0) {
+            // Agregar o remover favoritos múltiples
+            const selectedComicsList = this.getSelectedComics();
+
+            selectedComicsList.forEach(comic => {
+                if (this.isRemoveAction) {
+                    this.favoritesManager.removeFavorite(dataSource, collection, comic.id);
+                } else {
+                    this.favoritesManager.addFavorite(dataSource, collection, comic.id);
+                }
+
+                // Actualizar estado de la tarjeta
+                const card = document.querySelector(`.card[data-id="${comic.id}"]`);
+                const checkbox = card.querySelector('.card-checkbox');
+                checkbox.checked = false;
+                card.classList.remove('selected');
+
+                // Actualizar botones
+                this.updateFavoriteButtons(comic.id);
+            });
+
+            this.selectedComics.clear();
+            this.updateActionsBar();
+            this.isRemoveAction = false; // Resetear indicador
+        }
+
+        this.closeCollectionModal();
+    },
+
+    removeIndividualFavorite(comicId) {
+        this.tempComicId = comicId; // Almacenar temporalmente el ID del cómic
+        this.openRemoveCollectionModal(true); // Indicar que es una acción individual
+    },
+
+    openRemoveCollectionModal(isIndividual = false) {
+        this.isIndividualRemove = isIndividual;
+        const dataSource = Config.USE_MOCK_DATA ? 'mock' : 'api';
+    
+        if (isIndividual && this.tempComicId !== null) {
+            // Deshabilitar colecciones en las que no está el cómic
+            this.collectionButtons.forEach(button => {
+                const collection = button.dataset.collection;
+                const isInCollection = this.favoritesManager.isFavorite(dataSource, collection, this.tempComicId);
+                button.disabled = !isInCollection;
+            });
+        } else {
+            // Habilitar todas las colecciones
+            this.collectionButtons.forEach(button => {
+                button.disabled = false;
+            });
+        }
+    
+        // Cambiar el texto del modal para indicar que es una acción de remover
+        this.collectionModal.querySelector('h2').textContent = 'Selecciona una colección para remover';
+        this.collectionModal.style.display = 'block';
+    },
+
+    updateFavoriteButtons(comicId) {
+        const dataSource = Config.USE_MOCK_DATA ? 'mock' : 'api';
+        const isFavorite = this.favoritesManager.isFavorite(dataSource, null, comicId);
+    
+        const card = document.querySelector(`.card[data-id="${comicId}"]`);
+    
+        if (card) {
+            const favoriteBtn = card.querySelector('.add-favorite-btn');
+            const removeFavoriteBtn = card.querySelector('.remove-favorite-btn');
+    
+            if (isFavorite) {
+                favoriteBtn.classList.add('added');
+                favoriteBtn.innerHTML = `<i class="fas fa-heart"></i> Añadido a Favoritos`;
+            } else {
+                favoriteBtn.classList.remove('added');
+                favoriteBtn.innerHTML = `<i class="far fa-heart"></i> Añadir a Favoritos`;
+            }
+        } else {
+            console.warn(`No se encontró la tarjeta con data-id="${comicId}".`);
+        }
+    },
+
+    removeFavorites() {
+        if (this.selectedComics.size > 0) {
+            this.isRemoveAction = true;
+            this.openRemoveCollectionModal(false); // Acción múltiple
+        }
     }
 };
 
 document.addEventListener('DOMContentLoaded', () => UI.init());
+

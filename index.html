@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Superhero Comics</title>
+    <title>UOC - Programación Web</title>
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
@@ -12,7 +12,7 @@
 
 <body>
     <div class="container">
-        <h1 class="main-title">Superhero Comics</h1>
+        <h1 class="main-title">UOC - Programación Web</h1>
 
         <div class="tabs">
             <button class="tab-btn active" data-tab="comics">Comics</button>
@@ -35,14 +35,28 @@
             <span id="pageInfo">1 of 2</span>
             <button id="nextPage" class="page-btn"><i class="fas fa-chevron-right"></i></button>
         </div>
-        <button id="toggleDataBtn">Toggle Data Source</button>
+        <button id="toggleDataBtn">Usar Data Mockeada</button>
 
         <!-- Barra de acciones -->
         <div class="actions-bar" id="actionsBar">
-            <span class="selected-count">0 cómic seleccionado</span>
+            <span class="selected-count">0 cómics seleccionados</span>
             <button class="save-favorites-btn" onclick="UI.saveFavorites()">
                 Guardar en Favoritos
             </button>
+            <button class="remove-favorites-btn" onclick="UI.removeFavorites()">
+                Remover de Favoritos
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal para selección de colección -->
+    <div id="collectionModal" class="modal">
+        <div class="modal-content">
+            <h2>Selecciona una colección</h2>
+            <button class="collection-btn" data-collection="gold">Favoritos de Oro</button>
+            <button class="collection-btn" data-collection="silver">Favoritos de Plata</button>
+            <button class="collection-btn" data-collection="bronze">Favoritos de Bronce</button>
+            <button id="closeModal" class="close-modal-btn">Cancelar</button>
         </div>
     </div>
 

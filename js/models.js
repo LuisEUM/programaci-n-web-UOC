@@ -115,51 +115,39 @@ class Heroe {
  */
 class Favorites {
     constructor() {
-        this.favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+        // Inicializa los favoritos por fuente de datos y colección
+        this.favorites = JSON.parse(localStorage.getItem('favorites')) || {
+            mock: { gold: [], silver: [], bronze: [] },
+            api: { gold: [], silver: [], bronze: [] }
+        };
     }
 
-    addFavorite(comicId) {
-        if (!this.favorites.includes(comicId)) {
-            this.favorites.push(comicId);
+    addFavorite(dataSource, collection, comicId) {
+        if (!this.favorites[dataSource][collection].includes(comicId)) {
+            this.favorites[dataSource][collection].push(comicId);
             this.saveFavorites();
         }
     }
 
-    addMultipleFavorites(...comicIds) {
-        comicIds.forEach(id => {
-            if (!this.favorites.includes(id)) {
-                this.favorites.push(id);
-            }
-        });
+    removeFavorite(dataSource, collection, comicId) {
+        this.favorites[dataSource][collection] = this.favorites[dataSource][collection].filter(id => id !== comicId);
         this.saveFavorites();
     }
 
-    removeFavorite(comicId) {
-        this.favorites = this.favorites.filter(id => id !== comicId);
-        this.saveFavorites();
-    }
-
-    toggleFavorite(comicId) {
-        if (this.favorites.includes(comicId)) {
-            this.removeFavorite(comicId);
+    isFavorite(dataSource, collection, comicId) {
+        if (collection) {
+            return this.favorites[dataSource][collection]?.includes(comicId) || false;
         } else {
-            this.addFavorite(comicId);
+            // Verificar en todas las colecciones
+            return Object.values(this.favorites[dataSource]).some(col => col.includes(comicId));
         }
     }
 
-    showFavorites() {
-        return mockComics.comics.filter(comic => this.favorites.includes(comic.id));
-    }
-
-    isFavorite(comicId) {
-        return this.favorites.includes(comicId);
+    getAllFavorites(dataSource) {
+        return this.favorites[dataSource];
     }
 
     saveFavorites() {
         localStorage.setItem('favorites', JSON.stringify(this.favorites));
-    }
-
-    copyFavorites() {
-        return [...this.favorites];
     }
 }

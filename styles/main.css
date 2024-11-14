@@ -8,14 +8,19 @@
 :root {
   --primary-color: #ed1d24;
   --secondary-color: #202020;
-  --background-color: #f8f9fa;
-  --card-background: #ffffff;
-  --text-primary: #333333;
-  --text-secondary: #666666;
+  --background-color: #e7e7e7;
+  --card-background: #000000;
+  --card-bg: #000000;
+  --text-primary: #ffffff;
+  --text-color: #ffffff;
+  --text-secondary: #ff0000;
   --border-radius: 12px;
   --spacing: 1.5rem;
+  --error-red: #d32f2f;
+  --hover-red: #b71c1c;
 }
 
+/* Base Styles */
 body {
   background-color: var(--background-color);
   padding: var(--spacing);
@@ -29,16 +34,18 @@ body {
   padding: var(--spacing);
 }
 
+/* Typography */
 .main-title {
   text-align: center;
   margin-bottom: calc(var(--spacing) * 2);
   font-size: 3em;
   font-weight: 800;
-  color: var(--secondary-color);
+  color: var(--primary-color);
   text-transform: uppercase;
   letter-spacing: -1px;
 }
 
+/* Layout Components */
 .search-section {
   display: flex;
   justify-content: space-between;
@@ -54,6 +61,7 @@ body {
   position: relative;
 }
 
+/* Search Input */
 .search-icon {
   position: absolute;
   left: 16px;
@@ -71,6 +79,7 @@ body {
   background-color: var(--card-background);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
+  color:white
 }
 
 #searchInput:focus {
@@ -79,6 +88,7 @@ body {
   box-shadow: 0 4px 12px rgba(237, 29, 36, 0.1);
 }
 
+/* Tabs */
 .tabs {
   display: flex;
   gap: 2px;
@@ -96,7 +106,7 @@ body {
   background: none;
   cursor: pointer;
   font-size: 1rem;
-  color: var(--text-secondary);
+  color: black;
   border-radius: calc(var(--border-radius) - 4px);
   transition: all 0.3s ease;
 }
@@ -108,6 +118,7 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+/* Comic Grid and Cards */
 .comics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -115,45 +126,104 @@ body {
   margin-bottom: calc(var(--spacing) * 2);
 }
 
-.comic-card {
-  background: var(--card-background);
+.comic-card, .card {
+  background: var(--card-bg);
   border-radius: var(--border-radius);
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  border: 2px solid grey;
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-.comic-card:hover {
+.comic-card:hover, .card:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
 }
 
-.comic-image {
-  width: 100%;
-  height: 400px;
-  object-fit: cover;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+.comic-card.selected, .card.selected {
+  border-color: var(--primary-color);
 }
 
-.comic-info {
-  padding: calc(var(--spacing) * 1.5);
+/* Card Elements */
+.card-id {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: #fff;
+  z-index: 2;
+}
+
+.card-checkbox {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.checkbox-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid #fff;
+  border-radius: 6px;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.card.selected .checkbox-indicator {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.card.selected .checkbox-indicator:after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+}
+
+.comic-image, .card-image {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+/* Card Info */
+.comic-info, .card-info {
+  padding: 15px;
   display: flex;
   flex-direction: column;
   gap: 1rem;
   flex: 1;
 }
 
-.comic-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0;
+.comic-title, .card-title {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  color: var(--text-color);
+  font-weight: 700;
 }
 
 .comic-description {
@@ -166,6 +236,15 @@ body {
   margin: 0;
 }
 
+.comic-metadata, .card-metadata {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: auto;
+}
+
 .comic-price {
   font-size: 1.5rem;
   font-weight: 700;
@@ -173,14 +252,8 @@ body {
   margin: 0;
 }
 
-.comic-metadata {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: auto;
-}
-
-.add-favorite-btn {
+/* Buttons */
+.add-favorite-btn, .remove-favorite-btn {
   width: 100%;
   padding: 8px;
   background-color: transparent;
@@ -191,70 +264,165 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  color: var(--primary-color);
-  font-weight: 600;
   transition: all 0.3s ease;
-  margin-top: var(--spacing);
+  margin-top: 8px;
+  font-weight: 600;
 }
 
-.add-favorite-btn:hover {
-  background-color: var(--primary-color);
-  color: white;
+.add-favorite-btn {
+  color: var(--primary-color);
 }
 
-.add-favorite-btn i {
-  transition: transform 0.3s ease;
+.remove-favorite-btn {
+  border-color: var(--error-red);
+  color: var(--error-red);
 }
 
-.add-favorite-btn:hover i {
-  transform: scale(1.2);
-}
-
+.add-favorite-btn:hover,
 .add-favorite-btn.added {
   background-color: var(--primary-color);
   color: white;
 }
 
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: calc(var(--spacing) * 1.5);
-  margin-top: calc(var(--spacing) * 2);
-}
-
-.page-btn {
-  padding: 12px;
-  border: none;
-  background: var(--card-background);
-  cursor: pointer;
-  font-size: 1.2rem;
-  color: var(--text-secondary);
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.page-btn:hover {
-  background-color: var(--primary-color);
+.remove-favorite-btn:hover {
+  background-color: var(--error-red);
   color: white;
 }
 
-.page-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background-color: #f1f1f1;
+/* Actions Bar */
+.actions-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(26, 26, 26, 0.95);
+  padding: 15px 20px;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  backdrop-filter: blur(10px);
 }
 
-#pageInfo {
-  font-size: 1rem;
+.actions-bar.visible {
+  display: flex;
+}
+
+.selected-count {
+  font-size: 0.9rem;
   color: var(--text-secondary);
-  font-weight: 500;
+}
+
+.save-favorites-btn,
+.remove-favorites-btn {
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border: none;
+  color: white;
+}
+
+.save-favorites-btn {
+  background-color: var(--primary-color);
+}
+
+.remove-favorites-btn {
+  background-color: var(--error-red);
+  margin-left: 10px;
+}
+
+.save-favorites-btn:hover {
+  background-color: var(--hover-red);
+}
+
+.remove-favorites-btn:hover {
+  background-color: var(--hover-red);
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.modal-content {
+  background-color: #2b2b2b;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid var(--primary-color);
+  width: 80%;
+  max-width: 400px;
+  text-align: center;
+  border-radius: 8px;
+}
+
+.collection-btn {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.collection-btn:hover {
+  background-color: var(--hover-red);
+}
+
+.collection-btn:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.close-modal-btn {
+  background-color: transparent;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.collection-header {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: var(--primary-color);
+  font-size: 1.5rem;
+}
+
+/* Toggle Data Button */
+#toggleDataBtn {
+  background-color: green;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+  margin-top: 20px;
+}
+
+#toggleDataBtn.mock {
+  background-color: yellow;
+  color: black;
+}
+
+/* Utility Classes */
+.hidden {
+  display: none;
 }
 
 /* Responsive Styles */
@@ -309,195 +477,4 @@ body {
 
 .comic-card {
   animation: fadeIn 0.3s ease-out;
-}
-
-.comic-details {
-  display: flex;
-  gap: 1rem;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-}
-
-.comic-issue,
-.comic-pages {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.comic-creators {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
-
-.creator-tag {
-  background-color: #f8f9fa;
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-}
-
-.comic-card:hover .comic-image {
-  transform: scale(1.05);
-  transition: transform 0.3s ease;
-}
-
-.error-message {
-  text-align: center;
-  padding: 2rem;
-  color: var(--text-secondary);
-  font-size: 1.2rem;
-}
-
-.no-results {
-  text-align: center;
-  padding: 2rem;
-  color: var(--text-secondary);
-  font-size: 1.2rem;
-  grid-column: 1 / -1;
-}
-
-/* [styles/main.css](styles/main.css) */
-
-/* Estilos de las tarjetas */
-.card {
-  background: var(--card-bg);
-  border-radius: 12px;
-  overflow: hidden;
-  position: relative;
-  border: 2px solid transparent;
-  transition: all 0.3s ease;
-}
-
-.card.selected {
-  border-color: var(--primary-color);
-}
-
-.card-id {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  color: #fff;
-  z-index: 2;
-}
-
-.card-checkbox {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 24px;
-  height: 24px;
-  opacity: 0;
-  cursor: pointer;
-  z-index: 2;
-}
-
-.checkbox-indicator {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 24px;
-  height: 24px;
-  background: rgba(0, 0, 0, 0.5);
-  border: 2px solid #fff;
-  border-radius: 6px;
-  pointer-events: none;
-  transition: all 0.3s ease;
-}
-
-.card.selected .checkbox-indicator {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-.card.selected .checkbox-indicator:after {
-  content: "✓";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-}
-
-.card-image {
-  width: 100%;
-  height: 280px;
-  object-fit: cover;
-  display: block;
-}
-
-.card-info {
-  padding: 15px;
-}
-
-.card-title {
-  font-size: 0.9rem;
-  margin-bottom: 8px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.card-metadata {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.85rem;
-  color: #888;
-}
-
-.card-creators {
-  font-size: 0.8rem;
-  color: #666;
-  margin-top: 8px;
-  margin-bottom: 12px;
-}
-
-/* Estilos para la barra de acciones */
-.actions-bar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(26, 26, 26, 0.95);
-  padding: 15px 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-  backdrop-filter: blur(10px);
-  transform: translateY(100%);
-  transition: transform 0.3s ease;
-}
-
-.actions-bar.visible {
-  transform: translateY(0);
-}
-
-.selected-count {
-  font-size: 0.9rem;
-  color: #888;
-}
-
-.save-favorites-btn {
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  transition: background 0.3s ease;
-}
-
-.save-favorites-btn:hover {
-  background: #b71c1c;
 }

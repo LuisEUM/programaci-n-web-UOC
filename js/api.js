@@ -1,4 +1,5 @@
 const MarvelAPI = {
+    BASE_URL: Config.MARVEL_API_BASE_URL,
     /**
      * Transforma los datos de la API al formato de nuestra aplicación
      * @param {Object} apiComic - Datos del cómic desde la API
@@ -165,6 +166,41 @@ const MarvelAPI = {
             resourceURI: apiHero.resourceURI || "",
             comics: apiHero.comics?.items?.map(comic => comic.name) || [],
         };
+    },
+
+    async getAllComics() {
+        const comics = [];
+        let offset = 0;
+        const limit = 100; // Puedes ajustar el límite según tus necesidades
+        let total = 0;
+
+        do {
+            const response = await this.fetchComics(offset, limit);
+            const data = response.data;
+            total = data.total;
+            comics.push(...data.results);
+            offset += limit;
+        } while (offset < total);
+
+        return comics;
+    },
+
+    fetchComics(offset, limit) {
+        const ts = Date.now().toString();
+        const hash = CryptoJS.MD5(ts + Config.MARVEL_PRIVATE_KEY + Config.MARVEL_PUBLIC_KEY).toString();
+        const url = `${this.BASE_URL}/comics?apikey=${Config.MARVEL_PUBLIC_KEY}&ts=${ts}&hash=${hash}&offset=${offset}&limit=${limit}`;
+    
+        return fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok (${response.status})`);
+                }
+                return response.json();
+            })
+            .catch(error => {
+                console.error('Error fetching comics:', error);
+                throw error;
+            });
     }
 };
 
