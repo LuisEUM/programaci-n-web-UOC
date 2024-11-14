@@ -478,3 +478,40 @@ body {
 .comic-card {
   animation: fadeIn 0.3s ease-out;
 }
+
+.hero-card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.2s;
+    position: relative;
+}
+
+.hero-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.card-description {
+    font-size: 0.85em;
+    color: var(--text-color);
+    margin: 8px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-creators,
+.card-characters {
+    margin: 5px 0;
+    font-size: 0.85em;
+    color: var(--text-color);
+}
+
+.card strong {
+    color: var(--text-secondary);
+}

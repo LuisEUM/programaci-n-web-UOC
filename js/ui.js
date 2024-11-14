@@ -168,9 +168,8 @@ const UI = {
   createComicElement(comic) {
       const dataSource = Config.USE_MOCK_DATA ? 'mock' : 'api';
       const isFavorite = this.favoritesManager.isFavorite(dataSource, null, comic.id);
-  const isSelected = this.selectedComics.has(comic.id); // Agregar esta línea
+      const isSelected = this.selectedComics.has(comic.id);
 
-      // Crear el contenedor principal
       const card = document.createElement('div');
       card.className = `card ${isSelected ? 'selected' : ''}`;
       card.setAttribute('data-id', comic.id);
@@ -189,16 +188,15 @@ const UI = {
       checkbox.addEventListener('change', () => this.toggleSelect(comic.id));
       card.appendChild(checkbox);
 
-      const checkboxIndicator = document.createElement('div');
-      checkboxIndicator.className = 'checkbox-indicator';
-      card.appendChild(checkboxIndicator);
-
       // Imagen del cómic
       const img = document.createElement('img');
       img.src = `${comic.thumbnail.path}/portrait_xlarge.${comic.thumbnail.extension}`;
       img.alt = comic.title;
       img.className = 'card-image';
       img.loading = 'lazy';
+      img.onerror = () => {
+          img.src = 'https://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available/portrait_xlarge.jpg';
+      };
       card.appendChild(img);
 
       // Información del cómic
@@ -210,15 +208,36 @@ const UI = {
       title.textContent = comic.title;
       cardInfo.appendChild(title);
 
+      // Añadir descripción
+      if (comic.description && comic.description !== "#N/A" && comic.description !== "No description available") {
+          const description = document.createElement('p');
+          description.className = 'card-description';
+          description.textContent = Utils.truncateText(comic.description, 150);
+          cardInfo.appendChild(description);
+      }
+
       const metadata = document.createElement('div');
       metadata.className = 'card-metadata';
-      metadata.innerHTML = `<span>Issue #${comic.issueNumber}</span><span>$${comic.price.toFixed(2)}</span>`;
+      metadata.innerHTML = `
+          <span>Issue #${comic.issueNumber}</span>
+          <span>$${comic.price.toFixed(2)}</span>
+          ${comic.pageCount ? `<span>${comic.pageCount} páginas</span>` : ''}
+      `;
       cardInfo.appendChild(metadata);
 
-      const creators = document.createElement('div');
-      creators.className = 'card-creators';
-      creators.textContent = `Creadores: ${comic.creators.slice(0, 2).join(', ')}${comic.creators.length > 2 ? '...' : ''}`;
-      cardInfo.appendChild(creators);
+      if (comic.creators && comic.creators.length > 0) {
+          const creators = document.createElement('div');
+          creators.className = 'card-creators';
+          creators.innerHTML = `<strong>Creadores:</strong> ${comic.creators.slice(0, 3).join(', ')}${comic.creators.length > 3 ? '...' : ''}`;
+          cardInfo.appendChild(creators);
+      }
+
+      if (comic.characters && comic.characters.length > 0) {
+          const characters = document.createElement('div');
+          characters.className = 'card-characters';
+          characters.innerHTML = `<strong>Personajes:</strong> ${comic.characters.slice(0, 3).join(', ')}${comic.characters.length > 3 ? '...' : ''}`;
+          cardInfo.appendChild(characters);
+      }
 
       const favoriteBtn = document.createElement('button');
       favoriteBtn.className = `add-favorite-btn ${isFavorite ? 'added' : ''}`;
@@ -226,15 +245,13 @@ const UI = {
       favoriteBtn.addEventListener('click', () => this.toggleIndividualFavorite(comic.id));
       cardInfo.appendChild(favoriteBtn);
 
-      // **Nuevo: Botón de remover de favoritos**
       const removeFavoriteBtn = document.createElement('button');
-      removeFavoriteBtn.className = `remove-favorite-btn`;
-      removeFavoriteBtn.innerHTML = `<i class="fas fa-trash-alt"></i> Remover de Favoritos`;
+      removeFavoriteBtn.className = 'remove-favorite-btn';
+      removeFavoriteBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Remover de Favoritos';
       removeFavoriteBtn.addEventListener('click', () => this.removeIndividualFavorite(comic.id));
       cardInfo.appendChild(removeFavoriteBtn);
 
       card.appendChild(cardInfo);
-
       return card;
   },
 
@@ -385,21 +402,54 @@ const UI = {
 
   createHeroElement(hero) {
       const div = document.createElement('div');
-      div.className = 'hero-card';
+      div.className = 'card hero-card';
       
-      const imageUrl = `${hero.thumbnail.path}/portrait_xlarge.${hero.thumbnail.extension}`;
+      // ID del héroe
+      const heroId = document.createElement('div');
+      heroId.className = 'card-id';
+      heroId.textContent = `ID: ${hero.id}`;
+      div.appendChild(heroId);
       
-      div.innerHTML = `
-          <img class="hero-image" 
-              src="${imageUrl}" 
-              alt="${hero.name}"
-              loading="lazy"
-              onerror="this.src='https://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available/portrait_xlarge.jpg'">
-          <div class="hero-info">
-              <h3 class="hero-name">${hero.name}</h3>
-              <p class="hero-description">${Utils.truncateText(hero.description || 'No description available.', 150)}</p>
-          </div>
-      `;
+      // Imagen del héroe
+      const img = document.createElement('img');
+      img.src = `${hero.thumbnail.path}/portrait_xlarge.${hero.thumbnail.extension}`;
+      img.alt = hero.name;
+      img.className = 'card-image';
+      img.loading = 'lazy';
+      img.onerror = () => {
+          img.src = 'https://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available/portrait_xlarge.jpg';
+      };
+      div.appendChild(img);
+      
+      // Información del héroe
+      const heroInfo = document.createElement('div');
+      heroInfo.className = 'card-info';
+      
+      const name = document.createElement('h3');
+      name.className = 'card-title';
+      name.textContent = hero.name;
+      heroInfo.appendChild(name);
+      
+      const description = document.createElement('p');
+      description.className = 'card-description';
+      description.textContent = Utils.truncateText(hero.description || 'No description available.', 150);
+      heroInfo.appendChild(description);
+      
+      if (hero.comics && hero.comics.length > 0) {
+          const comics = document.createElement('div');
+          comics.className = 'card-comics';
+          comics.innerHTML = `<strong>Comics:</strong> ${hero.comics.slice(0, 3).join(', ')}${hero.comics.length > 3 ? '...' : ''}`;
+          heroInfo.appendChild(comics);
+      }
+      
+      if (hero.series && hero.series.length > 0) {
+          const series = document.createElement('div');
+          series.className = 'card-series';
+          series.innerHTML = `<strong>Series:</strong> ${hero.series.slice(0, 3).join(', ')}${hero.series.length > 3 ? '...' : ''}`;
+          heroInfo.appendChild(series);
+      }
+      
+      div.appendChild(heroInfo);
       return div;
   },
 

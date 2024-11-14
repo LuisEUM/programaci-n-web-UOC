@@ -18,6 +18,8 @@ const MarvelAPI = {
      * @private
      */
     transformComicData(apiComic) {
+        if (!apiComic) return null;
+        
         return {
             id: apiComic.id || 0,
             title: apiComic.title || "Sin título",
@@ -28,9 +30,19 @@ const MarvelAPI = {
                 path: apiComic.thumbnail?.path || "https://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available",
                 extension: apiComic.thumbnail?.extension || "jpg",
             },
-            price: apiComic.prices?.[0]?.price || 0,
-            creators: apiComic.creators?.items?.map((creator) => creator.name) || [],
-            characters: apiComic.characters?.items?.map((char) => char.name) || [],
+            price: Config.USE_MOCK_DATA ? 
+                (apiComic.price || 0) : 
+                (apiComic.prices?.[0]?.price || 0),
+            creators: Config.USE_MOCK_DATA ? 
+                (apiComic.creators || []) : 
+                (Array.isArray(apiComic.creators?.items) ? 
+                    apiComic.creators.items.map(creator => creator.name) : 
+                    []),
+            characters: Config.USE_MOCK_DATA ? 
+                (apiComic.characters || []) : 
+                (Array.isArray(apiComic.characters?.items) ? 
+                    apiComic.characters.items.map(char => char.name) : 
+                    [])
         };
     },
 
@@ -166,6 +178,8 @@ const MarvelAPI = {
     },
 
     transformHeroData(apiHero) {
+        if (!apiHero) return null;
+
         return {
             id: apiHero.id || 0,
             name: apiHero.name || "Sin nombre",
@@ -175,8 +189,12 @@ const MarvelAPI = {
                 path: apiHero.thumbnail?.path || "https://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available",
                 extension: apiHero.thumbnail?.extension || "jpg",
             },
-            resourceURI: apiHero.resourceURI || "",
-            comics: apiHero.comics?.items?.map(comic => comic.name) || [],
+            comics: Array.isArray(apiHero.comics?.items)
+                ? apiHero.comics.items.map(comic => comic.name)
+                : [],
+            series: Array.isArray(apiHero.series?.items)
+                ? apiHero.series.items.map(serie => serie.name)
+                : []
         };
     },
 
