@@ -664,7 +664,7 @@ body {
 .no-results {
     text-align: center;
     padding: 20px;
-    color: var(--text-color);
+    color: black;
     font-size: 1.2em;
 }
 
@@ -885,4 +885,50 @@ body {
     .price-filter-container {
         min-width: 100%;
     }
+}
+
+.collection-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.move-collection-btn {
+    width: 100%;
+    padding: 8px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.clone-collection-btn {
+    width: 100%;
+    padding: 8px;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.move-collection-btn:hover,
+.clone-collection-btn:hover {
+    background-color: var(--hover-red);
+}
+
+.collection-actions .remove-favorite-btn {
+    width: 100%;
 }

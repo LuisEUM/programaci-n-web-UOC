@@ -345,8 +345,29 @@ const UI = {
   },
 
   toggleIndividualFavorite(comicId) {
-    this.tempComicId = comicId; // Almacenar temporalmente el ID del cómic
-    this.openCollectionModal(true); // Indicar que es un favorito individual
+    this.tempComicId = comicId;
+    
+    // Actualizar la selección de la tarjeta
+    const card = document.querySelector(`.card[data-id="${comicId}"]`);
+    const checkbox = card.querySelector('.card-checkbox');
+    
+    if (!this.selectedComics.has(comicId)) {
+        // Si no está seleccionado, lo seleccionamos
+        this.selectedComics.add(comicId);
+        card.classList.add('selected');
+        if (checkbox) checkbox.checked = true;
+    } else {
+        // Si ya está seleccionado, lo deseleccionamos
+        this.selectedComics.delete(comicId);
+        card.classList.remove('selected');
+        if (checkbox) checkbox.checked = false;
+    }
+
+    // Actualizar la barra de acciones
+    this.updateActionsBar();
+    
+    // Abrir el modal de colecciones
+    this.collectionModal.open(true, comicId);
   },
 
   toggleFavorite(comicId) {
@@ -395,7 +416,7 @@ const UI = {
 
   saveFavorites() {
     if (this.selectedComics.size > 0) {
-      this.openCollectionModal();
+      this.collectionModal.open(false);
     }
   },
 
@@ -446,48 +467,76 @@ const UI = {
   handleCollectionSelection(collection) {
     const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
 
-    if (this.isIndividualFavorite && this.tempComicId !== null) {
-      // Agregar favorito individual
-      this.favoritesManager.addFavorite(
-        dataSource,
-        collection,
-        this.tempComicId
-      );
-      this.updateFavoriteButtons(this.tempComicId);
-      this.tempComicId = null;
-      this.isIndividualFavorite = false;
-    } else if (this.isIndividualRemove && this.tempComicId !== null) {
-      // Remover favorito individual
-      this.favoritesManager.removeFavorite(
-        dataSource,
-        collection,
-        this.tempComicId
-      );
-      this.updateFavoriteButtons(this.tempComicId);
-      this.tempComicId = null;
-      this.isIndividualRemove = false;
-    } else if (this.selectedComics.size > 0) {
-      // Agregar o remover favoritos múltiples
-      const selectedComicsList = this.getSelectedComics();
-      selectedComicsList.forEach((comic) => {
-        if (this.isRemoveAction) {
+    if (this.isMovingComic && this.tempComicId) {
+        // Primero remover de la colección actual
+        const currentCollection = document.querySelector('.collections-tabs .tab-btn.active')?.dataset.collection;
+        if (currentCollection) {
+            this.favoritesManager.removeFavorite(dataSource, currentCollection, this.tempComicId);
+        }
+        // Luego añadir a la nueva colección
+        this.favoritesManager.addFavorite(dataSource, collection, this.tempComicId);
+        this.tempComicId = null;
+        this.isMovingComic = false;
+        // Actualizar la vista
+        this.loadFavorites();
+    } else if (this.isCloningComic && this.tempComicId) {
+        // Añadir a la nueva colección sin remover de la actual
+        this.favoritesManager.addFavorite(dataSource, collection, this.tempComicId);
+        this.tempComicId = null;
+        this.isCloningComic = false;
+        // Actualizar la vista
+        this.loadFavorites();
+    } else {
+        if (this.isIndividualFavorite && this.tempComicId !== null) {
+            // Agregar favorito individual
+            this.favoritesManager.addFavorite(dataSource, collection, this.tempComicId);
+            this.updateFavoriteButtons(this.tempComicId);
+            
+            // Limpiar la selección después de añadir a favoritos
+            const card = document.querySelector(`.card[data-id="${this.tempComicId}"]`);
+            const checkbox = card.querySelector('.card-checkbox');
+            if (checkbox) checkbox.checked = false;
+            card.classList.remove('selected');
+            this.selectedComics.delete(this.tempComicId);
+            
+            this.tempComicId = null;
+            this.isIndividualFavorite = false;
+            
+            // Actualizar la barra de acciones
+            this.updateActionsBar();
+        } else if (this.isIndividualRemove && this.tempComicId !== null) {
+          // Remover favorito individual
           this.favoritesManager.removeFavorite(
             dataSource,
             collection,
-            comic.id
+            this.tempComicId
           );
-        } else {
-          this.favoritesManager.addFavorite(dataSource, collection, comic.id);
+          this.updateFavoriteButtons(this.tempComicId);
+          this.tempComicId = null;
+          this.isIndividualRemove = false;
+        } else if (this.selectedComics.size > 0) {
+          // Agregar o remover favoritos múltiples
+          const selectedComicsList = this.getSelectedComics();
+          selectedComicsList.forEach((comic) => {
+            if (this.isRemoveAction) {
+              this.favoritesManager.removeFavorite(
+                dataSource,
+                collection,
+                comic.id
+              );
+            } else {
+              this.favoritesManager.addFavorite(dataSource, collection, comic.id);
+            }
+            const card = document.querySelector(`.card[data-id="${comic.id}"]`);
+            const checkbox = card.querySelector(".card-checkbox");
+            checkbox.checked = false;
+            card.classList.remove("selected");
+            this.updateFavoriteButtons(comic.id);
+          });
+          this.selectedComics.clear();
+          this.updateActionsBar();
+          this.isRemoveAction = false; // Resetear indicador
         }
-        const card = document.querySelector(`.card[data-id="${comic.id}"]`);
-        const checkbox = card.querySelector(".card-checkbox");
-        checkbox.checked = false;
-        card.classList.remove("selected");
-        this.updateFavoriteButtons(comic.id);
-      });
-      this.selectedComics.clear();
-      this.updateActionsBar();
-      this.isRemoveAction = false; // Resetear indicador
     }
   },
 
@@ -723,6 +772,18 @@ const UI = {
       document.querySelector(".search-section").after(priceInfo);
     }
     priceInfo.textContent = message;
+  },
+
+  moveToAnotherCollection(comicId) {
+    this.tempComicId = comicId;
+    this.isMovingComic = true;
+    this.collectionModal.open(true, comicId);
+  },
+
+  cloneToAnotherCollection(comicId) {
+    this.tempComicId = comicId;
+    this.isCloningComic = true;
+    this.collectionModal.open(true, comicId);
   },
 };
 

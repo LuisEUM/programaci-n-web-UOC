@@ -20,6 +20,43 @@ class Card {
 
         // Info Container
         const infoContainer = this.createInfoContainer(data, options);
+        
+        // Agregar botones de acción específicos para colecciones
+        if (options.inCollection) {
+            const actionButtons = document.createElement('div');
+            actionButtons.className = 'collection-actions';
+            
+            // Botón de mover a otra colección
+            const moveButton = document.createElement('button');
+            moveButton.className = 'move-collection-btn';
+            moveButton.innerHTML = '<i class="fas fa-exchange-alt"></i> Mover a otra colección';
+            moveButton.onclick = () => UI.moveToAnotherCollection(data.id);
+            actionButtons.appendChild(moveButton);
+
+            // Botón de clonar a otra colección
+            const cloneButton = document.createElement('button');
+            cloneButton.className = 'clone-collection-btn';
+            cloneButton.innerHTML = '<i class="fas fa-copy"></i> Clonar a otra colección';
+            cloneButton.onclick = () => UI.cloneToAnotherCollection(data.id);
+            actionButtons.appendChild(cloneButton);
+
+            // Botón de remover existente
+            const removeButton = document.createElement('button');
+            removeButton.className = 'remove-favorite-btn';
+            removeButton.innerHTML = '<i class="fas fa-trash-alt"></i> Remover de Colección';
+            removeButton.onclick = options.actions[0].onClick;
+            actionButtons.appendChild(removeButton);
+
+            infoContainer.appendChild(actionButtons);
+        } else {
+            // Agregar acciones normales para cards fuera de colecciones
+            if (options.actions) {
+                options.actions.forEach(action => {
+                    infoContainer.appendChild(this.createActionButton(action));
+                });
+            }
+        }
+
         card.appendChild(infoContainer);
 
         return card;
@@ -78,13 +115,6 @@ class Card {
 
         // Lists (creators, characters, comics, etc.)
         this.appendLists(info, data);
-
-        // Action Buttons
-        if (options.actions) {
-            options.actions.forEach(action => {
-                info.appendChild(this.createActionButton(action));
-            });
-        }
 
         return info;
     }

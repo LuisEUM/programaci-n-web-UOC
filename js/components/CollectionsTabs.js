@@ -108,6 +108,7 @@ class CollectionsTabs {
           const cardElement = Card.createBasicCard(comic, {
             showId: true,
             showMetadata: true,
+            inCollection: true,
             actions: [
               {
                 className: "remove-favorite-btn",
