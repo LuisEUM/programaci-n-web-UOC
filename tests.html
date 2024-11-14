@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tests PRA1 - Marvel Comics</title>
+    <style>
+        :root {
+            --success-color: #4CAF50;
+            --error-color: #f44336;
+            --primary-color: #ed1d24;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .test-group {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .test-group h2 {
+            margin-top: 0;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .test-result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+
+        .test-success {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+        }
+
+        .test-error {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--error-color);
+        }
+
+        .test-details {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .run-tests-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .run-tests-btn:hover {
+            background-color: #c41e24;
+        }
+
+        .test-count {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.2em;
+        }
+
+        .success-count {
+            color: var(--success-color);
+        }
+
+        .error-count {
+            color: var(--error-color);
+        }
+    </style>
+    <!-- Incluir los scripts necesarios -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="js/classes/Comic.js"></script>
+    <script src="js/classes/Hero.js"></script>
+    <script src="js/classes/Favorites.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/mock-data.js"></script>
+    <script src="js/tests.js"></script>
+</head>
+<body>
+    <h1>Tests de Evaluación PRA1</h1>
+    <button id="runTestsBtn" class="run-tests-btn">Ejecutar Tests</button>
+    <div id="testCount" class="test-count">
+        Tests ejecutados: <span id="totalTests">0</span> | 
+        Exitosos: <span id="successTests" class="success-count">0</span> | 
+        Fallidos: <span id="errorTests" class="error-count">0</span>
+    </div>
+    <div id="testResults"></div>
+
+    <script>
+        document.getElementById('runTestsBtn').addEventListener('click', () => {
+            const resultsContainer = document.getElementById('testResults');
+            resultsContainer.innerHTML = '';
+            
+            // Contadores para los resultados
+            let totalTests = 0;
+            let successTests = 0;
+            let errorTests = 0;
+
+            // Función para mostrar resultados de test
+            const showTestResult = (groupName, testName, passed, error = null) => {
+                totalTests++;
+                if (passed) successTests++;
+                else errorTests++;
+
+                let groupContainer = document.querySelector(`#group-${groupName.replace(/\s+/g, '-')}`);
+                if (!groupContainer) {
+                    groupContainer = document.createElement('div');
+                    groupContainer.id = `group-${groupName.replace(/\s+/g, '-')}`;
+                    groupContainer.className = 'test-group';
+                    groupContainer.innerHTML = `<h2>${groupName}</h2>`;
+                    resultsContainer.appendChild(groupContainer);
+                }
+
+                const resultElement = document.createElement('div');
+                resultElement.className = `test-result ${passed ? 'test-success' : 'test-error'}`;
+                resultElement.innerHTML = `
+                    ${passed ? '✅' : '❌'} ${testName}
+                    ${error ? `<div class="test-details">Error: ${error}</div>` : ''}
+                `;
+                groupContainer.appendChild(resultElement);
+
+                // Actualizar contadores
+                document.getElementById('totalTests').textContent = totalTests;
+                document.getElementById('successTests').textContent = successTests;
+                document.getElementById('errorTests').textContent = errorTests;
+            };
+
+            // Sobrescribir console.assert para capturar resultados
+            const originalAssert = console.assert;
+            console.assert = function(condition, message) {
+                if (!condition) {
+                    throw new Error(message);
+                }
+            };
+
+            // Sobrescribir console.group para manejar grupos
+            let currentGroup = '';
+            console.group = function(name) {
+                currentGroup = name;
+            };
+            console.groupEnd = function() {
+                currentGroup = '';
+            };
+
+            // Ejecutar tests y capturar resultados
+            try {
+                Tests.runAll();
+            } catch (error) {
+                showTestResult(currentGroup, 'Test fallido', false, error.message);
+            }
+
+            // Restaurar console.assert
+            console.assert = originalAssert;
+        });
+    </script>
+</body>
+</html> 

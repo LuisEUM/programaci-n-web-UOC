@@ -126,9 +126,20 @@ class Favorites {
         if (!(comic instanceof Comic)) {
             throw new Error('Solo se pueden agregar instancias de Comic');
         }
-        if (!this.#favorites.some(c => c.id === comic.id)) {
-            this.#favorites.push(comic);
+        if (!this.#favoriteComics.some(c => c.id === comic.id)) {
+            this.#favoriteComics.push(comic);
         }
+    }
+
+    removeFavoriteComic(comicId) {
+        this.#favoriteComics = this.#favoriteComics.filter(comic => comic.id !== comicId);
+    }
+
+    showFavorites() {
+        return this.#favoriteComics.map(comic => ({
+            title: comic.title,
+            price: comic.price
+        }));
     }
 
     addMultipleFavorites(...comics) {
@@ -136,32 +147,24 @@ class Favorites {
     }
 
     copyFavorites() {
-        return [...this.#favorites];
+        return [...this.#favoriteComics];
     }
 
-    findComicById(comicId, comics = this.#favorites) {
+    findComicById(comicId, comics = this.#favoriteComics) {
         if (comics.length === 0) return null;
         if (comics[0].id === comicId) return comics[0];
         return this.findComicById(comicId, comics.slice(1));
     }
 
     calculateAveragePrice() {
-        if (this.#favorites.length === 0) return 0;
-        const total = this.#favorites.reduce((sum, comic) => sum + comic.price, 0);
-        return total / this.#favorites.length;
+        if (this.#favoriteComics.length === 0) return 0;
+        const total = this.#favoriteComics.reduce((sum, comic) => sum + comic.price, 0);
+        return total / this.#favoriteComics.length;
     }
 
     getAffordableComicTitles(maxPrice) {
-        return this.#favorites
+        return this.#favoriteComics
             .filter(comic => comic.price <= maxPrice)
             .map(comic => comic.title);
-    }
-
-    // Método requerido por la práctica
-    showFavorites() {
-        return this.#favorites.map(comic => ({
-            title: comic.title,
-            price: comic.price
-        }));
     }
 }
