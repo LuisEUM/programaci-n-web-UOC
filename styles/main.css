@@ -79,7 +79,7 @@ body {
   background-color: var(--card-background);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
-  color:white
+  color: white;
 }
 
 #searchInput:focus {
@@ -126,7 +126,9 @@ body {
   margin-bottom: calc(var(--spacing) * 2);
 }
 
-.comic-card, .card {
+.comic-card,
+.card,
+.card-info {
   background: var(--card-bg);
   border-radius: var(--border-radius);
   overflow: hidden;
@@ -138,12 +140,14 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-.comic-card:hover, .card:hover {
+.comic-card:hover,
+.card:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
 }
 
-.comic-card.selected, .card.selected {
+.comic-card.selected,
+.card.selected {
   border-color: var(--primary-color);
 }
 
@@ -166,9 +170,11 @@ body {
   right: 10px;
   width: 24px;
   height: 24px;
-  opacity: 0;
+  opacity: 1;
   cursor: pointer;
   z-index: 2;
+  color: white;
+  border: 2px solid white;
 }
 
 .checkbox-indicator {
@@ -195,10 +201,10 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: white;
 }
 
-.comic-image, .card-image {
+.comic-image,
+.card-image {
   width: 100%;
   height: 280px;
   object-fit: cover;
@@ -207,7 +213,8 @@ body {
 }
 
 /* Card Info */
-.comic-info, .card-info {
+.comic-info,
+.card-info {
   padding: 15px;
   display: flex;
   flex-direction: column;
@@ -215,7 +222,8 @@ body {
   flex: 1;
 }
 
-.comic-title, .card-title {
+.comic-title,
+.card-title {
   font-size: 0.9rem;
   margin-bottom: 8px;
   display: -webkit-box;
@@ -236,7 +244,8 @@ body {
   margin: 0;
 }
 
-.comic-metadata, .card-metadata {
+.comic-metadata,
+.card-metadata {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -253,7 +262,8 @@ body {
 }
 
 /* Buttons */
-.add-favorite-btn, .remove-favorite-btn {
+.add-favorite-btn,
+.remove-favorite-btn {
   width: 100%;
   padding: 8px;
   background-color: transparent;
@@ -480,38 +490,38 @@ body {
 }
 
 .hero-card {
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    overflow: hidden;
-    transition: transform 0.2s;
-    position: relative;
+  display: flex;
+  flex-direction: column;
+  background: black;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s;
+  position: relative;
 }
 
 .hero-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .card-description {
-    font-size: 0.85em;
-    color: var(--text-color);
-    margin: 8px 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  font-size: 0.85em;
+  color: var(--text-color);
+  margin: 8px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .card-creators,
 .card-characters {
-    margin: 5px 0;
-    font-size: 0.85em;
-    color: var(--text-color);
+  margin: 5px 0;
+  font-size: 0.85em;
+  color: var(--text-color);
 }
 
 .card strong {
-    color: var(--text-secondary);
+  color: var(--text-secondary);
 }

@@ -209,12 +209,10 @@ const UI = {
       cardInfo.appendChild(title);
 
       // Añadir descripción
-      if (comic.description && comic.description !== "#N/A" && comic.description !== "No description available") {
-          const description = document.createElement('p');
-          description.className = 'card-description';
-          description.textContent = Utils.truncateText(comic.description, 150);
-          cardInfo.appendChild(description);
-      }
+      const description = document.createElement('p');
+      description.className = 'card-description';
+      description.textContent = Utils.truncateText(comic.description, 150);
+      cardInfo.appendChild(description);
 
       const metadata = document.createElement('div');
       metadata.className = 'card-metadata';
