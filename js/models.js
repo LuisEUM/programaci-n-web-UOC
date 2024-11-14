@@ -115,14 +115,48 @@ class Heroe {
  */
 class Favorites {
     constructor() {
-        // Inicializa los favoritos por fuente de datos y colección
-        this.favorites = JSON.parse(localStorage.getItem('favorites')) || {
-            mock: { gold: [], silver: [], bronze: [] },
-            api: { gold: [], silver: [], bronze: [] }
+        this.favorites = this.loadFavorites();
+    }
+
+    loadFavorites() {
+        const savedFavorites = localStorage.getItem('favorites');
+        if (savedFavorites) {
+            try {
+                return JSON.parse(savedFavorites);
+            } catch (e) {
+                console.error('Error parsing favorites:', e);
+                return this.getInitialFavoritesStructure();
+            }
+        }
+        return this.getInitialFavoritesStructure();
+    }
+
+    getInitialFavoritesStructure() {
+        return {
+            mock: {
+                general: [],
+                reading: [],
+                wishlist: []
+            },
+            api: {
+                general: [],
+                reading: [],
+                wishlist: []
+            }
         };
     }
 
+    saveFavorites() {
+        localStorage.setItem('favorites', JSON.stringify(this.favorites));
+    }
+
     addFavorite(dataSource, collection, comicId) {
+        if (!this.favorites[dataSource]) {
+            this.favorites[dataSource] = {};
+        }
+        if (!this.favorites[dataSource][collection]) {
+            this.favorites[dataSource][collection] = [];
+        }
         if (!this.favorites[dataSource][collection].includes(comicId)) {
             this.favorites[dataSource][collection].push(comicId);
             this.saveFavorites();
@@ -130,24 +164,25 @@ class Favorites {
     }
 
     removeFavorite(dataSource, collection, comicId) {
-        this.favorites[dataSource][collection] = this.favorites[dataSource][collection].filter(id => id !== comicId);
-        this.saveFavorites();
-    }
-
-    isFavorite(dataSource, collection, comicId) {
-        if (collection) {
-            return this.favorites[dataSource][collection]?.includes(comicId) || false;
-        } else {
-            // Verificar en todas las colecciones
-            return Object.values(this.favorites[dataSource]).some(col => col.includes(comicId));
+        if (this.favorites[dataSource]?.[collection]) {
+            this.favorites[dataSource][collection] = this.favorites[dataSource][collection].filter(id => id !== comicId);
+            this.saveFavorites();
         }
     }
 
     getAllFavorites(dataSource) {
-        return this.favorites[dataSource];
+        return this.favorites[dataSource] || {};
     }
 
-    saveFavorites() {
-        localStorage.setItem('favorites', JSON.stringify(this.favorites));
+    isFavorite(dataSource, collection, comicId) {
+        // Si no se especifica una colección, buscar en todas las colecciones
+        if (!collection) {
+            return Object.values(this.favorites[dataSource] || {}).some(
+                collectionIds => collectionIds.includes(comicId)
+            );
+        }
+        
+        // Si se especifica una colección, buscar solo en esa colección
+        return this.favorites[dataSource]?.[collection]?.includes(comicId) || false;
     }
 }

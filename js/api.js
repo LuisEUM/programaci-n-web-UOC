@@ -1,5 +1,16 @@
 const MarvelAPI = {
     BASE_URL: Config.MARVEL_API_BASE_URL,
+    PUBLIC_KEY: Config.MARVEL_PUBLIC_KEY,
+    PRIVATE_KEY: Config.MARVEL_PRIVATE_KEY,
+
+    generateHash(timestamp) {
+        return Utils.generateMarvelHash(
+            timestamp,
+            this.PRIVATE_KEY,
+            this.PUBLIC_KEY
+        );
+    },
+
     /**
      * Transforma los datos de la API al formato de nuestra aplicación
      * @param {Object} apiComic - Datos del cómic desde la API
@@ -85,30 +96,31 @@ const MarvelAPI = {
             });
         }
 
-        const timestamp = new Date().getTime().toString();
-        const hash = Utils.generateMarvelHash(
-            timestamp,
-            Config.MARVEL_PRIVATE_KEY,
-            Config.MARVEL_PUBLIC_KEY
-        );
-
-        const queryParams = new URLSearchParams({
-            ts: timestamp,
-            apikey: Config.MARVEL_PUBLIC_KEY,
-            hash: hash
-        });
-
         try {
-            const response = await fetch(`${Config.MARVEL_API_BASE_URL}/comics/${comicId}?${queryParams}`);
+            const timestamp = new Date().getTime().toString();
+            const hash = this.generateHash(timestamp);
+            
+            const queryParams = new URLSearchParams({
+                ts: timestamp,
+                apikey: this.PUBLIC_KEY,
+                hash: hash
+            });
+            
+            const response = await fetch(
+                `${this.BASE_URL}/comics/${comicId}?${queryParams}`
+            );
+            
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`Marvel API error: ${response.status} - ${errorData.message || "Unknown error"}`);
+                throw new Error('Network response was not ok');
             }
-
+            
             const data = await response.json();
-            return this.transformComicData(data.data.results[0]);
+            if (data.data && data.data.results && data.data.results.length > 0) {
+                return this.transformComicData(data.data.results[0]);
+            }
+            return null;
         } catch (error) {
-            console.error("Error fetching comic:", error);
+            console.error('Error fetching comic by ID:', error);
             throw error;
         }
     },
