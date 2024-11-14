@@ -114,74 +114,51 @@ class Heroe {
  * @class
  */
 class Favorites {
-    /**
-     * Crea una instancia de Favorites
-     * Inicializa un array vacío para almacenar los cómics favoritos
-     * @constructor
-     */
     constructor() {
-        /**
-         * Array que almacena los cómics favoritos
-         * @private
-         * @type {Array<Comic>}
-         */
-        this.favorites = [];
+        this.favorites = JSON.parse(localStorage.getItem('favorites')) || [];
     }
 
-    /**
-     * Añade un cómic a la lista de favoritos
-     * Verifica que el parámetro sea una instancia válida de Comic
-     * @param {Comic} comic - El cómic a añadir a favoritos
-     * @throws {Error} Si el parámetro no es una instancia de Comic
-     */
-    addFavorite(comic) {
-        if (!(comic instanceof Comic)) {
-            throw new Error('Solo se pueden añadir instancias de Comic');
+    addFavorite(comicId) {
+        if (!this.favorites.includes(comicId)) {
+            this.favorites.push(comicId);
+            this.saveFavorites();
         }
-        this.favorites.push(comic);
     }
 
-    /**
-     * Elimina un cómic de la lista de favoritos por su ID
-     * Utiliza filter para crear un nuevo array sin el cómic especificado
-     * @param {number} comicId - ID del cómic a eliminar
-     * @returns {void}
-     */
-    removeFavorite(comicId) {
-        if (typeof comicId !== 'number') {
-            throw new Error('El ID debe ser un número');
-        }
-        this.favorites = this.favorites.filter(comic => comic.id !== comicId);
-    }
-
-    /**
-     * Muestra todos los cómics en la lista de favoritos
-     * @returns {Array<Comic>} Array con todos los cómics favoritos
-     */
-    showFavorites() {
-        return this.favorites;
-    }
-
-    /**
-     * Añade múltiples cómics a la lista de favoritos
-     * Utiliza el operador rest para recibir múltiples argumentos
-     * @param {...Comic} comics - Lista variable de cómics a añadir
-     * @throws {Error} Si alguno de los elementos no es una instancia de Comic
-     */
-    addMultipleFavorites(...comics) {
-        comics.forEach(comic => {
-            if (!(comic instanceof Comic)) {
-                throw new Error('Todos los elementos deben ser instancias de Comic');
+    addMultipleFavorites(...comicIds) {
+        comicIds.forEach(id => {
+            if (!this.favorites.includes(id)) {
+                this.favorites.push(id);
             }
-            this.favorites.push(comic);
         });
+        this.saveFavorites();
     }
 
-    /**
-     * Crea una copia superficial de la lista de favoritos
-     * Utiliza el operador spread para crear un nuevo array
-     * @returns {Array<Comic>} Nueva copia del array de cómics favoritos
-     */
+    removeFavorite(comicId) {
+        this.favorites = this.favorites.filter(id => id !== comicId);
+        this.saveFavorites();
+    }
+
+    toggleFavorite(comicId) {
+        if (this.favorites.includes(comicId)) {
+            this.removeFavorite(comicId);
+        } else {
+            this.addFavorite(comicId);
+        }
+    }
+
+    showFavorites() {
+        return mockComics.comics.filter(comic => this.favorites.includes(comic.id));
+    }
+
+    isFavorite(comicId) {
+        return this.favorites.includes(comicId);
+    }
+
+    saveFavorites() {
+        localStorage.setItem('favorites', JSON.stringify(this.favorites));
+    }
+
     copyFavorites() {
         return [...this.favorites];
     }

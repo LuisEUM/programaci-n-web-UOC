@@ -27,7 +27,7 @@
             </div>
         </div>
         <div id="comicsContainer" class="comics-grid">
-
+            <!-- Las tarjetas se generarán dinámicamente aquí -->
         </div>
 
         <div class="pagination">
@@ -36,6 +36,14 @@
             <button id="nextPage" class="page-btn"><i class="fas fa-chevron-right"></i></button>
         </div>
         <button id="toggleDataBtn">Toggle Data Source</button>
+
+        <!-- Barra de acciones -->
+        <div class="actions-bar" id="actionsBar">
+            <span class="selected-count">0 cómic seleccionado</span>
+            <button class="save-favorites-btn" onclick="UI.saveFavorites()">
+                Guardar en Favoritos
+            </button>
+        </div>
     </div>
 
     <!-- Scripts en orden específico -->
