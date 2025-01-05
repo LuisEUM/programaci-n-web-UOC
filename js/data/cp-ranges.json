@@ -1,0 +1,80 @@
+{
+  "rangos": {
+    "Andalucía": {
+      "start": "04001",
+      "end": "41999"
+    },
+    "Aragón": {
+      "start": "22001",
+      "end": "50999"
+    },
+    "Asturias": {
+      "start": "33001",
+      "end": "33999"
+    },
+    "Cantabria": {
+      "start": "39001",
+      "end": "39999"
+    },
+    "Castilla-La Mancha": {
+      "start": "02001",
+      "end": "45999"
+    },
+    "Castilla y León": {
+      "start": "05001",
+      "end": "49999"
+    },
+    "Cataluña": {
+      "start": "08001",
+      "end": "43999"
+    },
+    "Ceuta": {
+      "start": "51001",
+      "end": "51999"
+    },
+    "Comunidad de Madrid": {
+      "start": "28001",
+      "end": "28999"
+    },
+    "Comunidad Valenciana": {
+      "start": "03001",
+      "end": "46999"
+    },
+    "Extremadura": {
+      "start": "06001",
+      "end": "10999"
+    },
+    "Galicia": {
+      "start": "15001",
+      "end": "36999"
+    },
+    "Islas Baleares": {
+      "start": "07001",
+      "end": "07999"
+    },
+    "Islas Canarias": {
+      "start": "35001",
+      "end": "38999"
+    },
+    "La Rioja": {
+      "start": "26001",
+      "end": "26999"
+    },
+    "Melilla": {
+      "start": "52001",
+      "end": "52999"
+    },
+    "Navarra": {
+      "start": "31001",
+      "end": "31999"
+    },
+    "País Vasco": {
+      "start": "01001",
+      "end": "48999"
+    },
+    "Región de Murcia": {
+      "start": "30001",
+      "end": "30999"
+    }
+  }
+}

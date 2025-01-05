@@ -1,0 +1,612 @@
+/* Variables from main theme */
+:root {
+  --primary-color: #e23636;
+  --secondary-color: #504a4a;
+  --background-color: #f5f5f5;
+  --text-color: #333;
+  --white: #ffffff;
+  --input-bg: #f8f9fa;
+  --input-border: #e1e1e1;
+  --success-color: #28a745;
+  --error-color: #dc3545;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Arial", sans-serif;
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+    url("https://unsplash.com/photos/8SeJUmfahu0/download?ixid=M3wxMjA3fDB8MXxhbGx8fHx8fHx8fHwxNzA5MjE5MTc5fA&force=true");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+}
+
+.register-container {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+/* Header Styles */
+.register-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.back-button {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--secondary-color);
+  text-decoration: none;
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+.back-button:hover {
+  transform: translateX(-5px);
+}
+
+.register-header h1 {
+  color: var(--primary-color);
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.subtitle {
+  color: var(--secondary-color);
+  font-size: 1rem;
+}
+
+/* Form Styles */
+.register-form {
+  margin-top: 2rem;
+}
+
+.form-group {
+  margin-bottom: 0.5rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.half {
+  flex: 1;
+}
+
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-group i:not(.toggle-password):not(.validation-icon) {
+  position: absolute;
+  left: 1rem;
+  color: var(--secondary-color);
+  transition: color 0.3s ease;
+}
+
+.input-group input,
+.input-group select {
+  width: 100%;
+  padding: 0.8rem 2.5rem;
+  border: 2px solid var(--input-border);
+  border-radius: 10px;
+  background-color: var(--input-bg);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+/* Ajuste específico para el campo de contraseña */
+.input-group input[type="password"],
+.input-group input[type="text"] {
+  padding-right: 2.5rem; /* Espacio para el icono de toggle */
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  border-color: var(--secondary-color);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(80, 74, 74, 0.1);
+}
+
+.input-group input:focus + i {
+  color: var(--primary-color);
+}
+
+.toggle-password {
+  position: absolute;
+  right: 1rem;
+  cursor: pointer;
+  color: var(--secondary-color);
+  background: none;
+  border: none;
+  padding: 0;
+  transition: color 0.3s ease;
+}
+
+.toggle-password:hover {
+  color: var(--primary-color);
+}
+
+/* Register Button */
+.register-button {
+  width: 100%;
+  padding: 1rem;
+  background-color: var(--primary-color);
+  color: var(--white);
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.register-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(226, 54, 54, 0.3);
+}
+
+.register-button i {
+  font-size: 1.2rem;
+}
+
+/* Login Link */
+.login-link {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: var(--secondary-color);
+}
+
+.login-link a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .register-container {
+    padding: 1.5rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .half {
+    width: 100%;
+  }
+
+  .register-header h1 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-container {
+    padding: 1rem;
+  }
+
+  .input-group input,
+  .input-group select {
+    font-size: 0.9rem;
+  }
+
+  .register-button {
+    font-size: 1rem;
+  }
+}
+
+.input-group select {
+  width: 100%;
+  padding: 0.8rem 2.5rem;
+  border: 2px solid var(--input-border);
+  border-radius: 10px;
+  background-color: var(--input-bg);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23504a4a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1em;
+}
+
+.input-group select:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(226, 54, 54, 0.1);
+}
+
+/* Test User Section */
+.test-user-info {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: var(--input-bg);
+  border-radius: 10px;
+  text-align: center;
+  border: 1px solid var(--input-border);
+}
+
+.test-user-info p {
+  color: var(--secondary-color);
+  margin-bottom: 0.8rem;
+  font-size: 0.9rem;
+}
+
+.test-user-info code {
+  display: block;
+  padding: 0.8rem;
+  background-color: var(--white);
+  border-radius: 5px;
+  font-family: monospace;
+  color: var(--primary-color);
+  line-height: 1.5;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+/* Test User Button */
+.test-user-button {
+  width: auto;
+  padding: 0.5rem 1rem;
+  background: none;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  border-radius: 5px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0 auto;
+}
+
+.test-user-button:hover {
+  background-color: var(--primary-color);
+  color: var(--white);
+  transform: translateY(-1px);
+}
+
+.test-user-button i {
+  font-size: 0.9rem;
+}
+
+.image-credits {
+  text-align: center;
+  color: var(--white);
+  font-size: 0.8rem;
+  margin-top: 1rem;
+  opacity: 0.8;
+}
+
+.image-credits a {
+  color: var(--white);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.image-credits a:hover {
+  border-bottom-color: var(--white);
+}
+
+/* Validation States */
+.input-group.error input {
+  border-color: var(--error-color);
+}
+
+.input-group.success input {
+  border-color: var(--success-color);
+}
+
+.input-group .validation-icon {
+  position: absolute;
+  right: 1rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  font-size: 1.1rem;
+  z-index: 2;
+}
+
+.input-group .validation-icon.success-icon {
+  color: var(--success-color);
+}
+
+.input-group .validation-icon.error-icon {
+  color: var(--error-color);
+}
+
+.input-group.success .validation-icon.success-icon,
+.input-group.error .validation-icon.error-icon {
+  opacity: 1;
+}
+
+/* Ajustes para campos con toggle y validación */
+.input-group.with-toggle .validation-icon {
+  right: 2.5rem;
+}
+
+.input-group.with-toggle input {
+  padding-right: 4rem;
+}
+
+/* Botón de verificación de usuario */
+.check-user-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0 1.2rem;
+  cursor: pointer;
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.check-user-btn:hover {
+  background-color: var(--secondary-color);
+  transform: scale(1.02);
+}
+
+.check-user-btn i {
+  font-size: 0.9em;
+}
+
+/* Mensajes de validación para todos los campos */
+.validation-message {
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+  min-height: 0;
+  padding: 0;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: hidden;
+  max-height: 0;
+}
+
+.validation-message.error,
+.validation-message.success {
+  padding: 0.3rem 0.5rem;
+  min-height: 1.2rem;
+  max-height: 100px;
+  margin-top: 0.4rem;
+}
+
+.validation-message i {
+  font-size: 0.9em;
+}
+
+.validation-message.success {
+  color: var(--success-color);
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.validation-message.error {
+  color: var(--error-color);
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+/* Estados de validación para inputs */
+.input-group.success input {
+  border-color: var(--success-color);
+}
+
+.input-group.error input {
+  border-color: var(--error-color);
+}
+
+/* Ajuste para los iconos de validación dentro de los inputs */
+.input-group .validation-icon {
+  position: absolute;
+  right: 1rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  font-size: 1.1rem;
+  z-index: 2;
+}
+
+.input-group .validation-icon.success-icon {
+  color: var(--success-color);
+}
+
+.input-group .validation-icon.error-icon {
+  color: var(--error-color);
+}
+
+.input-group.success .validation-icon.success-icon,
+.input-group.error .validation-icon.error-icon {
+  opacity: 1;
+}
+
+/* Ajustes para campos con toggle */
+.input-group.with-toggle .validation-icon {
+  right: 2.5rem;
+}
+
+.input-group.with-toggle .toggle-password {
+  right: 1rem;
+  z-index: 3;
+}
+
+/* Ajustes para select */
+.input-group select {
+  padding-right: 3rem !important;
+}
+
+/* Input Padding */
+.input-group input,
+.input-group select {
+  width: 100%;
+  padding: 0.8rem 2.5rem;
+  border: 2px solid var(--input-border);
+  border-radius: 10px;
+  background-color: var(--input-bg);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+/* Usuario input group layout */
+.usuario-container {
+  margin-bottom: 0.5rem;
+}
+
+.usuario-container .input-wrapper {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.usuario-container .input-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+/* Form Sections */
+.form-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+}
+
+.section-title {
+  color: var(--secondary-color);
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--primary-color);
+}
+
+/* Reduce spacing between grouped inputs */
+.form-section .form-group {
+  margin-bottom: 1rem;
+}
+
+.form-section .form-group:last-child {
+  margin-bottom: 0;
+}
+
+/* Verification button states */
+.check-user-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0 1.2rem;
+  cursor: pointer;
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  min-width: 100px;
+  justify-content: center;
+}
+
+.check-user-btn:hover:not(:disabled) {
+  background-color: var(--secondary-color);
+  transform: scale(1.02);
+}
+
+.check-user-btn:disabled {
+  background-color: var(--success-color);
+  cursor: default;
+  opacity: 0.9;
+}
+
+/* Validation Messages */
+.validation-message {
+  font-size: 0.85rem;
+  margin-top: 0.2rem;
+  min-height: 0;
+  padding: 0;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: hidden;
+  max-height: 0;
+}
+
+.validation-message.error,
+.validation-message.success {
+  padding: 0.3rem 0.5rem;
+  min-height: 1.2rem;
+  max-height: 100px;
+  margin-top: 0.4rem;
+}
+
+.validation-message i {
+  font-size: 0.9em;
+}
+
+.validation-message.success {
+  color: var(--success-color);
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.validation-message.error {
+  color: var(--error-color);
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+/* Password validation message */
+#passwordValidationMessage {
+  font-size: 0.85rem;
+  margin-top: 0.4rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+/* Labels */
+.form-label {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--secondary-color);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
