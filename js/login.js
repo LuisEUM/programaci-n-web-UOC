@@ -25,41 +25,27 @@ document.addEventListener("DOMContentLoaded", function () {
   loginForm.addEventListener("submit", function (e) {
     e.preventDefault();
 
-    const userData = {
-      usuario: document.getElementById("usuario").value,
-      password: document.getElementById("password").value,
-      remember: document.getElementById("remember").checked,
-    };
-
-    // Obtener usuarios registrados
+    const username = document.getElementById("usuario").value;
+    const password = document.getElementById("password").value;
     const registeredUsers =
-      JSON.parse(localStorage.getItem("registeredUsers")) || [];
-    const testUser = {
-      usuario: "test",
-      password: "Test123",
-    };
+      JSON.parse(sessionStorage.getItem("registeredUsers")) || [];
 
-    // Verificar si es el usuario de prueba o un usuario registrado
-    const isTestUser =
-      userData.usuario === testUser.usuario &&
-      userData.password === testUser.password;
-    const registeredUser = registeredUsers.find(
-      (user) =>
-        user.usuario === userData.usuario && user.password === userData.password
+    const user = registeredUsers.find(
+      (u) => u.username === username && u.password === password
     );
 
-    if (isTestUser || registeredUser) {
-      // Login exitoso
-      const storage = userData.remember ? localStorage : sessionStorage;
-      storage.setItem("userToken", "token-" + Date.now());
-      storage.setItem("userName", userData.usuario);
+    if (user) {
+      const userData = {
+        username: user.username,
+        token: generateToken(),
+      };
 
-      showToast("¡Inicio de sesión exitoso!", "success");
-      setTimeout(() => {
-        window.location.href = "/comics";
-      }, 1500);
+      sessionStorage.setItem("userToken", userData.token);
+      sessionStorage.setItem("userName", userData.username);
+
+      window.location.href = "index.html";
     } else {
-      showToast("Usuario o contraseña incorrectos", "error");
+      showError("Usuario o contraseña incorrectos");
     }
   });
 });

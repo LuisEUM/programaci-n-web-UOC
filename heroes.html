@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marvel Heroes Explorer</title>
+  <link rel="stylesheet" href="styles/heroes.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">
+      <h1>Marvel Explorer</h1>
+    </div>
+    <div class="nav-links">
+      <a href="index.html">Inicio</a>
+      <a href="comics.html">Cómics</a>
+      <a href="heroes.html" class="active">Héroes</a>
+      <a href="collections.html">Colecciones</a>
+    </div>
+    <div class="user-section">
+      <span class="data-status">Usando Data Mockeada</span>
+      <button class="logout-button">
+        <i class="fas fa-sign-out-alt"></i>
+        Cerrar Sesión
+      </button>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container">
+      <!-- Heroes Section -->
+      <section class="heroes-section">
+        <div class="section-header">
+          <h2>Explora los Héroes</h2>
+          <div class="search-section">
+            <div class="search-container">
+              <i class="fas fa-search search-icon"></i>
+              <input type="text" id="searchByName" placeholder="Buscar por nombre...">
+              <button id="searchByNameBtn" class="search-btn">Buscar</button>
+            </div>
+            <div class="search-container">
+              <i class="fas fa-hashtag search-icon"></i>
+              <input type="number" id="searchById" placeholder="Buscar por ID...">
+              <button id="searchByIdBtn" class="search-btn">Buscar</button>
+            </div>
+          </div>
+          <!-- Contenedor para los badges de filtros -->
+          <div id="filterBadgesContainer"></div>
+        </div>
+
+        <div class="heroes-grid">
+          <!-- Heroes will be loaded here -->
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container">
+          <div class="pagination-controls">
+            <button id="firstPage" class="page-btn" title="Primera página">
+              <i class="fas fa-angle-double-left"></i>
+            </button>
+            <button id="prevPage" class="page-btn" title="Página anterior">
+              <i class="fas fa-angle-left"></i>
+            </button>
+            <div class="page-input-container">
+              <span>Página</span>
+              <input type="number" id="pageInput" min="1">
+              <span>de <span id="totalPages">1</span></span>
+            </div>
+            <button id="nextPage" class="page-btn" title="Página siguiente">
+              <i class="fas fa-angle-right"></i>
+            </button>
+            <button id="lastPage" class="page-btn" title="Última página">
+              <i class="fas fa-angle-double-right"></i>
+            </button>
+          </div>
+          <div class="items-per-page">
+            <label for="itemsPerPage">Items por página:</label>
+            <select id="itemsPerPage">
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Actions Bar -->
+    <div id="actionsBar" class="actions-bar">
+      <div class="selection-info">
+        <span class="selected-count">0 héroes seleccionados</span>
+      </div>
+      <div class="actions-buttons">
+        <button class="save-favorites-btn">
+          <i class="fas fa-heart"></i>
+          Añadir a Favoritos
+        </button>
+        <button class="remove-favorites-btn">
+          <i class="fas fa-trash"></i>
+          Remover de Favoritos
+        </button>
+      </div>
+    </div>
+
+    <!-- Collections Modal -->
+    <div id="collectionModal" class="modal">
+      <div class="modal-content">
+        <h2>Selecciona una colección</h2>
+        <button id="closeModal" class="close-modal-btn">
+          <i class="fas fa-times"></i>
+        </button>
+        <button class="collection-btn" data-collection="wishlist">
+          <i class="fas fa-star"></i>
+          Lista de Deseos
+        </button>
+        <button class="collection-btn" data-collection="toread">
+          <i class="fas fa-bookmark"></i>
+          Por Leer
+        </button>
+        <button class="collection-btn" data-collection="reading">
+          <i class="fas fa-book-open"></i>
+          Leyendo
+        </button>
+        <button class="collection-btn" data-collection="read">
+          <i class="fas fa-check-circle"></i>
+          Leídos
+        </button>
+        <button class="collection-btn" data-collection="favorites">
+          <i class="fas fa-heart"></i>
+          Mis Favoritos
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/models/Hero.js"></script>
+  <script src="js/components/FilterBadges.js"></script>
+  <script src="js/components/Favorites.js"></script>
+  <script src="js/heroes.js"></script>
+</body>
+
+</html>

@@ -9,64 +9,74 @@ const UI = {
 
   init() {
     this.bindEvents();
-    this.updateToggleButton();
-    this.loadInitialComics();
-    this.isIndividualRemove = false;
-    this.isRemoveAction = false;
-    this.selectedComics = new Set();
 
-    // Inicializar el modal de colecciones
-    this.collectionModal = new CollectionModal();
-
-    // Inicializar los tabs principales
+    // Solo inicializar elementos si estamos en index.html
     const tabsContainer = document.querySelector(".tabs-container");
-    this.mainTabs = new MainTabs(tabsContainer, (tabName) =>
-      this.handleTabChange(tabName)
-    );
+    if (tabsContainer) {
+      this.updateToggleButton();
+      this.loadInitialComics();
+      this.isIndividualRemove = false;
+      this.isRemoveAction = false;
+      this.selectedComics = new Set();
 
-    // Inicializar paginación para cómics
-    const comicsPaginationContainer = document.querySelector(
-      "#comicsTab .pagination"
-    );
-    this.comicsPagination = new Pagination(comicsPaginationContainer, {
-      itemsPerPage: Config.LIMIT,
-      onPageChange: async (page) => {
-        this.currentPage = page;
-        this.offset = (page - 1) * this.comicsPagination.itemsPerPage;
-        await this.loadComics();
-      },
-      onItemsPerPageChange: async (itemsPerPage) => {
-        Config.LIMIT = itemsPerPage;
-        this.offset = 0;
-        this.currentPage = 1;
-        await this.loadComics();
-      },
-    });
+      // Inicializar el modal de colecciones
+      this.collectionModal = new CollectionModal();
 
-    // Inicializar paginación para héroes
-    const heroesPaginationContainer = document.querySelector(
-      "#heroesTab .heroes-pagination"
-    );
-    if (heroesPaginationContainer) {
-      this.heroesPagination = new HeroesPagination(heroesPaginationContainer, {
+      // Inicializar los tabs principales
+      this.mainTabs = new MainTabs(tabsContainer, (tabName) =>
+        this.handleTabChange(tabName)
+      );
+
+      // Inicializar paginación para cómics
+      const comicsPaginationContainer = document.querySelector(
+        "#comicsTab .pagination"
+      );
+      this.comicsPagination = new Pagination(comicsPaginationContainer, {
         itemsPerPage: Config.LIMIT,
-        onPageChange: (page) => {
-          this.heroesOffset = (page - 1) * this.heroesPagination.itemsPerPage;
-          this.loadHeroes();
+        onPageChange: async (page) => {
+          this.currentPage = page;
+          this.offset = (page - 1) * this.comicsPagination.itemsPerPage;
+          await this.loadComics();
         },
-        onItemsPerPageChange: (itemsPerPage) => {
-          this.heroesOffset = 0;
-          this.loadHeroes();
+        onItemsPerPageChange: async (itemsPerPage) => {
+          Config.LIMIT = itemsPerPage;
+          this.offset = 0;
+          this.currentPage = 1;
+          await this.loadComics();
         },
       });
-    }
 
-    // Cargar los cómics iniciales después de inicializar la paginación
-    this.loadInitialComics();
+      // Inicializar paginación para héroes
+      const heroesPaginationContainer = document.querySelector(
+        "#heroesTab .heroes-pagination"
+      );
+      if (heroesPaginationContainer) {
+        this.heroesPagination = new HeroesPagination(
+          heroesPaginationContainer,
+          {
+            itemsPerPage: Config.LIMIT,
+            onPageChange: (page) => {
+              this.heroesOffset =
+                (page - 1) * this.heroesPagination.itemsPerPage;
+              this.loadHeroes();
+            },
+            onItemsPerPageChange: (itemsPerPage) => {
+              this.heroesOffset = 0;
+              this.loadHeroes();
+            },
+          }
+        );
+      }
+
+      // Cargar los cómics iniciales después de inicializar la paginación
+      this.loadInitialComics();
+    }
   },
 
   updateToggleButton() {
     const toggleBtn = document.getElementById("toggleDataBtn");
+    if (!toggleBtn) return;
+
     if (Config.USE_MOCK_DATA) {
       toggleBtn.textContent = "Usando Data Mockeada";
       toggleBtn.classList.add("mock");

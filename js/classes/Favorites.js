@@ -27,50 +27,59 @@ class Favorites {
   static COPY_SUFFIX = " copia";
 
   constructor() {
-    // Inicializar las estructuras de datos
-    this.#favoriteComics = [];
-    this.#favorites = {
-      mock: {},
-      api: {},
-    };
+    // Intentar cargar datos existentes primero
+    const savedFavorites = localStorage.getItem("favorites");
 
-    // Inicializar estadísticas de colecciones
-    this.#collectionStats = {
-      mock: {},
-      api: {},
-    };
-
-    // Inicializar estadísticas para cada colección
-    ["mock", "api"].forEach((dataSource) => {
-      Favorites.DEFAULT_COLLECTIONS.forEach((collection) => {
-        this.#collectionStats[dataSource][collection] = {
-          total: 0,
-          totalPrice: 0,
-          averagePrice: 0,
-        };
-      });
-    });
-
-    // Inicializar las colecciones por defecto
-    this.#initializeDefaultCollections();
-
-    // Cargar favoritos guardados
-    const savedFavorites = this.loadFavorites();
     if (savedFavorites) {
-      this.#favorites = savedFavorites;
-    }
-    this.#updateAllCollectionStats();
-  }
+      // Si hay datos guardados, usarlos
+      this.#favorites = JSON.parse(savedFavorites);
+      this.#favoriteComics = [];
 
-  #initializeDefaultCollections() {
-    ["mock", "api"].forEach((dataSource) => {
-      Favorites.DEFAULT_COLLECTIONS.forEach((collection) => {
-        if (!this.#favorites[dataSource][collection]) {
-          this.#favorites[dataSource][collection] = [];
-        }
+      // Inicializar estadísticas para los datos existentes
+      this.#collectionStats = {
+        mock: {},
+        api: {},
+      };
+
+      ["mock", "api"].forEach((dataSource) => {
+        Favorites.DEFAULT_COLLECTIONS.forEach((collection) => {
+          this.#collectionStats[dataSource][collection] = {
+            total: 0,
+            totalPrice: 0,
+            averagePrice: 0,
+          };
+        });
       });
-    });
-    this.saveFavorites();
+
+      // Actualizar estadísticas con los datos cargados
+      this.#updateAllCollectionStats();
+    } else {
+      // Si no hay datos guardados, inicializar desde cero
+      this.#favoriteComics = [];
+      this.#favorites = {
+        mock: {},
+        api: {},
+      };
+
+      this.#collectionStats = {
+        mock: {},
+        api: {},
+      };
+
+      ["mock", "api"].forEach((dataSource) => {
+        Favorites.DEFAULT_COLLECTIONS.forEach((collection) => {
+          this.#favorites[dataSource][collection] = [];
+          this.#collectionStats[dataSource][collection] = {
+            total: 0,
+            totalPrice: 0,
+            averagePrice: 0,
+          };
+        });
+      });
+
+      // Guardar el estado inicial
+      this.saveFavorites();
+    }
   }
 
   #validateDataSource(dataSource) {
@@ -137,16 +146,8 @@ class Favorites {
   loadFavorites() {
     const savedFavorites = localStorage.getItem("favorites");
     if (savedFavorites) {
-      try {
-        const parsed = JSON.parse(savedFavorites);
-        if (parsed.mock && parsed.api) {
-          return parsed;
-        }
-      } catch (error) {
-        console.error("Error loading favorites:", error);
-      }
+      this.#favorites = JSON.parse(savedFavorites);
     }
-    return null;
   }
 
   // Métodos requeridos por la práctica

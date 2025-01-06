@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comics - Marvel Comics API - UOC</title>
+  <link rel="stylesheet" href="styles/comics.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/classes/Comic.js"></script>
+  <script src="js/classes/Hero.js"></script>
+  <script src="js/classes/Favorites.js"></script>
+  <script src="js/services/DataService.js"></script>
+  <script src="js/services/MarvelAPI.js"></script>
+  <script src="js/data/mockComics.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/comics.js"></script>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">
+      <h1>UOC - PROGRAMACIÓN WEB</h1>
+    </div>
+    <div class="nav-links">
+      <a href="comics.html" class="active">Comics</a>
+      <a href="heroes.html">Heroes</a>
+      <a href="favorites.html">Favorites</a>
+    </div>
+    <div class="user-section">
+      <span class="data-status">Usando Data Mockeada</span>
+      <button class="logout-button">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main>
+    <div class="container">
+      <h1 class="main-title">Comics Marvel</h1>
+
+      <!-- Popular Heroes Section -->
+      <section class="popular-heroes">
+        <h2>Héroes Populares</h2>
+        <div class="carousel-wrapper">
+          <input type="radio" name="hero-slider" id="hero1" checked>
+          <input type="radio" name="hero-slider" id="hero2">
+          <input type="radio" name="hero-slider" id="hero3">
+
+          <div class="heroes-carousel">
+            <div class="heroes-inner">
+              <!-- Heroes will be loaded here -->
+            </div>
+          </div>
+
+          <div class="carousel-controls">
+            <label for="hero3" class="prev-slide">
+              <i class="fas fa-chevron-left"></i>
+            </label>
+            <label for="hero2" class="next-slide">
+              <i class="fas fa-chevron-right"></i>
+            </label>
+          </div>
+
+          <div class="carousel-dots">
+            <label for="hero1"></label>
+            <label for="hero2"></label>
+            <label for="hero3"></label>
+          </div>
+        </div>
+      </section>
+
+      <!-- Comics Section -->
+      <section class="comics-section">
+        <div class="section-header">
+          <h2>Explora los Cómics</h2>
+          <div class="search-section">
+            <div class="search-container">
+              <i class="fas fa-search search-icon"></i>
+              <input type="text" id="searchByName" placeholder="Buscar por nombre...">
+              <button id="searchByNameBtn" class="search-btn">Buscar</button>
+            </div>
+            <div class="search-container">
+              <i class="fas fa-hashtag search-icon"></i>
+              <input type="number" id="searchById" placeholder="Buscar por ID...">
+              <button id="searchByIdBtn" class="search-btn">Buscar</button>
+            </div>
+            <div class="price-filter-container">
+              <i class="fas fa-dollar-sign search-icon"></i>
+              <input type="number" id="priceFilter" placeholder="Filtrar por precio máximo...">
+              <button id="filterByPriceBtn" class="search-btn">Filtrar</button>
+            </div>
+          </div>
+          <!-- Contenedor para los badges de filtros -->
+          <div id="filterBadgesContainer"></div>
+        </div>
+
+        <div class="comics-grid">
+          <!-- Comics will be loaded here -->
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container">
+          <div class="pagination-controls">
+            <button id="firstPage" class="page-btn" title="Primera página">
+              <i class="fas fa-angle-double-left"></i>
+            </button>
+            <button id="prevPage" class="page-btn" title="Página anterior">
+              <i class="fas fa-angle-left"></i>
+            </button>
+            <div class="page-input-container">
+              <span>Página</span>
+              <input type="number" id="pageInput" min="1">
+              <span>de <span id="totalPages">1</span></span>
+            </div>
+            <button id="nextPage" class="page-btn" title="Página siguiente">
+              <i class="fas fa-angle-right"></i>
+            </button>
+            <button id="lastPage" class="page-btn" title="Última página">
+              <i class="fas fa-angle-double-right"></i>
+            </button>
+          </div>
+          <div class="items-per-page">
+            <label for="itemsPerPage">Items por página:</label>
+            <select id="itemsPerPage">
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Actions Bar -->
+    <div id="actionsBar" class="actions-bar">
+      <div class="selection-info">
+        <span class="selected-count">0 cómics seleccionados</span>
+      </div>
+      <div class="actions-buttons">
+        <button class="save-favorites-btn">
+          <i class="fas fa-heart"></i>
+          Añadir a Favoritos
+        </button>
+        <button class="remove-favorites-btn">
+          <i class="fas fa-trash"></i>
+          Remover de Favoritos
+        </button>
+      </div>
+    </div>
+
+    <!-- Collections Modal -->
+    <div id="collectionModal" class="modal">
+      <div class="modal-content">
+        <h2>Selecciona una colección</h2>
+        <button id="closeModal" class="close-modal-btn">
+          <i class="fas fa-times"></i>
+        </button>
+        <button class="collection-btn" data-collection="wishlist">
+          <i class="fas fa-star"></i>
+          Lista de Deseos
+        </button>
+        <button class="collection-btn" data-collection="toread">
+          <i class="fas fa-bookmark"></i>
+          Por Leer
+        </button>
+        <button class="collection-btn" data-collection="reading">
+          <i class="fas fa-book-open"></i>
+          Leyendo
+        </button>
+        <button class="collection-btn" data-collection="read">
+          <i class="fas fa-check-circle"></i>
+          Leídos
+        </button>
+        <button class="collection-btn" data-collection="favorites">
+          <i class="fas fa-heart"></i>
+          Mis Favoritos
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="js/components/FilterBadges.js"></script>
+</body>
+
+</html>

@@ -3,7 +3,7 @@
  * Simula la estructura de respuesta de la API de Marvel
  * Se utiliza cuando Config.USE_MOCK_DATA está activo
  */
-const mockComics = {
+window.mockComics = {
   comics: [
     {
       id: 15808,

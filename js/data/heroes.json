@@ -1,0 +1,139 @@
+{
+  "heroes": [
+    {
+      "id": 1009610,
+      "name": "Spider-Man (Peter Parker)",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/3/50/526548a343e4b/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1009220,
+      "name": "Captain America",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/3/50/537ba56d31087/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1009664,
+      "name": "Thor",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/d/d0/5269657a74350/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1009351,
+      "name": "Hulk",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/5/a0/538615ca33ab0/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1009189,
+      "name": "Black Widow",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/f/30/50fecad1f395b/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1009282,
+      "name": "Doctor Strange",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/5/f0/5261a85a501fe/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1009718,
+      "name": "Wolverine",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/2/60/537bcaef0f6cf/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1009268,
+      "name": "Deadpool",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/9/90/5261a86cacb99/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1009562,
+      "name": "Scarlet Witch",
+      "image": "https://i.annihil.us/u/prod/marvel/i/mg/6/70/5261a7d7c394b/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1009368,
+      "name": "Iron Man",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/9/c0/527bb7b37ff55/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1009187,
+      "name": "Black Panther",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/6/60/5261a80a67e7d/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1010338,
+      "name": "Captain Marvel (Carol Danvers)",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/6/80/5269608c1be7a/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1010801,
+      "name": "Ant-Man (Scott Lang)",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/e/20/52696868356a0/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1009697,
+      "name": "Vision",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/9/d0/5111527040594/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1009338,
+      "name": "Hawkeye",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/e/90/50fecaf4f101b/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1009184,
+      "name": "Black Bolt",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/1/20/52696929dc721/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1010733,
+      "name": "Star-Lord (Peter Quill)",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/9/a0/537bc55e8b1f5/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1010763,
+      "name": "Gamora",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/5/90/526032a2cce62/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1010735,
+      "name": "Drax",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/e/d0/526032deabbff/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1010744,
+      "name": "Rocket Raccoon",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/9/b0/50fec1e49298a/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1010743,
+      "name": "Groot",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/3/10/526033c8b474a/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1009281,
+      "name": "Doctor Doom",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/3/60/53176bb096d17/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1009407,
+      "name": "Loki",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/d/90/526547f509313/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1010740,
+      "name": "Winter Soldier",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/d/03/5265478293c1e/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1009297,
+      "name": "Falcon",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/f/b0/5111505fb7009/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1010991,
+      "name": "War Machine",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/c/f0/535febf826de5/portrait_xlarge.jpg"
+    },
+    {
+      "id": 1009608,
+      "name": "Spider-Woman (Jessica Drew)",
+      "image": "http://i.annihil.us/u/prod/marvel/i/mg/b/50/5265479097743/portrait_xlarge.jpg"
+    }
+  ]
+}
