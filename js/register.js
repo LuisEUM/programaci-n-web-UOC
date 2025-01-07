@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Función para verificar disponibilidad de usuario
   async function checkUserAvailability(username) {
     const registeredUsers =
-      JSON.parse(sessionStorage.getItem("registeredUsers")) || [];
+      JSON.parse(localStorage.getItem("registeredUsers")) || [];
     return !registeredUsers.some((user) => user.usuario === username);
   }
 
@@ -497,7 +497,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       // Verificar disponibilidad de usuario
       const registeredUsers =
-        JSON.parse(sessionStorage.getItem("registeredUsers")) || [];
+        JSON.parse(localStorage.getItem("registeredUsers")) || [];
       if (registeredUsers.some((user) => user.usuario === userData.usuario)) {
         showToast("El nombre de usuario ya está en uso", "error");
         return;
@@ -511,23 +511,20 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       // Guardar nuevo usuario
       registeredUsers.push(userData);
-      sessionStorage.setItem(
-        "registeredUsers",
-        JSON.stringify(registeredUsers)
-      );
+      localStorage.setItem("registeredUsers", JSON.stringify(registeredUsers));
 
       // Crear lista de favoritos vacía
       const userFavorites = {
         comics: [],
         heroes: [],
       };
-      sessionStorage.setItem(
+      localStorage.setItem(
         `favorites_${userData.usuario}`,
         JSON.stringify(userFavorites)
       );
 
       // Guardar sesión actual
-      sessionStorage.setItem("currentUser", JSON.stringify(userData));
+      localStorage.setItem("currentUser", JSON.stringify(userData));
 
       // Mostrar mensaje de éxito y redirigir
       showToast("¡Registro exitoso!", "success");

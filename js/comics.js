@@ -9,8 +9,8 @@ let filterBadges; // Instancia del componente FilterBadges
 
 document.addEventListener("DOMContentLoaded", () => {
   // Verificar autenticación
-  const userToken = sessionStorage.getItem("userToken");
-  const userName = sessionStorage.getItem("userName");
+  const userToken = localStorage.getItem("userToken");
+  const userName = localStorage.getItem("userName");
 
   if (!userToken || !userName) {
     window.location.href = "login.html";
@@ -500,8 +500,8 @@ function setupEventListeners() {
 
   // Botón de logout
   document.querySelector(".logout-button").addEventListener("click", () => {
-    sessionStorage.removeItem("userToken");
-    sessionStorage.removeItem("userName");
+    localStorage.removeItem("userToken");
+    localStorage.removeItem("userName");
     window.location.href = "login.html";
   });
 

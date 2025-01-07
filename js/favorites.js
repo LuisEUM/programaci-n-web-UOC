@@ -1,9 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
   // Verificar autenticación
-  const userToken =
-    localStorage.getItem("userToken") || sessionStorage.getItem("userToken");
-  const userName =
-    localStorage.getItem("userName") || sessionStorage.getItem("userName");
+  const userToken = localStorage.getItem("userToken");
+  const userName = localStorage.getItem("userName");
 
   if (!userToken || !userName) {
     window.location.href = "login.html";
@@ -27,8 +25,6 @@ function setupEventListeners(favoritesManager) {
   logoutButton.addEventListener("click", function () {
     localStorage.removeItem("userToken");
     localStorage.removeItem("userName");
-    sessionStorage.removeItem("userToken");
-    sessionStorage.removeItem("userName");
     window.location.href = "login.html";
   });
 
