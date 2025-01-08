@@ -15,27 +15,29 @@ class Hero {
   /**
    * @throws {Error} Si algún parámetro requerido es inválido o está ausente
    */
-  constructor(id, name, description, modified, thumbnail, resourceURI, comics) {
-    // Validaciones estrictas para garantizar la integridad de los datos
+  constructor(
+    id,
+    name,
+    description = "No description available",
+    modified = new Date().toISOString(),
+    thumbnail = null,
+    resourceURI = "",
+    comics = []
+  ) {
+    // Validaciones menos estrictas para mantener compatibilidad
     if (!id || typeof id !== "number") throw new Error("ID de héroe inválido");
     if (!name || typeof name !== "string")
       throw new Error("Nombre de héroe inválido");
-    if (!description || typeof description !== "string")
-      throw new Error("Descripción de héroe inválida");
-    if (!modified || typeof modified !== "string")
-      throw new Error("Fecha de modificación inválida");
-    if (!thumbnail || !thumbnail.path || !thumbnail.extension)
-      throw new Error("Thumbnail de héroe inválido");
-    if (!resourceURI || typeof resourceURI !== "string")
-      throw new Error("ResourceURI inválido");
-    if (!Array.isArray(comics)) throw new Error("Comics debe ser un array");
 
-    // Inicialización de propiedades privadas
+    // Inicialización de propiedades privadas con valores por defecto
     this.#id = id;
     this.#name = name;
     this.#description = description;
     this.#modified = modified;
-    this.#thumbnail = thumbnail;
+    this.#thumbnail = thumbnail || {
+      path: "assets/images/image-not-found",
+      extension: "jpg",
+    };
     this.#resourceURI = resourceURI;
     this.#comics = comics;
   }
@@ -59,9 +61,13 @@ class Hero {
   get resourceURI() {
     return this.#resourceURI;
   }
-  // Retorna una copia del array para prevenir modificaciones externas
   get comics() {
     return [...this.#comics];
+  }
+
+  // Getter de compatibilidad para la versión simple
+  get image() {
+    return this.getThumbnailURL();
   }
 
   /**
@@ -69,7 +75,32 @@ class Hero {
    * Combina path y extension del thumbnail según el formato de la API
    */
   getThumbnailURL() {
-    return `${this.#thumbnail.path}.${this.#thumbnail.extension}`;
+    return this.getImageURL();
+  }
+
+  /**
+   * Método de compatibilidad con la implementación anterior
+   */
+  getImageURL() {
+    if (this.#thumbnail && this.#thumbnail.path && this.#thumbnail.extension) {
+      return `${this.#thumbnail.path}.${this.#thumbnail.extension}`;
+    }
+    return "assets/images/image-not-found.jpg";
+  }
+
+  /**
+   * Método de compatibilidad para serialización
+   */
+  toJSON() {
+    return {
+      id: this.#id,
+      name: this.#name,
+      thumbnail: this.#thumbnail,
+      description: this.#description,
+      modified: this.#modified,
+      resourceURI: this.#resourceURI,
+      comics: this.#comics,
+    };
   }
 
   /**
@@ -77,13 +108,20 @@ class Hero {
    * Maneja valores faltantes o nulos con valores por defecto
    */
   static fromAPI(apiHero) {
+    if (!apiHero) {
+      throw new Error("No data provided to create Hero");
+    }
+
     return new Hero(
       apiHero.id,
       apiHero.name,
       apiHero.description || "No description available",
-      apiHero.modified,
-      apiHero.thumbnail,
-      apiHero.resourceURI,
+      apiHero.modified || new Date().toISOString(),
+      apiHero.thumbnail || {
+        path: "assets/images/image-not-found",
+        extension: "jpg",
+      },
+      apiHero.resourceURI || "",
       apiHero.comics?.items?.map((comic) => comic.name) || []
     );
   }

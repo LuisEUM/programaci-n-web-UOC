@@ -1,12 +1,17 @@
-/* Variables y Reset */
+/* Variables */
 :root {
   --primary-color: #e23636;
   --secondary-color: #504a4a;
   --background-color: #f5f5f5;
-  --text-color: #333;
+  --text-color: #333333;
   --white: #ffffff;
+  --black: #000000;
+  --input-bg: #f8f9fa;
+  --input-border: #e1e1e1;
+  --success-color: #28a745;
+  --error-color: #dc3545;
+  --hover-red: #c42f2f;
 }
-
 * {
   margin: 0;
   padding: 0;
@@ -93,7 +98,6 @@ body {
   justify-content: center;
   text-align: center;
   color: var(--white);
-  margin-top: 60px;
   position: relative;
 }
 

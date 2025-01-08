@@ -4,36 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Favoritos - Marvel Comics API - UOC</title>
+  <title>Favorites - Marvel Comics API - UOC</title>
   <link rel="stylesheet" href="styles/favorites.css">
+  <link rel="stylesheet" href="styles/navbar.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-  <script src="js/classes/Comic.js"></script>
-  <script src="js/classes/Hero.js"></script>
-  <script src="js/classes/Favorites.js"></script>
-  <script src="js/services/DataService.js"></script>
-  <script src="js/components/Card.js"></script>
+  <link rel="icon" type="image/png" href="assets/images/marvel-logo.png">
 </head>
 
 <body>
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="logo">
-      <h1>UOC - PROGRAMACIÓN WEB</h1>
-    </div>
-    <div class="nav-links">
-      <a href="comics.html">Comics</a>
-      <a href="heroes.html">Heroes</a>
-      <a href="favorites.html" class="active">Favorites</a>
-    </div>
-    <div class="user-section">
-      <span class="data-status">Usando Data Mockeada</span>
-      <button class="logout-button">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Logout</span>
-      </button>
-    </div>
-  </nav>
 
   <!-- Main Content -->
   <main>
@@ -80,11 +58,27 @@
   </main>
 
   <!-- Scripts -->
-  <script src="js/utils.js"></script>
+  <!-- Dependencias externas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+  <!-- Configuración y utilidades -->
   <script src="js/config.js"></script>
-  <script src="js/mock-data.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/ui.js"></script>
+  <script src="js/utils.js"></script>
+
+  <!-- Servicios -->
+  <script src="js/services/MarvelAPI.js"></script>
+  <script src="js/services/DataService.js"></script>
+
+  <!-- Clases base -->
+  <script src="js/classes/Comic.js"></script>
+  <script src="js/classes/Hero.js"></script>
+  <script src="js/classes/Favorites.js"></script>
+
+  <!-- Componentes -->
+  <script src="js/components/Navbar.js"></script>
+  <script src="js/components/Card.js"></script>
+
+  <!-- Script principal -->
   <script src="js/favorites.js"></script>
 </body>
 
