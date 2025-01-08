@@ -1,35 +1,97 @@
 class HeroesSearch {
-  constructor(gridComponent) {
-    this.grid = gridComponent;
+  constructor(heroesGrid) {
+    this.heroesGrid = heroesGrid;
     this.filterBadges = new FilterBadges(
       document.getElementById("filterBadgesContainer"),
       this.handleRemoveFilter.bind(this)
     );
     this.setupEventListeners();
+    this.checkUrlParameters();
   }
 
   setupEventListeners() {
-    // Event listeners para búsqueda por nombre
-    document.getElementById("searchByNameBtn").addEventListener("click", () => {
-      this.handleSearchByName();
-    });
+    // Event Listeners para búsqueda por nombre
     document
-      .getElementById("searchByName")
+      .querySelector("#searchByNameBtn")
+      .addEventListener("click", () => this.handleSearchByName());
+
+    document
+      .querySelector("#searchByName")
       .addEventListener("keypress", (e) => {
-        if (e.key === "Enter") this.handleSearchByName();
+        if (e.key === "Enter") {
+          this.handleSearchByName();
+        }
       });
 
-    // Event listeners para búsqueda por ID
-    document.getElementById("searchByIdBtn").addEventListener("click", () => {
-      this.handleSearchById();
-    });
-    document.getElementById("searchById").addEventListener("keypress", (e) => {
-      if (e.key === "Enter") this.handleSearchById();
+    // Event Listeners para búsqueda por ID
+    document
+      .querySelector("#searchByIdBtn")
+      .addEventListener("click", () => this.handleSearchById());
+
+    document.querySelector("#searchById").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        this.handleSearchById();
+      }
     });
   }
 
+  async checkUrlParameters() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const heroId = urlParams.get("id");
+
+    if (heroId) {
+      document.querySelector("#searchById").value = heroId;
+      await this.handleSearchById(heroId);
+    }
+  }
+
+  async handleSearchById(providedId = null) {
+    const searchInput = document.querySelector("#searchById");
+    const id = providedId || searchInput.value.trim();
+
+    if (!id) {
+      // Si no hay ID, eliminar solo los filtros de ID
+      const activeFilters = this.filterBadges.getActiveFilters();
+      Object.keys(activeFilters)
+        .filter((key) => key.startsWith("id_"))
+        .forEach((key) => this.filterBadges.removeFilter(key));
+      return;
+    }
+
+    try {
+      const response = await MarvelAPI.getHeroById(id);
+      if (response.data?.results?.length > 0) {
+        // Eliminar solo los filtros de ID anteriores si existen
+        const activeFilters = this.filterBadges.getActiveFilters();
+        Object.keys(activeFilters)
+          .filter((key) => key.startsWith("id_"))
+          .forEach((key) => this.filterBadges.removeFilter(key));
+
+        // Añadir el nuevo filtro de ID
+        this.filterBadges.addFilter(`id_${id}`, id, `ID: ${id}`);
+
+        // Actualizar la URL sin recargar la página
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set("id", id);
+        window.history.pushState({}, "", newUrl);
+
+        this.applyAllFilters();
+      } else {
+        window.showToast("No se encontró ningún héroe con ese ID", "error");
+      }
+    } catch (error) {
+      console.error("Error buscando héroe por ID:", error);
+      window.showToast("Error al buscar héroe por ID", "error");
+    }
+
+    // Limpiar el input después de la búsqueda
+    if (!providedId) {
+      searchInput.value = "";
+    }
+  }
+
   handleSearchByName() {
-    const searchInput = document.getElementById("searchByName");
+    const searchInput = document.querySelector("#searchByName");
     const searchTerms = searchInput.value
       .trim()
       .toLowerCase()
@@ -38,82 +100,60 @@ class HeroesSearch {
       .filter((term) => term.length > 0);
 
     if (searchTerms.length === 0) {
-      this.filterBadges.removeFilter("name");
+      // Si no hay términos, eliminar solo los filtros de nombre
+      const activeFilters = this.filterBadges.getActiveFilters();
+      Object.keys(activeFilters)
+        .filter((key) => key.startsWith("name_"))
+        .forEach((key) => this.filterBadges.removeFilter(key));
       return;
     }
 
-    // Añadir un badge por cada término de búsqueda
-    searchTerms.forEach((term, index) => {
-      this.filterBadges.addFilter(`name${index}`, term, `Nombre: ${term}`);
+    // Eliminar los filtros de ID si existen
+    const activeFilters = this.filterBadges.getActiveFilters();
+    Object.keys(activeFilters)
+      .filter((key) => key.startsWith("id_"))
+      .forEach((key) => this.filterBadges.removeFilter(key));
+
+    // Eliminar los filtros de nombre anteriores
+    Object.keys(activeFilters)
+      .filter((key) => key.startsWith("name_"))
+      .forEach((key) => this.filterBadges.removeFilter(key));
+
+    // Añadir los nuevos filtros de nombre
+    searchTerms.forEach((term) => {
+      this.filterBadges.addFilter(
+        `name_${Date.now()}`,
+        term,
+        `Nombre: ${term}`
+      );
     });
 
-    this.applyFilters();
-  }
-
-  handleSearchById() {
-    const searchInput = document.getElementById("searchById");
-    const heroId = parseInt(searchInput.value);
-
-    if (isNaN(heroId)) {
-      this.showToast("Por favor ingresa un ID válido", "error");
-      return;
-    }
-
-    this.filterBadges.addFilter("id", heroId, `ID: ${heroId}`);
-    this.applyFilters();
+    // Limpiar el input después de procesar todos los términos
+    searchInput.value = "";
+    this.applyAllFilters();
   }
 
   handleRemoveFilter(type) {
     if (type === "all") {
-      // Limpiar todos los filtros
-      document.getElementById("searchByName").value = "";
-      document.getElementById("searchById").value = "";
-      this.grid.loadHeroes();
-    } else if (type.startsWith("name")) {
-      // Remover filtro de nombre específico
-      const searchInput = document.getElementById("searchByName");
-      const currentTerms = searchInput.value
-        .split(",")
-        .map((term) => term.trim())
-        .filter((term) => term.length > 0);
-
-      const termToRemove = this.filterBadges.getActiveFilters()[type].value;
-      const updatedTerms = currentTerms.filter(
-        (term) => term.toLowerCase() !== termToRemove.toLowerCase()
-      );
-
-      searchInput.value = updatedTerms.join(", ");
-      this.applyFilters();
-    } else if (type === "id") {
-      document.getElementById("searchById").value = "";
-      this.applyFilters();
+      document.querySelector("#searchByName").value = "";
+      this.heroesGrid.updateFilters({});
+    } else {
+      this.applyAllFilters();
     }
   }
 
-  async applyFilters() {
+  applyAllFilters() {
     const activeFilters = this.filterBadges.getActiveFilters();
-    let params = {};
+    this.heroesGrid.updateFilters(activeFilters);
 
-    // Aplicar filtros de nombre
-    const nameFilters = Object.entries(activeFilters)
-      .filter(([key]) => key.startsWith("name"))
-      .map(([_, filter]) => filter.value);
-
-    if (nameFilters.length > 0) {
-      params.nameStartsWith = nameFilters[0]; // La API solo soporta un término de búsqueda
-    }
-
-    // Aplicar filtro de ID
-    if (activeFilters.id) {
-      params.id = activeFilters.id.value;
-    }
-
-    // Recargar héroes con los filtros aplicados
-    await this.grid.loadHeroes(params);
-  }
-
-  showToast(message, type = "info") {
-    // Implementar sistema de notificaciones toast
-    console.log(`${type}: ${message}`);
+    // Emitir evento con la cantidad de filtros activos
+    document.dispatchEvent(
+      new CustomEvent("filtersUpdated", {
+        detail: {
+          filters: activeFilters,
+          resultCount: this.heroesGrid.filteredHeroes.length,
+        },
+      })
+    );
   }
 }

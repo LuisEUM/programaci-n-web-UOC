@@ -144,15 +144,22 @@ const MarvelAPI = {
   async getHeroes(params = {}) {
     if (Config.USE_MOCK_DATA) {
       return new Promise((resolve) => {
-        const allHeroes = mockComics.heroes;
+        const mockData = require("./data/heroes.json");
         const start = params.offset || 0;
         const limit = params.limit || Config.LIMIT;
-        const paginatedHeroes = allHeroes.slice(start, start + limit);
+        const filteredHeroes = mockData.heroes.filter(
+          (hero) =>
+            !params.nameStartsWith ||
+            hero.name
+              .toLowerCase()
+              .includes(params.nameStartsWith.toLowerCase())
+        );
+        const paginatedHeroes = filteredHeroes.slice(start, start + limit);
 
         resolve({
           data: {
             results: paginatedHeroes,
-            total: allHeroes.length,
+            total: filteredHeroes.length,
             limit: limit,
             offset: start,
             count: paginatedHeroes.length,
@@ -180,7 +187,6 @@ const MarvelAPI = {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
-
       return {
         data: {
           results: data.data.results.map((hero) => ({
@@ -200,6 +206,78 @@ const MarvelAPI = {
       };
     } catch (error) {
       console.error("Error fetching heroes:", error);
+      throw error;
+    }
+  },
+
+  async getHero(heroId) {
+    if (Config.USE_MOCK_DATA) {
+      return new Promise((resolve) => {
+        const mockData = require("./data/heroes.json");
+        const hero = mockData.heroes.find((h) => h.id === parseInt(heroId));
+        resolve({
+          data: {
+            results: hero ? [hero] : [],
+          },
+        });
+      });
+    }
+
+    const timestamp = new Date().getTime().toString();
+    const hash = this.generateHash(timestamp);
+    const queryParams = new URLSearchParams({
+      ts: timestamp,
+      apikey: this.PUBLIC_KEY,
+      hash: hash,
+    });
+
+    try {
+      const response = await fetch(
+        `${this.BASE_URL}/characters/${heroId}?${queryParams}`
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching hero:", error);
+      throw error;
+    }
+  },
+
+  async getHeroComics(heroId) {
+    if (Config.USE_MOCK_DATA) {
+      return new Promise((resolve) => {
+        const mockData = require("./data/comics.json");
+        const heroComics = mockData.comics.filter((comic) =>
+          comic.characters?.includes(parseInt(heroId))
+        );
+        resolve({
+          data: {
+            results: heroComics,
+          },
+        });
+      });
+    }
+
+    const timestamp = new Date().getTime().toString();
+    const hash = this.generateHash(timestamp);
+    const queryParams = new URLSearchParams({
+      ts: timestamp,
+      apikey: this.PUBLIC_KEY,
+      hash: hash,
+    });
+
+    try {
+      const response = await fetch(
+        `${this.BASE_URL}/characters/${heroId}/comics?${queryParams}`
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching hero comics:", error);
       throw error;
     }
   },

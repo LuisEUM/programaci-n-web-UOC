@@ -11,9 +11,7 @@ class ComicsGrid {
 
   async loadComics() {
     try {
-      this.container.innerHTML =
-        '<div class="loading">Cargando cómics...</div>';
-
+      Spinner.show(this.container, "Cargando cómics...");
       let comicsData;
       const offset = (this.currentPage - 1) * this.itemsPerPage;
 
