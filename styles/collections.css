@@ -104,8 +104,8 @@ main {
   padding: 2rem 5%;
 }
 
-/* Favorites Section */
-.favorites-section {
+/* Collections Section */
+.collections-section {
   background-color: var(--white);
   border-radius: 15px;
   padding: 2rem;
@@ -136,7 +136,7 @@ main {
 }
 
 /* Tabs */
-.favorites-tabs {
+.collections-tabs {
   display: flex;
   gap: 1rem;
   margin-bottom: 2rem;
@@ -174,8 +174,8 @@ main {
   border-color: var(--primary-color);
 }
 
-/* Favorites Grid */
-.favorites-grid {
+/* Collections Grid */
+.collections-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 2rem;
@@ -272,7 +272,7 @@ main {
   color: var(--primary-color);
 }
 
-.remove-favorite-btn {
+.remove-collection-btn {
   width: 100%;
   padding: 0.8rem;
   border: none;
@@ -289,26 +289,26 @@ main {
   margin-top: 1rem;
 }
 
-.remove-favorite-btn:hover {
+.remove-collection-btn:hover {
   background-color: #b32c2c;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* No Favorites Message */
-.no-favorites-message {
+/* No Collections Message */
+.no-collections-message {
   text-align: center;
   padding: 3rem;
   color: var(--secondary-color);
 }
 
-.no-favorites-message i {
+.no-collections-message i {
   font-size: 3rem;
   margin-bottom: 1rem;
   color: var(--primary-color);
 }
 
-.no-favorites-message p {
+.no-collections-message p {
   font-size: 1.2rem;
   font-weight: 500;
 }
@@ -347,7 +347,7 @@ main {
 
 /* Responsive */
 @media (max-width: 768px) {
-  .favorites-tabs {
+  .collections-tabs {
     flex-direction: column;
   }
 
@@ -356,14 +356,14 @@ main {
     justify-content: center;
   }
 
-  .favorites-grid {
+  .collections-grid {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1.5rem;
   }
 }
 
 @media (max-width: 480px) {
-  .favorites-grid {
+  .collections-grid {
     grid-template-columns: 1fr;
   }
 
@@ -386,7 +386,7 @@ main {
 
 .move-collection-btn,
 .clone-collection-btn,
-.remove-favorite-btn {
+.remove-collection-btn {
   width: 100%;
   padding: 0.8rem;
   border: none;
@@ -423,12 +423,12 @@ main {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.remove-favorite-btn {
+.remove-collection-btn {
   background-color: var(--error-color);
   color: var(--white);
 }
 
-.remove-favorite-btn:hover {
+.remove-collection-btn:hover {
   background-color: #b32c2c;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

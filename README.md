@@ -19,10 +19,10 @@ class Hero {
 +getThumbnailURL()
 +static fromAPI()
 }
-class Favorites {
--favorites: Array
-+addFavorite()
-+removeFavorite()
+class Collections {
+-collections: Array
++addCollection()
++removeCollection()
 +calculateAveragePrice()
 }
 class UI {
@@ -40,8 +40,8 @@ class MarvelAPI {
 }
 UI --> DataService
 DataService --> MarvelAPI
-UI --> Favorites
-Favorites --> Comic
+UI --> Collections
+Collections --> Comic
 DataService --> Comic
 DataService --> Hero
 ```
@@ -56,7 +56,7 @@ C -->|Consulta| D[MarvelAPI]
 D -->|Responde| C
 C -->|Transforma| E[Comic/Hero]
 E -->|Renderiza| B
-B -->|Gestiona| F[Favorites]
+B -->|Gestiona| F[Collections]
 F -->|Persiste| G[LocalStorage]
 ```
 
@@ -72,7 +72,7 @@ B --> F[MainTabs]
 B --> G[CollectionsTabs]
 C --> H[Comic]
 C --> I[Hero]
-G --> J[Favorites]
+G --> J[Collections]
 ```
 
 ## 🛠️ Tecnologías y Patrones
@@ -192,7 +192,7 @@ async function loadComics() {
 flowchart LR
 A[Test Runner] -->|Ejecuta| B[Comic Tests]
 A -->|Ejecuta| C[Hero Tests]
-A -->|Ejecuta| D[Favorites Tests]
+A -->|Ejecuta| D[Collections Tests]
 B --> E[Assertions]
 C --> E
 D --> E
@@ -203,9 +203,9 @@ D --> E
 - Clases principales
   - Comic
   - Hero
-  - Favorites
+  - Collections
 - Métodos críticos
-  - addFavorite
+  - addCollection
   - calculateAveragePrice
   - findComicById
 - Casos edge
@@ -246,7 +246,7 @@ marvel-comics/
 │   ├── classes/
 │   │   ├── Comic.js
 │   │   ├── Hero.js
-│   │   └── Favorites.js
+│   │   └── Collections.js
 │   ├── components/
 │   │   ├── Card.js
 │   │   ├── Pagination.js
@@ -275,7 +275,7 @@ Este proyecto es parte de una práctica académica y utiliza la API de Marvel ba
 ## 🎯 Objetivos Cumplidos
 
 1. ✅ Implementación de clases base
-2. ✅ Sistema de gestión de favoritos
+2. ✅ Sistema de gestión de colecciones
 3. ✅ Funciones recursivas y funcionales
 4. ✅ Interfaz intuitiva y responsive
 5. ✅ Tests completos

@@ -1,5 +1,5 @@
 // Variables globales
-let favoritesManager;
+let collectionsManager;
 let comicsGrid;
 let comicsSearch;
 let comicsActionsBar;
@@ -22,8 +22,8 @@ document.addEventListener("DOMContentLoaded", () => {
     Config.USE_MOCK_DATA = true;
   }
 
-  // Inicializar manejador de favoritos
-  favoritesManager = new Favorites();
+  // Inicializar manejador de coleccionables
+  collectionsManager = new Collections();
 
   // Inicializar componentes
   comicsGrid = new ComicsGrid(".comics-grid");
@@ -131,9 +131,9 @@ function setupCustomEventListeners() {
     document.querySelector("#lastPage").disabled = currentPage === totalPages;
   });
 
-  // Escuchar eventos de actualización de botones de favoritos
-  document.addEventListener("updateFavoriteButtons", (e) => {
-    comicsGrid.updateFavoriteButtons(e.detail.comicId);
+  // Escuchar eventos de actualización de botones de coleccionables
+  document.addEventListener("updateCollectionButtons", (e) => {
+    comicsGrid.updateCollectionButtons(e.detail.comicId);
   });
 }
 

@@ -5,6 +5,50 @@ class ComicsSearch {
       this.handleRemoveFilter.bind(this)
     );
     this.setupEventListeners();
+    this.checkUrlParameters();
+  }
+
+  async checkUrlParameters() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialFilters = {};
+
+    // Procesar ID (tiene prioridad)
+    const id = urlParams.get("id");
+    if (id) {
+      initialFilters.id = { value: id, displayText: `ID: ${id}` };
+      document.querySelector("#searchById").value = id;
+    }
+    // Si no hay ID, procesar precio
+    else {
+      const price = urlParams.get("price");
+      if (price) {
+        initialFilters.price = {
+          value: price,
+          displayText: `Precio máximo: $${price}`,
+        };
+        document.querySelector("#priceFilter").value = price;
+      }
+    }
+
+    // Procesar nombres (pueden ser múltiples)
+    const names = urlParams.getAll("name");
+    names.forEach((name) => {
+      if (name && name.trim()) {
+        const timestamp = Date.now();
+        initialFilters[`name_${timestamp}`] = {
+          value: name.trim(),
+          displayText: `Nombre: ${name.trim()}`,
+        };
+      }
+    });
+
+    // Si hay filtros iniciales, aplicarlos
+    if (Object.keys(initialFilters).length > 0) {
+      Object.entries(initialFilters).forEach(([type, filter]) => {
+        this.filterBadges.addFilter(type, filter.value, filter.displayText);
+      });
+      this.applyAllFilters();
+    }
   }
 
   setupEventListeners() {

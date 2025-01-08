@@ -1,4 +1,13 @@
 document.addEventListener("DOMContentLoaded", async function () {
+  // Verificar si el usuario ya está logueado
+  const userToken = localStorage.getItem("userToken");
+  const userName = localStorage.getItem("userName");
+
+  if (userToken && userName) {
+    window.location.href = "comics.html";
+    return;
+  }
+
   let codigosPostales = {};
   let comunidadesData = {};
 
@@ -513,25 +522,27 @@ document.addEventListener("DOMContentLoaded", async function () {
       registeredUsers.push(userData);
       localStorage.setItem("registeredUsers", JSON.stringify(registeredUsers));
 
-      // Crear lista de favoritos vacía
-      const userFavorites = {
+      // Crear lista de colecciones vacía
+      const userCollections = {
         comics: [],
         heroes: [],
       };
       localStorage.setItem(
-        `favorites_${userData.usuario}`,
-        JSON.stringify(userFavorites)
+        `collections_${userData.usuario}`,
+        JSON.stringify(userCollections)
       );
 
-      // Guardar sesión actual
-      localStorage.setItem("currentUser", JSON.stringify(userData));
+      // Guardar token y nombre de usuario
+      const token = generateToken();
+      localStorage.setItem("userToken", token);
+      localStorage.setItem("userName", userData.usuario);
 
       // Mostrar mensaje de éxito y redirigir
       showToast("¡Registro exitoso!", "success");
 
       // Redirigir después de un breve delay
       setTimeout(() => {
-        window.location.href = "login.html";
+        window.location.href = "comics.html";
       }, 1500);
     } catch (error) {
       console.error("Error en el registro:", error);
@@ -571,4 +582,9 @@ function showToast(message, type = "info") {
 function validarCodigoPostalEspanol(codigoPostal) {
   const pattern = /^(0[1-9]|[1-4]\d|5[0-2])\d{3}$/;
   return pattern.test(codigoPostal);
+}
+
+// Función para generar un token aleatorio
+function generateToken() {
+  return Math.random().toString(36).substring(2) + Date.now().toString(36);
 }

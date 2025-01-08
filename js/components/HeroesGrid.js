@@ -2,13 +2,19 @@ class HeroesGrid {
   constructor() {
     this.container = document.getElementById("heroesGrid");
     this.modal = document.getElementById("heroModal");
-    this.currentPage = 1;
     this.itemsPerPage =
       parseInt(document.getElementById("itemsPerPage").value) || 10;
     this.currentFilters = {};
     this.allHeroes = [];
     this.filteredHeroes = [];
     this.lastSearchId = 0;
+
+    // Inicializar página desde URL o default
+    const urlParams = new URLSearchParams(window.location.search);
+    const pageParam = parseInt(urlParams.get("page"));
+    this.currentPage = pageParam && pageParam > 0 ? pageParam : 1;
+    this.totalPages = 1;
+
     this.setupModal();
     this.setupPagination();
     this.initialize();
@@ -268,6 +274,20 @@ class HeroesGrid {
 
       this.totalPages = Math.ceil(heroesData.total / this.itemsPerPage);
       this.updatePaginationControls(heroesData.total);
+
+      // Validar página actual contra total de páginas
+      if (heroesData.total > 0) {
+        const totalPages = Math.ceil(heroesData.total / this.itemsPerPage);
+        if (this.currentPage > totalPages) {
+          this.container.innerHTML =
+            '<div class="error">La página solicitada no existe</div>';
+          showToast("La página solicitada no existe", "error");
+          return;
+        }
+      }
+
+      // Actualizar URL con la página actual y filtros
+      this.updateUrlWithCurrentState();
     } catch (error) {
       // Verificar si el error ocurrió en la búsqueda más reciente
       if (searchId === this.lastSearchId) {
@@ -482,16 +502,9 @@ class HeroesGrid {
       if (!heroResponse.data.results.length) {
         throw new Error("Héroe no encontrado");
       }
-      const hero = new Hero(
-        heroResponse.data.results[0].id,
-        heroResponse.data.results[0].name,
-        heroResponse.data.results[0].description,
-        heroResponse.data.results[0].modified,
-        heroResponse.data.results[0].thumbnail,
-        heroResponse.data.results[0].resourceURI,
-        heroResponse.data.results[0].comics
-      );
 
+      // Usar el método fromAPI para crear la instancia de Hero
+      const hero = Hero.fromAPI(heroResponse.data.results[0]);
       this.renderModal(hero);
     } catch (error) {
       console.error("Error loading hero details:", error);
@@ -506,22 +519,47 @@ class HeroesGrid {
       const modalBody = this.modal.querySelector(".modal-body");
       const heroContent = modalBody.querySelector(".hero-content");
       const loadingContainer = modalBody.querySelector(".loading-container");
-      const modalImage = heroContent.querySelector(".hero-modal-image");
-      const modalDescription = heroContent.querySelector(".hero-description");
-      const comicsContainer = heroContent.querySelector(".comics-container");
 
-      if (!modalTitle || !modalImage || !modalDescription || !comicsContainer) {
+      if (!modalTitle || !heroContent || !loadingContainer) {
         throw new Error("Modal elements not found");
       }
 
       // Actualizar el contenido
       modalTitle.textContent = hero.name;
-      modalImage.src = hero.getThumbnailURL();
-      modalImage.alt = hero.name;
-      modalDescription.textContent =
-        hero.description || "No hay descripción disponible.";
-      comicsContainer.innerHTML =
-        "<p>Lista de comics no disponible por el momento.</p>";
+      heroContent.innerHTML = `
+        <div class="hero-details">
+          <div class="hero-image-container">
+            <img src="${hero.getThumbnailURL()}" alt="${
+        hero.name
+      }" class="hero-modal-image">
+          </div>
+          <div class="hero-info-container">
+            <div class="hero-info-section">
+              <h3>Información General</h3>
+              <p><strong>ID:</strong> ${hero.id}</p>
+              <p><strong>Nombre:</strong> ${hero.name}</p>
+              <p><strong>Última modificación:</strong> ${new Date(
+                hero.modified
+              ).toLocaleDateString()}</p>
+              <p><strong>URI del recurso:</strong> ${hero.resourceURI}</p>
+            </div>
+            <div class="hero-description-section">
+              <h3>Descripción</h3>
+              <p>${hero.description || "No hay descripción disponible."}</p>
+            </div>
+            <div class="hero-comics-section">
+              <h3>Comics</h3>
+              <div class="comics-list">
+                ${
+                  hero.comics && hero.comics.length > 0
+                    ? hero.comics.map((comic) => `<p>• ${comic}</p>`).join("")
+                    : "<p>No hay comics disponibles.</p>"
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
 
       // Ocultar spinner y mostrar contenido
       loadingContainer.style.display = "none";
@@ -573,5 +611,46 @@ class HeroesGrid {
 
   showToast(message, type = "info") {
     console.log(`${type}: ${message}`);
+  }
+
+  updateUrlWithCurrentState() {
+    const newUrl = new URL(window.location.href);
+
+    // Actualizar página
+    if (this.currentPage > 1) {
+      newUrl.searchParams.set("page", this.currentPage);
+    } else {
+      newUrl.searchParams.delete("page");
+    }
+
+    // Mantener filtros existentes
+    const idFilter = Object.entries(this.currentFilters).find(([key]) =>
+      key.startsWith("id_")
+    );
+    if (idFilter) {
+      newUrl.searchParams.set("id", idFilter[1].value);
+    }
+
+    // Manejar múltiples nombres
+    newUrl.searchParams.delete("name");
+    Object.entries(this.currentFilters)
+      .filter(([key]) => key.startsWith("name_"))
+      .forEach(([_, filter]) => {
+        newUrl.searchParams.append("name", filter.value);
+      });
+
+    window.history.pushState({}, "", newUrl);
+  }
+
+  setPage(page) {
+    const newPage = parseInt(page);
+    if (newPage > 0) {
+      this.currentPage = newPage;
+      // Actualizar URL antes de cargar
+      this.updateUrlWithCurrentState();
+      this.loadHeroes(this.getLastParams());
+    } else {
+      showToast("Número de página inválido", "error");
+    }
   }
 }

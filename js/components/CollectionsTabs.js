@@ -1,8 +1,8 @@
 class CollectionsTabs {
-  constructor(container, favoritesManager) {
+  constructor(container, collectionsManager) {
     this.container = container;
-    this.favoritesManager = favoritesManager;
-    this.collections = Favorites.DEFAULT_COLLECTIONS;
+    this.collectionsManager = collectionsManager;
+    this.collections = Collections.DEFAULT_COLLECTIONS;
     this.activeCollection = this.collections[0];
     this.init();
   }
@@ -25,10 +25,9 @@ class CollectionsTabs {
       }`;
       tab.dataset.collection = collection;
       tab.textContent =
-        this.favoritesManager.getCollectionDisplayName(collection);
+        this.collectionsManager.getCollectionDisplayName(collection);
       tabsContainer.appendChild(tab);
     });
-
 
     const contentContainer = document.createElement("div");
     contentContainer.className = "collections-content";
@@ -60,9 +59,9 @@ class CollectionsTabs {
     contentContainer.innerHTML = "";
 
     const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
-    const favorites =
-      this.favoritesManager.getAllFavorites(dataSource)[collection] || [];
-    const stats = this.favoritesManager.getCollectionStats(
+    const collections =
+      this.collectionsManager.getAllCollections(dataSource)[collection] || [];
+    const stats = this.collectionsManager.getCollectionStats(
       dataSource,
       collection
     );
@@ -86,10 +85,10 @@ class CollectionsTabs {
         `;
     contentContainer.appendChild(statsContainer);
 
-    if (favorites.length === 0) {
+    if (collections.length === 0) {
       contentContainer.innerHTML += `
                 <div class="no-results">
-                    No hay cómics en la colección "${this.favoritesManager.getCollectionDisplayName(
+                    No hay cómics en la colección "${this.collectionsManager.getCollectionDisplayName(
                       collection
                     )}"
                 </div>
@@ -101,7 +100,7 @@ class CollectionsTabs {
     grid.className = "comics-grid";
 
     // Cargar y mostrar cada cómic
-    for (const comicId of favorites) {
+    for (const comicId of collections) {
       try {
         const comic = await DataService.fetchItemById("comics", comicId);
         if (comic) {
@@ -111,11 +110,11 @@ class CollectionsTabs {
             inCollection: true,
             actions: [
               {
-                className: "remove-favorite-btn",
+                className: "remove-collection-btn",
                 icon: "fas fa-trash-alt",
                 text: "Remover de Colección",
                 onClick: async () => {
-                  this.favoritesManager.removeFavorite(
+                  this.collectionsManager.removeCollection(
                     dataSource,
                     collection,
                     comicId

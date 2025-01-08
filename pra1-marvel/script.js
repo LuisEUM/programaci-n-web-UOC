@@ -337,64 +337,64 @@ class Hero {
 }
 
 /**
- * Clase Favorites: Gestiona una colección de cómics favoritos
+ * Clase Collections: Gestiona una colección de cómics
  */
-class Favorites {
+class Collections {
   // Propiedad privada para almacenar los cómics
-  #favoriteComics;
+  #collectionComics;
 
   /**
-   * Número máximo de cómics favoritos permitidos
+   * Número máximo de cómics coleccionables permitidos
    */
-  static MAX_FAVORITES = 50;
+  static MAX_COLLECTIONS = 50;
 
   constructor() {
-    this.#favoriteComics = [];
+    this.#collectionComics = [];
   }
 
   /**
-   * Obtiene una copia de la lista de cómics favoritos
+   * Obtiene una copia de la lista de cómics coleccionables
    */
-  get favoriteComics() {
-    return [...this.#favoriteComics];
+  get collectionComics() {
+    return [...this.#collectionComics];
   }
 
   /**
-   * Requisito 3: Agrega un cómic a la lista de favoritos
+   * Requisito 3: Agrega un cómic a la lista de coleccionables
    * @param {Comic} comic - Cómic a agregar
    * @throws {Error} Si el parámetro no es una instancia de Comic
    */
-  addFavoriteComic(comic) {
+  addCollectionComic(comic) {
     if (!(comic instanceof Comic)) {
       throw new Error("Solo se pueden agregar instancias de Comic");
     }
-    if (this.#favoriteComics.length >= Favorites.MAX_FAVORITES) {
-      throw new Error("Has alcanzado el límite máximo de favoritos");
+    if (this.#collectionComics.length >= Collections.MAX_COLLECTIONS) {
+      throw new Error("Has alcanzado el límite máximo de coleccionables");
     }
-    if (!this.#favoriteComics.some((c) => c.id === comic.id)) {
-      this.#favoriteComics.push(comic);
+    if (!this.#collectionComics.some((c) => c.id === comic.id)) {
+      this.#collectionComics.push(comic);
     }
   }
 
   /**
-   * Requisito 3: Elimina un cómic de favoritos por su ID
+   * Requisito 3: Elimina un cómic de coleccionables por su ID
    * @param {number} comicId - ID del cómic a eliminar
    */
-  removeFavoriteComic(comicId) {
+  removeCollectionComic(comicId) {
     if (typeof comicId !== "number") {
       throw new Error("El ID debe ser un número");
     }
-    this.#favoriteComics = this.#favoriteComics.filter(
+    this.#collectionComics = this.#collectionComics.filter(
       (comic) => comic.id !== comicId
     );
   }
 
   /**
-   * Requisito 3: Muestra todos los cómics en favoritos
+   * Requisito 3: Muestra todos los cómics en coleccionables
    * @returns {Array<{title: string, price: number}>} Array con información básica de los cómics
    */
-  showFavorites() {
-    return this.#favoriteComics.map((comic) => ({
+  showCollections() {
+    return this.#collectionComics.map((comic) => ({
       title: comic.title,
       price: comic.price,
     }));
@@ -406,7 +406,7 @@ class Favorites {
    * @param {Array<Comic>} comics - Array donde buscar (opcional)
    * @returns {Comic|null} Cómic encontrado o null
    */
-  findComicById(comicId, comics = this.#favoriteComics) {
+  findComicById(comicId, comics = this.#collectionComics) {
     if (typeof comicId !== "number") {
       throw new Error("El ID debe ser un número");
     }
@@ -420,12 +420,12 @@ class Favorites {
    * @returns {number} Precio promedio de los cómics
    */
   calculateAveragePrice() {
-    if (this.#favoriteComics.length === 0) return 0;
-    const total = this.#favoriteComics.reduce(
+    if (this.#collectionComics.length === 0) return 0;
+    const total = this.#collectionComics.reduce(
       (sum, comic) => sum + comic.price,
       0
     );
-    return total / this.#favoriteComics.length;
+    return total / this.#collectionComics.length;
   }
 
   /**
@@ -433,19 +433,19 @@ class Favorites {
    * @param {...Comic} comics - Lista de cómics a agregar
    * @throws {Error} Si algún parámetro no es una instancia de Comic
    */
-  addMultipleFavorites(...comics) {
+  addMultipleCollections(...comics) {
     if (!comics.every((comic) => comic instanceof Comic)) {
       throw new Error("Todos los elementos deben ser instancias de Comic");
     }
-    comics.forEach((comic) => this.addFavoriteComic(comic));
+    comics.forEach((comic) => this.addCollectionComic(comic));
   }
 
   /**
    * Requisito 7: Crea una copia usando el operador spread
-   * @returns {Array<Comic>} Copia de la colección de favoritos
+   * @returns {Array<Comic>} Copia de la colección de coleccionables
    */
-  copyFavorites() {
-    return [...this.#favoriteComics];
+  copyCollections() {
+    return [...this.#collectionComics];
   }
 
   /**
@@ -457,7 +457,7 @@ class Favorites {
     if (typeof maxPrice !== "number" || maxPrice < 0) {
       throw new Error("El precio máximo debe ser un número positivo");
     }
-    return this.#favoriteComics
+    return this.#collectionComics
       .filter((comic) => comic.price <= maxPrice)
       .map((comic) => comic.title);
   }
@@ -584,45 +584,48 @@ try {
   console.log("Error en modificación:", error.message);
 }
 
-// Requisito 3: Agregar, eliminar y mostrar favoritos
-console.log("\n--- Requisito 3: Gestión Favoritos ---");
+// Requisito 3: Agregar, eliminar y mostrar coleccionables
+console.log("\n--- Requisito 3: Gestión Colección ---");
 
-const favorites = new Favorites();
+const collections = new Collections();
 
 // Añadir cómic
-favorites.addFavoriteComic(amazingSpidermanComic);
-console.log("\nDespués de añadir:", favorites.showFavorites());
+collections.addCollectionComic(amazingSpidermanComic);
+console.log("\nDespués de añadir:", collections.showCollections());
 
-// Mostrar favoritos actuales
-console.log("\nLista actual:", favorites.showFavorites());
+// Mostrar coleccionables actuales
+console.log("\nLista actual:", collections.showCollections());
 
 // Eliminar cómic
-favorites.removeFavoriteComic(15808);
-console.log("\nDespués de eliminar:", favorites.showFavorites());
+collections.removeCollectionComic(15808);
+console.log("\nDespués de eliminar:", collections.showCollections());
 
 // Requisito 4: Búsqueda recursiva
 console.log("\n--- Requisito 4: Búsqueda Recursiva ---");
-favorites.addFavoriteComic(amazingSpidermanComic);
-const foundComic = favorites.findComicById(15808);
+collections.addCollectionComic(amazingSpidermanComic);
+const foundComic = collections.findComicById(15808);
 console.log("Cómic encontrado por ID 2:", foundComic?.title);
 
 // Requisito 6: Agregar múltiples cómics con rest
 console.log("\n--- Requisito 6: Agregar Múltiples ---");
-favorites.addMultipleFavorites(amazingSpidermanComic, xmenComic);
+collections.addMultipleCollections(amazingSpidermanComic, xmenComic);
 console.log(
-  "Favoritos después de agregar múltiples:",
-  favorites.showFavorites()
+  "Colecciones después de agregar múltiples:",
+  collections.showCollections()
 );
 
 // Requisito 5: Precio promedio usando reduce
 console.log("\n--- Requisito 5: Precio Promedio ---");
-console.log("Precio promedio de favoritos:", favorites.calculateAveragePrice());
+console.log(
+  "Precio promedio de colecciones:",
+  collections.calculateAveragePrice()
+);
 
 // Requisito 7: Copiar usando spread
 console.log("\n--- Requisito 7: Copia con Spread ---");
-const copiaFavoritos = favorites.copyFavorites();
+const copiaFavoritos = collections.copyCollections();
 console.log(
-  "Copia de favoritos:",
+  "Copia de colecciones:",
   copiaFavoritos.map((c) => c.title)
 );
 
@@ -630,5 +633,5 @@ console.log(
 console.log("\n--- Requisito 8: Filtrar por Precio ---");
 console.log(
   "Cómics con precio <= 7.99:",
-  favorites.getAffordableComicTitles(7.99)
+  collections.getAffordableComicTitles(7.99)
 );

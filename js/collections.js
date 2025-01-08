@@ -12,7 +12,7 @@ async function loadMockData() {
 }
 
 // Variables globales
-let favoritesManager;
+let collectionsManager;
 
 document.addEventListener("DOMContentLoaded", async function () {
   // Verificar autenticación
@@ -29,18 +29,18 @@ document.addEventListener("DOMContentLoaded", async function () {
     await loadMockData();
   }
 
-  // Inicializar manejador de favoritos
-  favoritesManager = new Favorites();
+  // Inicializar manejador de colecciones
+  collectionsManager = new Collections();
   const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
 
-  // Cargar favoritos iniciales (Lista de Deseos por defecto)
-  loadFavorites("wishlist", favoritesManager);
+  // Cargar colecciones iniciales (Lista de Deseos por defecto)
+  loadCollections("wishlist", collectionsManager);
 
   // Event Listeners
-  setupEventListeners(favoritesManager);
+  setupEventListeners(collectionsManager);
 });
 
-function setupEventListeners(favoritesManager) {
+function setupEventListeners(collectionsManager) {
   // Logout
   const logoutButton = document.querySelector(".logout-button");
   logoutButton.addEventListener("click", function () {
@@ -62,37 +62,39 @@ function setupEventListeners(favoritesManager) {
         await loadMockData();
       }
 
-      // Cargar favoritos de la colección seleccionada
+      // Cargar colecciones de la colección seleccionada
       const collection = this.dataset.collection;
-      loadFavorites(collection, favoritesManager);
+      loadCollections(collection, collectionsManager);
     });
   });
 }
 
-async function loadFavorites(collection, favoritesManager) {
+async function loadCollections(collection, collectionsManager) {
   const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
-  const favoritesGrid = document.querySelector(".favorites-grid");
-  const noFavoritesMessage = document.querySelector(".no-favorites-message");
+  const collectionsGrid = document.querySelector(".collections-grid");
+  const noCollectionsMessage = document.querySelector(
+    ".no-collections-message"
+  );
 
   try {
     // Obtener los IDs de los cómics de la colección
-    const favorites =
-      favoritesManager.getAllFavorites(dataSource)[collection] || [];
+    const collections =
+      collectionsManager.getAllCollections(dataSource)[collection] || [];
 
     // Limpiar grid
-    favoritesGrid.innerHTML = "";
+    collectionsGrid.innerHTML = "";
 
-    if (favorites.length === 0) {
-      favoritesGrid.style.display = "none";
-      noFavoritesMessage.style.display = "block";
+    if (collections.length === 0) {
+      collectionsGrid.style.display = "none";
+      noCollectionsMessage.style.display = "block";
       return;
     }
 
-    favoritesGrid.style.display = "grid";
-    noFavoritesMessage.style.display = "none";
+    collectionsGrid.style.display = "grid";
+    noCollectionsMessage.style.display = "none";
 
     // Cargar los datos completos de los cómics
-    for (const comicId of favorites) {
+    for (const comicId of collections) {
       try {
         let comic;
         if (Config.USE_MOCK_DATA) {
@@ -121,9 +123,9 @@ async function loadFavorites(collection, favoritesManager) {
           const card = createComicCard(
             formattedComic,
             collection,
-            favoritesManager
+            collectionsManager
           );
-          favoritesGrid.appendChild(card);
+          collectionsGrid.appendChild(card);
         } else {
           console.error(`Comic with ID ${comicId} not found`);
           showToast(`No se encontró el cómic con ID ${comicId}`, "error");
@@ -134,12 +136,12 @@ async function loadFavorites(collection, favoritesManager) {
       }
     }
   } catch (error) {
-    console.error("Error loading favorites:", error);
-    showToast("Error al cargar los favoritos", "error");
+    console.error("Error loading collections:", error);
+    showToast("Error al cargar los colecciones", "error");
   }
 }
 
-function createComicCard(comic, currentCollection, favoritesManager) {
+function createComicCard(comic, currentCollection, collectionsManager) {
   const card = document.createElement("div");
   card.className = "comic-card";
   card.dataset.id = comic.id;
@@ -180,7 +182,7 @@ function createComicCard(comic, currentCollection, favoritesManager) {
           <i class="fas fa-clone"></i>
           Clonar a otra colección
         </button>
-        <button class="remove-favorite-btn" onclick="removeFromCollection('${
+        <button class="remove-collection-btn" onclick="removeFromCollection('${
           comic.id
         }', '${currentCollection}')">
           <i class="fas fa-trash"></i>
@@ -208,8 +210,8 @@ function cloneToCollection(comicId, currentCollection) {
 // Función para remover un cómic de una colección
 function removeFromCollection(comicId, collection) {
   const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
-  favoritesManager.removeFavorite(dataSource, collection, comicId);
-  loadFavorites(collection, favoritesManager);
+  collectionsManager.removeCollection(dataSource, collection, comicId);
+  loadCollections(collection, collectionsManager);
   showToast("Cómic removido de la colección", "success");
 }
 
@@ -223,19 +225,19 @@ function handleModalSelection(targetCollection) {
 
   if (action === "move") {
     // Remover de la colección actual
-    favoritesManager.removeFavorite(dataSource, currentCollection, comicId);
+    collectionsManager.removeCollection(dataSource, currentCollection, comicId);
     // Añadir a la nueva colección
-    favoritesManager.addFavorite(dataSource, targetCollection, comicId);
+    collectionsManager.addCollection(dataSource, targetCollection, comicId);
     showToast("Cómic movido exitosamente", "success");
   } else if (action === "clone") {
     // Solo añadir a la nueva colección
-    favoritesManager.addFavorite(dataSource, targetCollection, comicId);
+    collectionsManager.addCollection(dataSource, targetCollection, comicId);
     showToast("Cómic clonado exitosamente", "success");
   }
 
   // Cerrar el modal y recargar la vista
   modal.style.display = "none";
-  loadFavorites(currentCollection, favoritesManager);
+  loadCollections(currentCollection, collectionsManager);
 }
 
 function showToast(message, type = "info") {

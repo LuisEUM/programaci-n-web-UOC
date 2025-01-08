@@ -70,7 +70,8 @@ body {
   z-index: 1;
 }
 
-#searchInput, #searchById {
+#searchInput,
+#searchById {
   flex: 1;
   padding: 16px 16px 16px 48px;
   border: 2px solid transparent;
@@ -82,7 +83,8 @@ body {
   color: white;
 }
 
-#searchInput:focus, #searchById:focus {
+#searchInput:focus,
+#searchById:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 4px 12px rgba(237, 29, 36, 0.1);
@@ -262,8 +264,8 @@ body {
 }
 
 /* Buttons */
-.add-favorite-btn,
-.remove-favorite-btn {
+.add-collection-btn,
+.remove-collection-btn {
   width: 100%;
   padding: 8px;
   background-color: transparent;
@@ -279,22 +281,22 @@ body {
   font-weight: 600;
 }
 
-.add-favorite-btn {
+.add-collection-btn {
   color: var(--primary-color);
 }
 
-.remove-favorite-btn {
+.remove-collection-btn {
   border-color: var(--error-red);
   color: var(--error-red);
 }
 
-.add-favorite-btn:hover,
-.add-favorite-btn.added {
+.add-collection-btn:hover,
+.add-collection-btn.added {
   background-color: var(--primary-color);
   color: white;
 }
 
-.remove-favorite-btn:hover {
+.remove-collection-btn:hover {
   background-color: var(--error-red);
   color: white;
 }
@@ -323,8 +325,8 @@ body {
   color: var(--text-secondary);
 }
 
-.save-favorites-btn,
-.remove-favorites-btn {
+.save-collections-btn,
+.remove-collections-btn {
   padding: 10px 15px;
   border-radius: 6px;
   cursor: pointer;
@@ -333,20 +335,20 @@ body {
   color: white;
 }
 
-.save-favorites-btn {
+.save-collections-btn {
   background-color: var(--primary-color);
 }
 
-.remove-favorites-btn {
+.remove-collections-btn {
   background-color: var(--error-red);
   margin-left: 10px;
 }
 
-.save-favorites-btn:hover {
+.save-collections-btn:hover {
   background-color: var(--hover-red);
 }
 
-.remove-favorites-btn:hover {
+.remove-collections-btn:hover {
   background-color: var(--hover-red);
 }
 
@@ -526,409 +528,409 @@ body {
   color: var(--text-secondary);
 }
 
-.favorites-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
+.collections-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
 }
 
-.favorites-table th,
-.favorites-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
+.collections-table th,
+.collections-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
 }
 
-.favorites-table th {
-    background-color: var(--primary-color);
-    color: white;
+.collections-table th {
+  background-color: var(--primary-color);
+  color: white;
 }
 
-.favorites-table tr:nth-child(even) {
-    background-color: #f2f2f2;
+.collections-table tr:nth-child(even) {
+  background-color: #f2f2f2;
 }
 
-.favorites-table tr:hover {
-    background-color: #ddd;
+.collections-table tr:hover {
+  background-color: #ddd;
 }
 
-.remove-favorite-btn {
-    background-color: var(--error-red);
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
+.remove-collection-btn {
+  background-color: var(--error-red);
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-.remove-favorite-btn:hover {
-    background-color: darkred;
+.remove-collection-btn:hover {
+  background-color: darkred;
 }
 
 .tab-content {
-    display: none;
+  display: none;
 }
 
 .tab-content.active {
-    display: block;
+  display: block;
 }
 
 #heroesTab .comics-grid {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
-.favorites-tabs {
-    margin-bottom: 20px;
+.collections-tabs {
+  margin-bottom: 20px;
 }
 
-#favoritesTab {
-    padding: 0px;
+#collectionsTab {
+  padding: 0px;
 }
 
 /* Estilos específicos para la sección de héroes */
 #heroesTab .comics-grid {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 .hero-card {
-    background: var(--card-bg);
-    border: 2px solid grey;
-    transition: transform 0.3s ease;
+  background: var(--card-bg);
+  border: 2px solid grey;
+  transition: transform 0.3s ease;
 }
 
 .hero-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .hero-card .card-title {
-    color: var(--text-color);
-    font-size: 1.2em;
-    margin-bottom: 10px;
+  color: var(--text-color);
+  font-size: 1.2em;
+  margin-bottom: 10px;
 }
 
 .hero-card .card-description {
-    color: var(--text-color);
-    margin: 10px 0;
+  color: var(--text-color);
+  margin: 10px 0;
 }
 
 .hero-card .card-comics {
-    color: var(--text-color);
-    font-size: 0.9em;
-    margin-top: 10px;
+  color: var(--text-color);
+  font-size: 0.9em;
+  margin-top: 10px;
 }
 
 /* Asegurarse de que el filtro solo aparezca en la sección de cómics */
 #heroesTab .search-section,
-#favoritesTab .search-section {
-    display: none;
+#collectionsTab .search-section {
+  display: none;
 }
 
 #heroesTab .pagination,
-#favoritesTab .pagination {
-    display: none;
+#collectionsTab .pagination {
+  display: none;
 }
 
 .collections-tabs {
-    display: flex;
-    gap: 2px;
-    margin-bottom: 20px;
-    background-color: #f1f1f1;
-    padding: 4px;
-    border-radius: var(--border-radius);
-    overflow-x: auto;
+  display: flex;
+  gap: 2px;
+  margin-bottom: 20px;
+  background-color: #f1f1f1;
+  padding: 4px;
+  border-radius: var(--border-radius);
+  overflow-x: auto;
 }
 
 .collections-content {
-    padding: 20px;
+  padding: 20px;
 }
 
 .collections-tabs .tab-btn {
-    flex: 1;
-    min-width: max-content;
-    padding: 12px 24px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-size: 1rem;
-    color: black;
-    border-radius: calc(var(--border-radius) - 4px);
-    transition: all 0.3s ease;
+  flex: 1;
+  min-width: max-content;
+  padding: 12px 24px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: black;
+  border-radius: calc(var(--border-radius) - 4px);
+  transition: all 0.3s ease;
 }
 
 .collections-tabs .tab-btn.active {
-    background-color: var(--primary-color);
-    color: white;
+  background-color: var(--primary-color);
+  color: white;
 }
 
 .no-results {
-    text-align: center;
-    padding: 20px;
-    color: black;
-    font-size: 1.2em;
+  text-align: center;
+  padding: 20px;
+  color: black;
+  font-size: 1.2em;
 }
 
 .pagination-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    background: var(--card-background);
-    border-radius: var(--border-radius);
-    margin: 1rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--card-background);
+  border-radius: var(--border-radius);
+  margin: 1rem 0;
 }
 
 .pagination-controls {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .page-btn {
-    background: var(--primary-color);
-    border: none;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  background: var(--primary-color);
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .page-btn:disabled {
-    background: #666;
-    cursor: not-allowed;
+  background: #666;
+  cursor: not-allowed;
 }
 
 .page-btn:hover:not(:disabled) {
-    background: var(--hover-red);
+  background: var(--hover-red);
 }
 
 .page-input-container {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--text-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-color);
 }
 
 #pageInput {
-    width: 60px;
-    padding: 0.5rem;
-    border: 1px solid #666;
-    border-radius: 4px;
-    background: var(--card-background);
-    color: var(--text-color);
-    text-align: center;
+  width: 60px;
+  padding: 0.5rem;
+  border: 1px solid #666;
+  border-radius: 4px;
+  background: var(--card-background);
+  color: var(--text-color);
+  text-align: center;
 }
 
 .items-per-page {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--text-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-color);
 }
 
 #itemsPerPage {
-    padding: 0.5rem;
-    border: 1px solid #666;
-    border-radius: 4px;
-    background: var(--card-background);
-    color: var(--text-color);
+  padding: 0.5rem;
+  border: 1px solid #666;
+  border-radius: 4px;
+  background: var(--card-background);
+  color: var(--text-color);
 }
 
 .heroes-pagination {
-    margin-top: 2rem;
+  margin-top: 2rem;
 }
 
 .heroes-pagination .pagination-container {
-    background-color: var(--card-background);
-    border-radius: var(--border-radius);
-    padding: 1rem;
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  padding: 1rem;
 }
 
 .heroes-pagination .page-btn {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .heroes-pagination .page-btn:disabled {
-    background-color: #666;
-    cursor: not-allowed;
+  background-color: #666;
+  cursor: not-allowed;
 }
 
 .heroes-pagination .page-btn:hover:not(:disabled) {
-    background-color: var(--hover-red);
+  background-color: var(--hover-red);
 }
 
 .message {
-    text-align: center;
-    padding: 20px;
-    background-color: var(--card-background);
-    border-radius: var(--border-radius);
-    color: var(--text-color);
-    margin: 20px 0;
+  text-align: center;
+  padding: 20px;
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  color: var(--text-color);
+  margin: 20px 0;
 }
 
 .search-btn {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-size: 1rem;
-    font-weight: 500;
-    min-width: 80px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
+  font-weight: 500;
+  min-width: 80px;
 }
 
 .search-btn:hover {
-    background-color: var(--hover-red);
+  background-color: var(--hover-red);
 }
 
 .collection-stats {
-    background: rgba(0, 0, 0, 0.8);
-    padding: 10px 20px;
-    border-radius: var(--border-radius);
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.8);
+  padding: 10px 20px;
+  border-radius: var(--border-radius);
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .collection-stat {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    color: var(--text-color);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  color: var(--text-color);
 }
 
 .collection-stat span {
-    display: flex;
-    align-items: center;
-    gap: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .collection-stat .stat-icon {
-    color: var(--primary-color);
-    margin-right: 5px;
+  color: var(--primary-color);
+  margin-right: 5px;
 }
 
 .collection-stat .stat-value {
-    font-weight: bold;
-    color: var(--primary-color);
+  font-weight: bold;
+  color: var(--primary-color);
 }
 
 /* Contenedor del filtro de precio */
 .price-filter-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    position: relative;
-    min-width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  min-width: 200px;
 }
 
 /* Input de precio */
 #maxPriceFilter {
-    width: 100%;
-    padding: 16px 16px 16px 48px;
-    border: 2px solid transparent;
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    background-color: var(--card-background);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    color: white;
+  width: 100%;
+  padding: 16px 16px 16px 48px;
+  border: 2px solid transparent;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  background-color: var(--card-background);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  color: white;
 }
 
 #maxPriceFilter:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 4px 12px rgba(237, 29, 36, 0.1);
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(237, 29, 36, 0.1);
 }
 
 /* Icono del dólar */
 .price-filter-container .search-icon {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-secondary);
-    z-index: 1;
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  z-index: 1;
 }
 
 /* Botón de filtrar */
 .price-filter-container .search-btn {
-    white-space: nowrap;
+  white-space: nowrap;
 }
 
 /* Ajuste del contenedor de búsqueda para acomodar los tres elementos */
 .search-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr auto;
-    gap: var(--spacing);
-    margin-bottom: calc(var(--spacing) * 2);
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: var(--spacing);
+  margin-bottom: calc(var(--spacing) * 2);
 }
 
 /* Responsive */
 @media (max-width: 1024px) {
-    .search-section {
-        grid-template-columns: 1fr;
-    }
+  .search-section {
+    grid-template-columns: 1fr;
+  }
 
-    .price-filter-container {
-        min-width: 100%;
-    }
+  .price-filter-container {
+    min-width: 100%;
+  }
 }
 
 .collection-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .move-collection-btn {
-    width: 100%;
-    padding: 8px;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.3s ease;
+  width: 100%;
+  padding: 8px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
 }
 
 .clone-collection-btn {
-    width: 100%;
-    padding: 8px;
-    background-color: var(--secondary-color);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.3s ease;
+  width: 100%;
+  padding: 8px;
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
 }
 
 .move-collection-btn:hover,
 .clone-collection-btn:hover {
-    background-color: var(--hover-red);
+  background-color: var(--hover-red);
 }
 
-.collection-actions .remove-favorite-btn {
-    width: 100%;
+.collection-actions .remove-collection-btn {
+  width: 100%;
 }

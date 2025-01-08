@@ -3,10 +3,14 @@ class ComicsGrid {
     this.container = document.querySelector(containerSelector);
     this.allComics = [];
     this.filteredComics = [];
-    this.currentPage = 1;
     this.itemsPerPage = 5;
-    this.totalPages = 1;
     this.currentFilters = {};
+
+    // Inicializar página desde URL o default
+    const urlParams = new URLSearchParams(window.location.search);
+    const pageParam = parseInt(urlParams.get("page"));
+    this.currentPage = pageParam && pageParam > 0 ? pageParam : 1;
+    this.totalPages = 1;
   }
 
   async loadComics() {
@@ -89,17 +93,58 @@ class ComicsGrid {
       comicsData.results.forEach((comic) => {
         const card = this.createComicCard(comic);
         this.container.appendChild(card);
-        this.updateFavoriteButtons(comic.id);
+        this.updateCollectionButtons(comic.id);
       });
 
       // Actualizar paginación
       this.updatePagination(comicsData.total);
+
+      // Validar página actual contra total de páginas
+      const totalPages = Math.ceil(comicsData.total / this.itemsPerPage);
+      if (this.currentPage > totalPages) {
+        this.container.innerHTML =
+          '<div class="error">La página solicitada no existe</div>';
+        showToast("La página solicitada no existe", "error");
+        return;
+      }
+
+      // Actualizar URL con la página actual
+      this.updateUrlWithCurrentState();
     } catch (error) {
       console.error("Error loading comics:", error);
       this.container.innerHTML =
         '<div class="error">Error al cargar los cómics</div>';
       showToast("Error al cargar los cómics", "error");
     }
+  }
+
+  updateUrlWithCurrentState() {
+    const newUrl = new URL(window.location.href);
+
+    // Actualizar página
+    if (this.currentPage > 1) {
+      newUrl.searchParams.set("page", this.currentPage);
+    } else {
+      newUrl.searchParams.delete("page");
+    }
+
+    // Mantener filtros existentes
+    if (this.currentFilters.id) {
+      newUrl.searchParams.set("id", this.currentFilters.id.value);
+    }
+    if (this.currentFilters.price) {
+      newUrl.searchParams.set("price", this.currentFilters.price.value);
+    }
+
+    // Manejar múltiples nombres
+    newUrl.searchParams.delete("name");
+    Object.entries(this.currentFilters)
+      .filter(([key]) => key.startsWith("name_"))
+      .forEach(([_, filter]) => {
+        newUrl.searchParams.append("name", filter.value);
+      });
+
+    window.history.pushState({}, "", newUrl);
   }
 
   applyLocalFilters(comics) {
@@ -192,11 +237,11 @@ class ComicsGrid {
           <p class="comic-price">$${comic.price.toFixed(2)}</p>
         </div>
         <div class="card-actions">
-          <button class="add-favorite-btn">
-            <i class="far fa-heart"></i> Añadir a Favoritos
+          <button class="add-collection-btn">
+            <i class="far fa-heart"></i> Añadir a Colecciones
           </button>
-          <button class="remove-favorite-btn">
-            <i class="fas fa-trash"></i> Quitar de Favoritos
+          <button class="remove-collection-btn">
+            <i class="fas fa-trash"></i> Quitar de Colecciones
           </button>
         </div>
       </div>
@@ -214,11 +259,11 @@ class ComicsGrid {
       document.dispatchEvent(new CustomEvent("updateActionsBar"));
     });
 
-    // Eventos de botones de favoritos
-    const addFavoriteBtn = card.querySelector(".add-favorite-btn");
-    const removeFavoriteBtn = card.querySelector(".remove-favorite-btn");
+    // Eventos de botones de colecciones
+    const addCollectionBtn = card.querySelector(".add-collection-btn");
+    const removeCollectionBtn = card.querySelector(".remove-collection-btn");
 
-    addFavoriteBtn.addEventListener("click", () => {
+    addCollectionBtn.addEventListener("click", () => {
       document.dispatchEvent(
         new CustomEvent("openCollectionModal", {
           detail: { isIndividual: true, comicId: comic.id },
@@ -226,7 +271,7 @@ class ComicsGrid {
       );
     });
 
-    removeFavoriteBtn.addEventListener("click", () => {
+    removeCollectionBtn.addEventListener("click", () => {
       document.dispatchEvent(
         new CustomEvent("openRemoveCollectionModal", {
           detail: { isIndividual: true, comicId: comic.id },
@@ -235,28 +280,28 @@ class ComicsGrid {
     });
   }
 
-  updateFavoriteButtons(comicId) {
+  updateCollectionButtons(comicId) {
     const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
     const card = document.querySelector(`.card[data-id="${comicId}"]`);
 
     if (card) {
-      const favoriteBtn = card.querySelector(".add-favorite-btn");
-      const removeBtn = card.querySelector(".remove-favorite-btn");
-      const isInAnyCollection = favoritesManager.isFavorite(
+      const collectionBtn = card.querySelector(".add-collection-btn");
+      const removeBtn = card.querySelector(".remove-collection-btn");
+      const isInAnyCollection = collectionsManager.isCollection(
         dataSource,
         null,
         comicId
       );
 
-      if (favoriteBtn && removeBtn) {
+      if (collectionBtn && removeBtn) {
         if (isInAnyCollection) {
-          favoriteBtn.classList.add("added");
-          favoriteBtn.innerHTML = `<i class="fas fa-heart"></i> Añadido`;
+          collectionBtn.classList.add("added");
+          collectionBtn.innerHTML = `<i class="fas fa-heart"></i> Añadido`;
           removeBtn.style.display = "inline-flex";
           removeBtn.classList.add("removing");
         } else {
-          favoriteBtn.classList.remove("added");
-          favoriteBtn.innerHTML = `<i class="far fa-heart"></i> Añadir a Favoritos`;
+          collectionBtn.classList.remove("added");
+          collectionBtn.innerHTML = `<i class="far fa-heart"></i> Añadir a Colección`;
           removeBtn.style.display = "none";
           removeBtn.classList.remove("removing");
         }
@@ -278,19 +323,30 @@ class ComicsGrid {
   }
 
   setPage(page) {
-    this.currentPage = page;
-    this.loadComics();
+    const newPage = parseInt(page);
+    if (newPage > 0) {
+      this.currentPage = newPage;
+      // Actualizar URL antes de cargar
+      this.updateUrlWithCurrentState();
+      this.loadComics();
+    } else {
+      showToast("Número de página inválido", "error");
+    }
   }
 
   setItemsPerPage(items) {
     this.itemsPerPage = items;
     this.currentPage = 1;
+    // Actualizar URL antes de cargar
+    this.updateUrlWithCurrentState();
     this.loadComics();
   }
 
   applyFilters(filteredComics) {
     this.filteredComics = filteredComics;
     this.currentPage = 1;
+    // Actualizar URL antes de cargar
+    this.updateUrlWithCurrentState();
     this.loadComics();
   }
 }

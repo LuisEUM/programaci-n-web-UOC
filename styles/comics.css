@@ -608,8 +608,8 @@ body {
   margin-top: 1rem;
 }
 
-.add-favorite-btn,
-.remove-favorite-btn {
+.add-collection-btn,
+.remove-collection-btn {
   width: 100%;
   padding: 0.5rem;
   border-radius: 8px;
@@ -622,44 +622,44 @@ body {
   font-weight: 500;
 }
 
-.add-favorite-btn {
+.add-collection-btn {
   border: 2px solid var(--primary-color);
   background: transparent;
   color: var(--primary-color);
 }
 
-.add-favorite-btn:hover {
+.add-collection-btn:hover {
   background-color: var(--primary-color);
   color: white;
 }
 
-.add-favorite-btn.added {
+.add-collection-btn.added {
   background-color: var(--primary-color);
   color: white;
 }
 
-.add-favorite-btn.added:hover {
+.add-collection-btn.added:hover {
   background-color: transparent;
   color: var(--primary-color);
 }
 
-.remove-favorite-btn {
+.remove-collection-btn {
   border: 2px solid var(--secondary-color);
   background-color: var(--secondary-color);
   color: white;
 }
 
-.remove-favorite-btn:hover {
+.remove-collection-btn:hover {
   background-color: #3a3636;
   border-color: #3a3636;
 }
 
-.remove-favorite-btn.removing {
+.remove-collection-btn.removing {
   background-color: var(--secondary-color);
   color: white;
 }
 
-.remove-favorite-btn.removing:hover {
+.remove-collection-btn.removing:hover {
   background-color: #3a3636;
   border-color: #3a3636;
 }
@@ -1062,8 +1062,8 @@ body {
   align-items: center;
 }
 
-.save-favorites-btn,
-.remove-favorites-btn {
+.save-collections-btn,
+.remove-collections-btn {
   padding: 0.8rem 1.5rem;
   border: none;
   border-radius: 8px;
@@ -1077,18 +1077,18 @@ body {
   min-width: 180px;
 }
 
-.save-favorites-btn {
+.save-collections-btn {
   background-color: var(--primary-color);
   color: white;
 }
 
-.remove-favorites-btn {
+.remove-collections-btn {
   background-color: var(--secondary-color);
   color: white;
 }
 
-.save-favorites-btn:hover,
-.remove-favorites-btn:hover {
+.save-collections-btn:hover,
+.remove-collections-btn:hover {
   transform: translateY(-2px);
   filter: brightness(1.1);
 }
@@ -1115,8 +1115,8 @@ body {
     flex-direction: column;
   }
 
-  .save-favorites-btn,
-  .remove-favorites-btn {
+  .save-collections-btn,
+  .remove-collections-btn {
     width: 100%;
   }
 }
@@ -1279,8 +1279,8 @@ body {
     padding: 1rem;
   }
 
-  .save-favorites-btn,
-  .remove-favorites-btn {
+  .save-collections-btn,
+  .remove-collections-btn {
     width: 100%;
     justify-content: center;
   }
@@ -1307,7 +1307,7 @@ body {
   margin-top: 1rem;
 }
 
-.favorite-btn {
+.collection-btn {
   background: none;
   border: 1px solid var(--primary-color);
   color: var(--primary-color);
@@ -1317,12 +1317,12 @@ body {
   transition: all 0.3s ease;
 }
 
-.favorite-btn.active {
+.collection-btn.active {
   background-color: var(--primary-color);
   color: var(--white);
 }
 
-.favorite-btn:hover {
+.collection-btn:hover {
   background-color: var(--primary-color);
   color: var(--white);
 }
@@ -1443,8 +1443,8 @@ body {
   box-shadow: 0 0 0 3px rgba(226, 54, 54, 0.1);
 }
 
-/* Estilos para el botón de quitar favoritos en las tarjetas */
-.remove-favorite-btn {
+/* Estilos para el botón de quitar colecciones en las tarjetas */
+.remove-collection-btn {
   width: 100%;
   padding: 0.5rem;
   border: 2px solid var(--secondary-color);
@@ -1460,17 +1460,17 @@ body {
   font-weight: 500;
 }
 
-.remove-favorite-btn:hover {
+.remove-collection-btn:hover {
   background-color: #3a3636;
   border-color: #3a3636;
 }
 
-.remove-favorite-btn.removing {
+.remove-collection-btn.removing {
   background-color: var(--secondary-color);
   color: white;
 }
 
-.remove-favorite-btn.removing:hover {
+.remove-collection-btn.removing:hover {
   background-color: #3a3636;
   border-color: #3a3636;
 }

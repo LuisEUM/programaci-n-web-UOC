@@ -3,7 +3,7 @@ const UI = {
   currentSearchTerm: "",
   totalPages: 0,
   currentPage: 1,
-  favoritesManager: new Favorites(),
+  collectionsManager: new Collections(),
   selectedComics: new Set(),
   currentComics: [],
 
@@ -143,17 +143,21 @@ const UI = {
       toggleDataBtn.addEventListener("click", () => this.toggleDataSource());
     }
 
-    // Botón de guardar favoritos
-    const saveFavoritesBtn = document.querySelector(".save-favorites-btn");
-    if (saveFavoritesBtn) {
-      saveFavoritesBtn.addEventListener("click", () => this.saveFavorites());
+    // Botón de guardar colecciones
+    const saveCollectionsBtn = document.querySelector(".save-collections-btn");
+    if (saveCollectionsBtn) {
+      saveCollectionsBtn.addEventListener("click", () =>
+        this.saveCollections()
+      );
     }
 
-    // Botón de remover favoritos
-    const removeFavoritesBtn = document.querySelector(".remove-favorites-btn");
-    if (removeFavoritesBtn) {
-      removeFavoritesBtn.addEventListener("click", () =>
-        this.removeFavorites()
+    // Botón de remover colecciones
+    const removeCollectionsBtn = document.querySelector(
+      ".remove-collections-btn"
+    );
+    if (removeCollectionsBtn) {
+      removeCollectionsBtn.addEventListener("click", () =>
+        this.removeCollections()
       );
     }
 
@@ -225,8 +229,8 @@ const UI = {
       case "heroes":
         this.loadHeroes();
         break;
-      case "favorites":
-        this.loadFavorites();
+      case "collections":
+        this.loadCollections();
         break;
     }
   },
@@ -326,7 +330,7 @@ const UI = {
           type,
           item,
           this.selectedComics,
-          this.favoritesManager
+          this.collectionsManager
         )
       );
       container.appendChild(cardElement);
@@ -354,7 +358,7 @@ const UI = {
     }
   },
 
-  toggleIndividualFavorite(comicId) {
+  toggleIndividualCollection(comicId) {
     this.tempComicId = comicId;
 
     // Actualizar la selección de la tarjeta
@@ -380,8 +384,8 @@ const UI = {
     this.collectionModal.open(true, comicId);
   },
 
-  toggleFavorite(comicId) {
-    this.favoritesManager.toggleFavorite(comicId);
+  toggleCollection(comicId) {
+    this.collectionsManager.toggleCollection(comicId);
     const card = document.querySelector(`.card[data-id="${comicId}"]`);
     if (card.classList.contains("selected")) {
       card.classList.remove("selected");
@@ -424,7 +428,7 @@ const UI = {
     }
   },
 
-  saveFavorites() {
+  saveCollections() {
     if (this.selectedComics.size > 0) {
       this.collectionModal.open(false);
     }
@@ -466,7 +470,7 @@ const UI = {
   },
 
   openCollectionModal(isIndividual = false) {
-    this.isIndividualFavorite = isIndividual;
+    this.isIndividualCollection = isIndividual;
     this.collectionModal.open(); // Abrir el modal
   },
 
@@ -483,14 +487,14 @@ const UI = {
         ".collections-tabs .tab-btn.active"
       )?.dataset.collection;
       if (currentCollection) {
-        this.favoritesManager.removeFavorite(
+        this.collectionsManager.removeCollection(
           dataSource,
           currentCollection,
           this.tempComicId
         );
       }
       // Luego añadir a la nueva colección
-      this.favoritesManager.addFavorite(
+      this.collectionsManager.addCollection(
         dataSource,
         collection,
         this.tempComicId
@@ -498,10 +502,10 @@ const UI = {
       this.tempComicId = null;
       this.isMovingComic = false;
       // Actualizar la vista
-      this.loadFavorites();
+      this.loadCollections();
     } else if (this.isCloningComic && this.tempComicId) {
       // Añadir a la nueva colección sin remover de la actual
-      this.favoritesManager.addFavorite(
+      this.collectionsManager.addCollection(
         dataSource,
         collection,
         this.tempComicId
@@ -509,18 +513,18 @@ const UI = {
       this.tempComicId = null;
       this.isCloningComic = false;
       // Actualizar la vista
-      this.loadFavorites();
+      this.loadCollections();
     } else {
-      if (this.isIndividualFavorite && this.tempComicId !== null) {
-        // Agregar favorito individual
-        this.favoritesManager.addFavorite(
+      if (this.isIndividualCollection && this.tempComicId !== null) {
+        // Agregar a coleccion individual
+        this.collectionsManager.addCollection(
           dataSource,
           collection,
           this.tempComicId
         );
-        this.updateFavoriteButtons(this.tempComicId);
+        this.updateCollectionButtons(this.tempComicId);
 
-        // Limpiar la selección después de añadir a favoritos
+        // Limpiar la selección después de añadir a colecciones
         const card = document.querySelector(
           `.card[data-id="${this.tempComicId}"]`
         );
@@ -530,38 +534,42 @@ const UI = {
         this.selectedComics.delete(this.tempComicId);
 
         this.tempComicId = null;
-        this.isIndividualFavorite = false;
+        this.isIndividualCollection = false;
 
         // Actualizar la barra de acciones
         this.updateActionsBar();
       } else if (this.isIndividualRemove && this.tempComicId !== null) {
-        // Remover favorito individual
-        this.favoritesManager.removeFavorite(
+        // Remover a coleccion individual
+        this.collectionsManager.removeCollection(
           dataSource,
           collection,
           this.tempComicId
         );
-        this.updateFavoriteButtons(this.tempComicId);
+        this.updateCollectionButtons(this.tempComicId);
         this.tempComicId = null;
         this.isIndividualRemove = false;
       } else if (this.selectedComics.size > 0) {
-        // Agregar o remover favoritos múltiples
+        // Agregar o remover colecciones múltiples
         const selectedComicsList = this.getSelectedComics();
         selectedComicsList.forEach((comic) => {
           if (this.isRemoveAction) {
-            this.favoritesManager.removeFavorite(
+            this.collectionsManager.removeCollection(
               dataSource,
               collection,
               comic.id
             );
           } else {
-            this.favoritesManager.addFavorite(dataSource, collection, comic.id);
+            this.collectionsManager.addCollection(
+              dataSource,
+              collection,
+              comic.id
+            );
           }
           const card = document.querySelector(`.card[data-id="${comic.id}"]`);
           const checkbox = card.querySelector(".card-checkbox");
           checkbox.checked = false;
           card.classList.remove("selected");
-          this.updateFavoriteButtons(comic.id);
+          this.updateCollectionButtons(comic.id);
         });
         this.selectedComics.clear();
         this.updateActionsBar();
@@ -570,7 +578,7 @@ const UI = {
     }
   },
 
-  removeIndividualFavorite(comicId) {
+  removeIndividualCollection(comicId) {
     this.tempComicId = comicId; // Almacenar temporalmente el ID del cómic
     this.openRemoveCollectionModal(true); // Indicar que es una acción individual
   },
@@ -583,7 +591,7 @@ const UI = {
       // Deshabilitar colecciones en las que no está el cómic
       this.collectionButtons.forEach((button) => {
         const collection = button.dataset.collection;
-        const isInCollection = this.favoritesManager.isFavorite(
+        const isInCollection = this.collectionsManager.isCollection(
           dataSource,
           collection,
           this.tempComicId
@@ -603,9 +611,9 @@ const UI = {
     this.collectionModal.style.display = "block";
   },
 
-  updateFavoriteButtons(comicId) {
+  updateCollectionButtons(comicId) {
     const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
-    const isFavorite = this.favoritesManager.isFavorite(
+    const isCollection = this.collectionsManager.isCollection(
       dataSource,
       null,
       comicId
@@ -614,63 +622,63 @@ const UI = {
     const card = document.querySelector(`.card[data-id="${comicId}"]`);
 
     if (card) {
-      const favoriteBtn = card.querySelector(".add-favorite-btn");
-      const removeFavoriteBtn = card.querySelector(".remove-favorite-btn");
+      const collectionBtn = card.querySelector(".add-collection-btn");
+      const removeCollectionBtn = card.querySelector(".remove-collection-btn");
 
-      if (isFavorite) {
-        favoriteBtn.classList.add("added");
-        favoriteBtn.innerHTML = `<i class="fas fa-heart"></i> Añadido a Favoritos`;
+      if (isCollection) {
+        collectionBtn.classList.add("added");
+        collectionBtn.innerHTML = `<i class="fas fa-heart"></i> Añadido a Favoritos`;
       } else {
-        favoriteBtn.classList.remove("added");
-        favoriteBtn.innerHTML = `<i class="far fa-heart"></i> Añadir a Favoritos`;
+        collectionBtn.classList.remove("added");
+        collectionBtn.innerHTML = `<i class="far fa-heart"></i> Añadir a Favoritos`;
       }
     } else {
       console.warn(`No se encontró la tarjeta con data-id="${comicId}".`);
     }
   },
 
-  removeFavorites() {
+  removeCollections() {
     if (this.selectedComics.size > 0) {
       this.isRemoveAction = true;
       this.openRemoveCollectionModal(false); // Acción múltiple
     }
   },
 
-  async loadFavorites() {
+  async loadCollections() {
     try {
-      const container = document.getElementById("favoritesContainer");
+      const container = document.getElementById("collectionsContainer");
 
       if (!this.collectionsTabs) {
         this.collectionsTabs = new CollectionsTabs(
           container,
-          this.favoritesManager
+          this.collectionsManager
         );
       }
 
       // Mostrar estadísticas de las colecciones
       this.showCollectionsStats();
     } catch (error) {
-      console.error("Error loading favorites:", error);
+      console.error("Error loading collections:", error);
       this.showError("Error al cargar las colecciones");
     }
   },
 
   loadCollectionContent(collection) {
-    const container = document.getElementById("favoritesContainer");
+    const container = document.getElementById("collectionsContainer");
     container.innerHTML = "";
 
     const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
-    const favorites =
-      this.favoritesManager.getAllFavorites(dataSource)[collection] || [];
+    const collections =
+      this.collectionsManager.getAllCollections(dataSource)[collection] || [];
 
-    if (favorites.length === 0) {
+    if (collections.length === 0) {
       container.innerHTML = `<div class="no-results">No hay cómics en esta colección</div>`;
       return;
     }
 
     // Crear una tabla para mostrar los cómics de la colección
     const table = document.createElement("table");
-    table.className = "favorites-table";
+    table.className = "collections-table";
     table.innerHTML = `
         <tr>
             <th>ID</th>
@@ -680,7 +688,7 @@ const UI = {
         </tr>
     `;
 
-    favorites.forEach(async (comicId) => {
+    collections.forEach(async (comicId) => {
       const comic = await DataService.fetchItemById("comics", comicId);
       if (comic) {
         const row = document.createElement("tr");
@@ -689,7 +697,7 @@ const UI = {
                 <td>${comic.title}</td>
                 <td>${Utils.truncateText(comic.description, 50)}</td>
                 <td>
-                    <button class="remove-favorite-btn" onclick="UI.removeIndividualFavorite(${
+                    <button class="remove-collection-btn" onclick="UI.removeIndividualCollection(${
                       comic.id
                     })">
                         Remover

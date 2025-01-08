@@ -1,4 +1,13 @@
 document.addEventListener("DOMContentLoaded", async function () {
+  // Verificar si el usuario ya está logueado
+  const userToken = localStorage.getItem("userToken");
+  const userName = localStorage.getItem("userName");
+
+  if (userToken && userName) {
+    window.location.href = "comics.html";
+    return;
+  }
+
   // Cargar el usuario de prueba desde el JSON
   try {
     const response = await fetch("js/data/test-user.json");

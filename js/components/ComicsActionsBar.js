@@ -9,7 +9,7 @@ class ComicsActionsBar {
     document.addEventListener("updateActionsBar", () => this.update());
 
     this.actionsBar
-      .querySelector(".save-favorites-btn")
+      .querySelector(".save-collections-btn")
       .addEventListener("click", () => {
         const selectedCards = document.querySelectorAll(".card.selected");
         if (selectedCards.length > 0) {
@@ -24,7 +24,7 @@ class ComicsActionsBar {
       });
 
     this.actionsBar
-      .querySelector(".remove-favorites-btn")
+      .querySelector(".remove-collections-btn")
       .addEventListener("click", () => {
         const selectedCards = document.querySelectorAll(".card.selected");
         if (selectedCards.length > 0) {

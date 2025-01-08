@@ -43,7 +43,7 @@ class ComicsCollectionModal {
 
       if (isIndividual && comicId) {
         const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
-        const isInCollection = favoritesManager.isFavorite(
+        const isInCollection = collectionsManager.isCollection(
           dataSource,
           collection,
           comicId
@@ -53,17 +53,17 @@ class ComicsCollectionModal {
         if (isInCollection) {
           button.innerHTML = `<i class="${this.getCollectionIcon(
             collection
-          )}"></i> ${Favorites.COLLECTION_NAMES[collection]} (Ya añadido)`;
+          )}"></i> ${Collections.COLLECTION_NAMES[collection]} (Ya añadido)`;
         } else {
           button.innerHTML = `<i class="${this.getCollectionIcon(
             collection
-          )}"></i> ${Favorites.COLLECTION_NAMES[collection]}`;
+          )}"></i> ${Collections.COLLECTION_NAMES[collection]}`;
         }
       } else {
         button.disabled = false;
         button.innerHTML = `<i class="${this.getCollectionIcon(
           collection
-        )}"></i> ${Favorites.COLLECTION_NAMES[collection]}`;
+        )}"></i> ${Collections.COLLECTION_NAMES[collection]}`;
       }
 
       button.onclick = () =>
@@ -84,7 +84,7 @@ class ComicsCollectionModal {
       const collection = button.dataset.collection;
 
       if (isIndividual && comicId) {
-        const isInCollection = favoritesManager.isFavorite(
+        const isInCollection = collectionsManager.isCollection(
           dataSource,
           collection,
           comicId
@@ -94,17 +94,17 @@ class ComicsCollectionModal {
         if (isInCollection) {
           button.innerHTML = `<i class="${this.getCollectionIcon(
             collection
-          )}"></i> Quitar de ${Favorites.COLLECTION_NAMES[collection]}`;
+          )}"></i> Quitar de ${Collections.COLLECTION_NAMES[collection]}`;
         } else {
           button.innerHTML = `<i class="${this.getCollectionIcon(
             collection
-          )}"></i> ${Favorites.COLLECTION_NAMES[collection]}`;
+          )}"></i> ${Collections.COLLECTION_NAMES[collection]}`;
         }
       } else {
         button.disabled = false;
         button.innerHTML = `<i class="${this.getCollectionIcon(
           collection
-        )}"></i> Quitar de ${Favorites.COLLECTION_NAMES[collection]}`;
+        )}"></i> Quitar de ${Collections.COLLECTION_NAMES[collection]}`;
       }
 
       button.onclick = () =>
@@ -128,42 +128,44 @@ class ComicsCollectionModal {
     if (comicId) {
       // Manejo individual
       if (isRemove) {
-        favoritesManager.removeFavorite(dataSource, collection, comicId);
+        collectionsManager.removeCollection(dataSource, collection, comicId);
         showToast(
-          `Comic eliminado de ${favoritesManager.getCollectionDisplayName(
+          `Comic eliminado de ${collectionsManager.getCollectionDisplayName(
             collection
           )}`,
           "success"
         );
       } else {
-        favoritesManager.addFavorite(dataSource, collection, comicId);
+        collectionsManager.addCollection(dataSource, collection, comicId);
         showToast(
-          `Comic añadido a ${favoritesManager.getCollectionDisplayName(
+          `Comic añadido a ${collectionsManager.getCollectionDisplayName(
             collection
           )}`,
           "success"
         );
       }
       document.dispatchEvent(
-        new CustomEvent("updateFavoriteButtons", { detail: { comicId } })
+        new CustomEvent("updateCollectionButtons", { detail: { comicId } })
       );
     } else {
       // Manejo múltiple
       selectedCards.forEach((card) => {
         const id = parseInt(card.dataset.id);
         if (isRemove) {
-          if (favoritesManager.isFavorite(dataSource, collection, id)) {
-            favoritesManager.removeFavorite(dataSource, collection, id);
+          if (collectionsManager.isCollection(dataSource, collection, id)) {
+            collectionsManager.removeCollection(dataSource, collection, id);
             actionCount++;
           }
         } else {
-          if (!favoritesManager.isFavorite(dataSource, collection, id)) {
-            favoritesManager.addFavorite(dataSource, collection, id);
+          if (!collectionsManager.isCollection(dataSource, collection, id)) {
+            collectionsManager.addCollection(dataSource, collection, id);
             actionCount++;
           }
         }
         document.dispatchEvent(
-          new CustomEvent("updateFavoriteButtons", { detail: { comicId: id } })
+          new CustomEvent("updateCollectionButtons", {
+            detail: { comicId: id },
+          })
         );
         card.classList.remove("selected");
         const checkbox = card.querySelector(".card-checkbox");
@@ -173,7 +175,7 @@ class ComicsCollectionModal {
       // Mostrar mensaje con el número de comics afectados
       const action = isRemove ? "eliminados de" : "añadidos a";
       const collectionName =
-        favoritesManager.getCollectionDisplayName(collection);
+        collectionsManager.getCollectionDisplayName(collection);
       if (actionCount > 0) {
         showToast(
           `${actionCount} ${
@@ -191,7 +193,7 @@ class ComicsCollectionModal {
       const buttons = document.querySelectorAll(".collection-btn");
       buttons.forEach((button) => {
         const buttonCollection = button.dataset.collection;
-        const isInCollection = favoritesManager.isFavorite(
+        const isInCollection = collectionsManager.isCollection(
           dataSource,
           buttonCollection,
           comicId
@@ -199,11 +201,11 @@ class ComicsCollectionModal {
         button.disabled = isInCollection;
 
         if (isInCollection) {
-          button.innerHTML = `${Favorites.COLLECTION_NAMES[buttonCollection]} (Ya añadido)`;
+          button.innerHTML = `${Collections.COLLECTION_NAMES[buttonCollection]} (Ya añadido)`;
         } else {
           button.innerHTML = `<i class="${this.getCollectionIcon(
             buttonCollection
-          )}"></i> ${Favorites.COLLECTION_NAMES[buttonCollection]}`;
+          )}"></i> ${Collections.COLLECTION_NAMES[buttonCollection]}`;
         }
       });
     }
@@ -218,7 +220,7 @@ class ComicsCollectionModal {
       toread: "fas fa-bookmark",
       reading: "fas fa-book-open",
       read: "fas fa-check-circle",
-      favorites: "fas fa-heart",
+      collections: "fas fa-heart",
     };
     return icons[collection] || "fas fa-list";
   }

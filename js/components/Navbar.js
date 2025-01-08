@@ -88,10 +88,10 @@ class Navbar {
           }">Comics</a>
           <a href="heroes.html" class="nav-link ${
             window.location.pathname.includes("heroes") ? "active" : ""
-          }">Heroes</a>
-          <a href="favorites.html" class="nav-link ${
-            window.location.pathname.includes("favorites") ? "active" : ""
-          }">Favorites</a>
+          }">Héroes</a>
+          <a href="collections.html" class="nav-link ${
+            window.location.pathname.includes("collections") ? "active" : ""
+          }">Colecciones</a>
         </div>
         <div class="user-section">
           <span class="username">

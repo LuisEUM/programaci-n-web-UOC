@@ -10,7 +10,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <script src="js/classes/Comic.js"></script>
   <script src="js/classes/Hero.js"></script>
-  <script src="js/classes/Favorites.js"></script>
+  <script src="js/classes/Collections.js"></script>
   <script src="js/services/DataService.js"></script>
   <script src="js/components/Tabs.js"></script>
   <script src="js/components/Card.js"></script>
@@ -70,12 +70,12 @@
       </div>
     </div>
 
-    <!-- Contenedor específico para Favorites -->
-    <div id="favoritesTab" class="tab-content">
-      <div class="favorites-tabs">
+    <!-- Contenedor específico para Collections -->
+    <div id="collectionsTab" class="tab-content">
+      <div class="collections-tabs">
         <!-- Los tabs de colecciones se generarán aquí -->
       </div>
-      <div id="favoritesContainer">
+      <div id="collectionsContainer">
         <!-- El contenido de las colecciones se generará aquí -->
       </div>
     </div>
@@ -83,11 +83,11 @@
     <!-- Barra de acciones -->
     <div class="actions-bar" id="actionsBar">
       <span class="selected-count">0 cómics seleccionados</span>
-      <button class="save-favorites-btn" onclick="UI.saveFavorites()">
-        Guardar en Favoritos
+      <button class="save-collections-btn" onclick="UI.saveCollections()">
+        Guardar en Colecciones
       </button>
-      <button class="remove-favorites-btn" onclick="UI.removeFavorites()">
-        Remover de Favoritos
+      <button class="remove-collections-btn" onclick="UI.removeCollections()">
+        Remover de Colecciones
       </button>
     </div>
   </div>
@@ -100,7 +100,7 @@
       <button class="collection-btn" data-collection="toread">Por Leer</button>
       <button class="collection-btn" data-collection="reading">Leyendo</button>
       <button class="collection-btn" data-collection="read">Leídos</button>
-      <button class="collection-btn" data-collection="favorites">Mis Favoritos</button>
+      <button class="collection-btn" data-collection="collections">Mis Favoritos</button>
       <button id="closeModal" class="close-modal-btn">Cancelar</button>
     </div>
   </div>

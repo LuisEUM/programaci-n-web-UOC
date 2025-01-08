@@ -69,19 +69,19 @@ class CollectionModal {
         button.disabled = collection === this.currentCollection;
         button.innerHTML =
           collection === this.currentCollection
-            ? `${Favorites.COLLECTION_NAMES[collection]} (Colección actual)`
-            : Favorites.COLLECTION_NAMES[collection];
+            ? `${Collections.COLLECTION_NAMES[collection]} (Colección actual)`
+            : Collections.COLLECTION_NAMES[collection];
       } else if (this.currentAction === "clone") {
         // Para clonar: deshabilitar las colecciones donde ya existe el cómic
-        const isInCollection = UI.favoritesManager.isFavorite(
+        const isInCollection = UI.collectionsManager.isCollection(
           dataSource,
           collection,
           this.currentComicId
         );
         button.disabled = isInCollection;
         button.innerHTML = isInCollection
-          ? `${Favorites.COLLECTION_NAMES[collection]} (Ya existe)`
-          : Favorites.COLLECTION_NAMES[collection];
+          ? `${Collections.COLLECTION_NAMES[collection]} (Ya existe)`
+          : Collections.COLLECTION_NAMES[collection];
       }
     });
   }
@@ -90,7 +90,7 @@ class CollectionModal {
     this.collectionButtons.forEach((button) => {
       button.disabled = false;
       const collection = button.dataset.collection;
-      button.innerHTML = Favorites.COLLECTION_NAMES[collection];
+      button.innerHTML = Collections.COLLECTION_NAMES[collection];
     });
   }
 
@@ -100,13 +100,13 @@ class CollectionModal {
 
     if (this.currentAction === "move") {
       // Remover de la colección actual
-      UI.favoritesManager.removeFavorite(
+      UI.collectionsManager.removeCollection(
         dataSource,
         this.currentCollection,
         this.currentComicId
       );
       // Añadir a la nueva colección
-      UI.favoritesManager.addFavorite(
+      UI.collectionsManager.addCollection(
         dataSource,
         targetCollection,
         this.currentComicId
@@ -114,7 +114,7 @@ class CollectionModal {
       showToast("Cómic movido exitosamente", "success");
     } else if (this.currentAction === "clone") {
       // Solo añadir a la nueva colección
-      UI.favoritesManager.addFavorite(
+      UI.collectionsManager.addCollection(
         dataSource,
         targetCollection,
         this.currentComicId
@@ -126,6 +126,6 @@ class CollectionModal {
     this.close();
 
     // Recargar la vista actual
-    loadFavorites(this.currentCollection, UI.favoritesManager);
+    loadCollections(this.currentCollection, UI.collectionsManager);
   }
 }
