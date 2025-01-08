@@ -15,6 +15,8 @@ class Navbar {
   }
 
   init() {
+    // Inicializar la configuración de la fuente de datos
+    Config.init();
     this.renderDataStatus();
     this.renderNavbar();
     this.setupEventListeners();
@@ -25,13 +27,44 @@ class Navbar {
     dataStatus.className = "data-status-bar";
     dataStatus.innerHTML = `
       <div class="data-status-container">
-        <span class="data-status">
+        <button class="data-status-toggle ${
+          Config.USE_MOCK_DATA ? "" : "api-mode"
+        }">
           <i class="fas fa-database" aria-hidden="true"></i>
-          <span>Usando Data Mockeada</span>
-        </span>
+          <span class="data-status-text">${
+            Config.USE_MOCK_DATA
+              ? "Usando Data Mockeada"
+              : "Usando Data de la API"
+          }</span>
+        </button>
       </div>
     `;
     document.body.insertBefore(dataStatus, document.body.firstChild);
+
+    // Añadir evento de click al botón
+    const toggleButton = dataStatus.querySelector(".data-status-toggle");
+    toggleButton.addEventListener("click", () => this.toggleDataSource());
+  }
+
+  toggleDataSource() {
+    const isUsingMock = Config.toggleDataSource();
+    // Actualizar el texto del botón
+    const toggleButton = document.querySelector(".data-status-toggle");
+    const statusText = toggleButton.querySelector(".data-status-text");
+
+    if (toggleButton) {
+      toggleButton.classList.toggle("api-mode", !isUsingMock);
+      statusText.textContent = isUsingMock
+        ? "Usando Data Mockeada"
+        : "Usando Data de la API";
+    }
+
+    // Disparar un evento personalizado para notificar el cambio
+    window.dispatchEvent(
+      new CustomEvent("dataSourceChanged", {
+        detail: { isUsingMock },
+      })
+    );
   }
 
   renderNavbar() {

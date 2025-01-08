@@ -6,6 +6,7 @@ class ComicsGrid {
     this.currentPage = 1;
     this.itemsPerPage = 5;
     this.totalPages = 1;
+    this.currentFilters = {};
   }
 
   async loadComics() {
@@ -13,47 +14,158 @@ class ComicsGrid {
       this.container.innerHTML =
         '<div class="loading">Cargando cómics...</div>';
 
-      // Cargar cómics desde comics.json si aún no están cargados
-      if (this.allComics.length === 0) {
-        const response = await fetch("js/data/comics.json");
-        if (!response.ok) {
-          throw new Error("Error fetching comics from comics.json");
+      let comicsData;
+      const offset = (this.currentPage - 1) * this.itemsPerPage;
+
+      if (Config.USE_MOCK_DATA) {
+        // Cargar cómics desde comics.json solo si no están cargados
+        if (this.allComics.length === 0) {
+          const response = await fetch("js/data/comics.json");
+          if (!response.ok) {
+            throw new Error("Error fetching comics from comics.json");
+          }
+          const data = await response.json();
+          this.allComics = data.comics.map((comic) => Comic.fromAPI(comic));
         }
-        const data = await response.json();
-        this.allComics = data.comics.map((comic) => Comic.fromAPI(comic));
+
+        // Aplicar filtros localmente en modo mock
+        let comicsToShow = this.allComics;
+        if (Object.keys(this.currentFilters).length > 0) {
+          comicsToShow = this.applyLocalFilters(this.allComics);
+        }
+
+        // Aplicar paginación a los datos filtrados
+        const startIndex = offset;
+        const endIndex = startIndex + this.itemsPerPage;
+        comicsData = {
+          results: comicsToShow.slice(startIndex, endIndex),
+          total: comicsToShow.length,
+        };
+      } else {
+        // Verificar si es búsqueda por ID específico
+        if (this.currentFilters.id && !this.currentFilters.name_) {
+          // Usar getComicById para búsqueda específica
+          const comicData = await MarvelAPI.getComicById(
+            this.currentFilters.id.value
+          );
+          const comic = comicData ? Comic.fromAPI(comicData) : null;
+          comicsData = {
+            results: comic ? [comic] : [],
+            total: comic ? 1 : 0,
+          };
+        } else {
+          // Búsqueda normal con filtros
+          const { params, hasLocalFilters } = this.getAPIFilterParams();
+          const apiParams = {
+            offset: offset,
+            limit: hasLocalFilters ? 100 : this.itemsPerPage,
+            ...params,
+          };
+
+          const response = await MarvelAPI.getComics(apiParams);
+          comicsData = response.data;
+          comicsData.results = comicsData.results.map((comic) =>
+            Comic.fromAPI(comic)
+          );
+
+          if (hasLocalFilters) {
+            comicsData.results = this.applyLocalFilters(comicsData.results);
+            comicsData.total = comicsData.results.length;
+
+            const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+            const endIndex = startIndex + this.itemsPerPage;
+            comicsData.results = comicsData.results.slice(startIndex, endIndex);
+          }
+        }
       }
 
-      // Usar los comics filtrados si hay algún filtro activo, si no usar todos
-      const comicsToShow =
-        this.filteredComics.length > 0 ? this.filteredComics : this.allComics;
-
-      if (!comicsToShow || comicsToShow.length === 0) {
+      if (!comicsData.results || comicsData.results.length === 0) {
         this.container.innerHTML =
           '<div class="no-results">No se encontraron cómics</div>';
         this.updatePagination(0);
         return;
       }
 
-      // Calcular paginación
-      const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-      const endIndex = startIndex + this.itemsPerPage;
-      const paginatedComics = comicsToShow.slice(startIndex, endIndex);
-
       // Limpiar contenedor y mostrar cómics
       this.container.innerHTML = "";
-      paginatedComics.forEach((comic) => {
+      comicsData.results.forEach((comic) => {
         const card = this.createComicCard(comic);
         this.container.appendChild(card);
-        // Actualizar estado del botón para este cómic
         this.updateFavoriteButtons(comic.id);
       });
 
       // Actualizar paginación
-      this.updatePagination(comicsToShow.length);
+      this.updatePagination(comicsData.total);
     } catch (error) {
       console.error("Error loading comics:", error);
+      this.container.innerHTML =
+        '<div class="error">Error al cargar los cómics</div>';
       showToast("Error al cargar los cómics", "error");
     }
+  }
+
+  applyLocalFilters(comics) {
+    let filtered = [...comics];
+
+    // Aplicar filtros de nombre
+    const nameFilters = Object.entries(this.currentFilters)
+      .filter(([key]) => key.startsWith("name"))
+      .map(([_, filter]) => filter.value);
+
+    if (nameFilters.length > 0) {
+      filtered = filtered.filter((comic) =>
+        nameFilters.some((term) =>
+          comic.title.toLowerCase().includes(term.toLowerCase())
+        )
+      );
+    }
+
+    // Filtro por ID
+    if (this.currentFilters.id) {
+      filtered = filtered.filter(
+        (comic) => comic.id === parseInt(this.currentFilters.id.value)
+      );
+    }
+
+    // Filtro por precio
+    if (this.currentFilters.price) {
+      filtered = filtered.filter(
+        (comic) => comic.price <= parseFloat(this.currentFilters.price.value)
+      );
+    }
+
+    return filtered;
+  }
+
+  getAPIFilterParams() {
+    const params = {};
+
+    // Buscar filtros de nombre (pueden ser múltiples con name_)
+    const nameFilters = Object.entries(this.currentFilters)
+      .filter(([key]) => key.startsWith("name_"))
+      .map(([_, filter]) => filter.value);
+
+    if (nameFilters.length > 0) {
+      // Usar el primer término de búsqueda para la API
+      params.titleStartsWith = nameFilters[0];
+    }
+
+    // Solo incluir ID en los parámetros si hay otros filtros activos
+    if (this.currentFilters.id && nameFilters.length > 0) {
+      params.id = this.currentFilters.id.value;
+    }
+
+    // Nota: El filtro de precio se aplicará después ya que la API no soporta filtro por precio
+    // Si hay filtro de precio, tendremos que filtrar los resultados después de recibirlos
+    const hasLocalFilters = this.currentFilters.price || nameFilters.length > 1;
+
+    return { params, hasLocalFilters };
+  }
+
+  updateFilters(filters) {
+    this.currentFilters = filters;
+    this.currentPage = 1; // Resetear a primera página al aplicar filtros
+    this.loadComics();
   }
 
   createComicCard(comic) {

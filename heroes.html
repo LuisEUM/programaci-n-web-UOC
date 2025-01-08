@@ -5,18 +5,104 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Heroes - Marvel Comics API - UOC</title>
-  <link rel="stylesheet" href="styles/heroes.css">
-  <link rel="stylesheet" href="styles/navbar.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="styles/navbar.css">
+  <link rel="stylesheet" href="styles/heroes.css">
   <link rel="icon" type="image/png" href="assets/images/marvel-logo.png">
 </head>
 
 <body>
   <main>
-    <!-- El contenido principal existente -->
+    <div class="container">
+      <h1 class="main-title">Héroes Marvel</h1>
+
+      <!-- Heroes Section -->
+      <section class="heroes-section">
+        <div class="section-header">
+          <h2>Explora los Héroes</h2>
+          <div class="search-section">
+            <div class="search-container">
+              <i class="fas fa-search search-icon"></i>
+              <input type="text" id="searchByName" placeholder="Buscar por nombre...">
+              <button id="searchByNameBtn" class="search-btn">Buscar</button>
+            </div>
+            <div class="search-container">
+              <i class="fas fa-hashtag search-icon"></i>
+              <input type="number" id="searchById" placeholder="Buscar por ID...">
+              <button id="searchByIdBtn" class="search-btn">Buscar</button>
+            </div>
+          </div>
+          <!-- Contenedor para los badges de filtros -->
+          <div id="filterBadgesContainer"></div>
+        </div>
+
+        <div class="heroes-grid" id="heroesGrid">
+          <!-- Heroes will be loaded here -->
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container">
+          <div class="pagination-controls">
+            <button id="firstPage" class="page-btn" title="Primera página">
+              <i class="fas fa-angle-double-left"></i>
+            </button>
+            <button id="prevPage" class="page-btn" title="Página anterior">
+              <i class="fas fa-angle-left"></i>
+            </button>
+            <div class="page-input-container">
+              <span>Página</span>
+              <input type="number" id="pageInput" min="1">
+              <span>de <span id="totalPages">1</span></span>
+            </div>
+            <button id="nextPage" class="page-btn" title="Página siguiente">
+              <i class="fas fa-angle-right"></i>
+            </button>
+            <button id="lastPage" class="page-btn" title="Última página">
+              <i class="fas fa-angle-double-right"></i>
+            </button>
+          </div>
+          <div class="items-per-page">
+            <label for="itemsPerPage">Items por página:</label>
+            <select id="itemsPerPage">
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="30">30</option>
+              <option value="50">50</option>
+            </select>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Hero Details Modal -->
+    <div class="hero-modal" id="heroModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title"></h2>
+          <button class="close-modal">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="hero-details">
+            <img src="" alt="" class="hero-modal-image">
+            <p class="hero-description"></p>
+          </div>
+          <div class="comics-list">
+            <h3>Comics</h3>
+            <div class="comics-container">
+              <!-- La lista de comics se cargará dinámicamente aquí -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- Scripts -->
+  <!-- Dependencias externas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
   <!-- Configuración y utilidades -->
   <script src="js/config.js"></script>
   <script src="js/utils.js"></script>
@@ -28,10 +114,12 @@
   <!-- Clases base -->
   <script src="js/classes/Comic.js"></script>
   <script src="js/classes/Hero.js"></script>
-  <script src="js/classes/Favorites.js"></script>
 
   <!-- Componentes -->
   <script src="js/components/Navbar.js"></script>
+  <script src="js/components/FilterBadges.js"></script>
+  <script src="js/components/HeroesGrid.js"></script>
+  <script src="js/components/HeroesSearch.js"></script>
 
   <!-- Script principal -->
   <script src="js/heroes.js"></script>

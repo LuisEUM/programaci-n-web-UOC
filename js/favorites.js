@@ -11,6 +11,9 @@ async function loadMockData() {
   }
 }
 
+// Variables globales
+let favoritesManager;
+
 document.addEventListener("DOMContentLoaded", async function () {
   // Verificar autenticación
   const userToken = localStorage.getItem("userToken");
@@ -27,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   // Inicializar manejador de favoritos
-  const favoritesManager = new Favorites();
+  favoritesManager = new Favorites();
   const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
 
   // Cargar favoritos iniciales (Lista de Deseos por defecto)
@@ -164,30 +167,75 @@ function createComicCard(comic, currentCollection, favoritesManager) {
         <span class="series">${series}</span>
         <span class="price">$${price}</span>
       </div>
-      <button class="remove-favorite-btn" onclick="removeFromCollection('${
-        comic.id
-      }', '${currentCollection}')">
-        <i class="fas fa-trash"></i>
-        Remover de favoritos
-      </button>
+      <div class="comic-actions">
+        <button class="move-collection-btn" onclick="moveToCollection('${
+          comic.id
+        }', '${currentCollection}')">
+          <i class="fas fa-exchange-alt"></i>
+          Mover a otra colección
+        </button>
+        <button class="clone-collection-btn" onclick="cloneToCollection('${
+          comic.id
+        }', '${currentCollection}')">
+          <i class="fas fa-clone"></i>
+          Clonar a otra colección
+        </button>
+        <button class="remove-favorite-btn" onclick="removeFromCollection('${
+          comic.id
+        }', '${currentCollection}')">
+          <i class="fas fa-trash"></i>
+          Remover de Colección
+        </button>
+      </div>
     </div>
   `;
 
   return card;
 }
 
+// Función para mover un cómic a otra colección
+function moveToCollection(comicId, currentCollection) {
+  const modal = new CollectionModal();
+  modal.open("move", comicId, currentCollection);
+}
+
+// Función para clonar un cómic a otra colección
+function cloneToCollection(comicId, currentCollection) {
+  const modal = new CollectionModal();
+  modal.open("clone", comicId, currentCollection);
+}
+
+// Función para remover un cómic de una colección
 function removeFromCollection(comicId, collection) {
   const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
-  const favoritesManager = new Favorites();
-
-  // Remover el cómic de la colección
   favoritesManager.removeFavorite(dataSource, collection, comicId);
-
-  // Mostrar mensaje de éxito
-  showToast("Cómic removido de favoritos", "success");
-
-  // Recargar la colección actual
   loadFavorites(collection, favoritesManager);
+  showToast("Cómic removido de la colección", "success");
+}
+
+// Función para manejar la selección de colección en el modal
+function handleModalSelection(targetCollection) {
+  const modal = document.getElementById("collectionModal");
+  const comicId = modal.dataset.comicId;
+  const currentCollection = modal.dataset.currentCollection;
+  const action = modal.dataset.action;
+  const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
+
+  if (action === "move") {
+    // Remover de la colección actual
+    favoritesManager.removeFavorite(dataSource, currentCollection, comicId);
+    // Añadir a la nueva colección
+    favoritesManager.addFavorite(dataSource, targetCollection, comicId);
+    showToast("Cómic movido exitosamente", "success");
+  } else if (action === "clone") {
+    // Solo añadir a la nueva colección
+    favoritesManager.addFavorite(dataSource, targetCollection, comicId);
+    showToast("Cómic clonado exitosamente", "success");
+  }
+
+  // Cerrar el modal y recargar la vista
+  modal.style.display = "none";
+  loadFavorites(currentCollection, favoritesManager);
 }
 
 function showToast(message, type = "info") {

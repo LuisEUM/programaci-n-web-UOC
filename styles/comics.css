@@ -45,7 +45,6 @@ body {
   letter-spacing: -1px;
 }
 
-
 .logo h1 {
   color: var(--primary-color);
   font-size: 1.5rem;
@@ -77,7 +76,6 @@ body {
   gap: 1rem;
 }
 
-
 .logout-button {
   background-color: var(--primary-color);
   color: var(--white);
@@ -95,11 +93,7 @@ body {
   opacity: 0.9;
 }
 
-/* Main Content */
-main {
-  margin-top: 80px;
-  padding: 2rem 5%;
-}
+
 
 /* Popular Heroes Section */
 .popular-heroes {
@@ -396,6 +390,7 @@ main {
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  max-width: 100%;
 }
 
 .search-container,
@@ -409,7 +404,6 @@ main {
   border-radius: 10px;
   border: 1px solid var(--input-border);
   transition: all 0.3s ease;
-  height: 50px;
 }
 
 .search-container:focus-within,
@@ -453,6 +447,7 @@ main {
   transition: all 0.3s ease;
   font-weight: 500;
   white-space: nowrap;
+  height: 35px;
 }
 
 .search-btn:hover {
@@ -1242,13 +1237,13 @@ main {
 /* Responsive */
 @media (max-width: 1200px) {
   .search-section {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(1, 1fr);
   }
 }
 
 @media (max-width: 768px) {
   .search-section {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(1, 1fr);
     padding: 1rem;
   }
 
@@ -1356,12 +1351,18 @@ main {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   margin-top: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
 }
 
 .pagination-controls {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
 }
 
 .page-btn {
@@ -1572,6 +1573,10 @@ main {
 @media (max-width: 992px) {
   .comics-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .actions-bar {
+    bottom: -200px;
   }
 }
 

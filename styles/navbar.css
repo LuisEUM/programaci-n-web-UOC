@@ -2,16 +2,20 @@
 .data-status-bar {
   background-color: var(--black);
   color: var(--white);
-  padding: 0.3rem 0;
+  padding: 0.5rem 0;
   text-align: center;
   width: 100%;
   position: relative;
+  border-bottom: 2px solid var(--primary-color);
 }
 
 .data-status-container {
   max-width: 1440px;
   margin: 0 auto;
   padding: 0 5%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .data-status {
@@ -285,4 +289,49 @@
 /* Ajuste para el contenido principal */
 main {
   margin-top: 20px;
+}
+
+.data-status-toggle {
+  background: var(--primary-color);
+  border: none;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilo para modo API */
+.data-status-toggle.api-mode {
+  background: #2ecc71; /* Verde para API */
+}
+
+.data-status-toggle.api-mode:hover {
+  background: #27ae60; /* Verde más oscuro para hover en modo API */
+}
+
+.data-status-toggle:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  background: var(--hover-red);
+}
+
+.data-status-toggle i {
+  font-size: 16px;
+  transition: transform 0.3s ease;
+}
+
+.data-status-toggle:hover i {
+  transform: rotate(180deg);
+}
+
+.data-status-text {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }

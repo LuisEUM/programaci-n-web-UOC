@@ -51,7 +51,36 @@ class MarvelAPI {
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-      return await response.json();
+      const data = await response.json();
+
+      // Transformar el resultado usando el mismo método que getComics
+      if (data.data?.results?.[0]) {
+        const transformedComic = {
+          id: data.data.results[0].id,
+          title: data.data.results[0].title,
+          issueNumber: data.data.results[0].issueNumber,
+          description:
+            data.data.results[0].description || "No description available",
+          pageCount: data.data.results[0].pageCount || 0,
+          thumbnail: {
+            path:
+              data.data.results[0].thumbnail?.path ||
+              "http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available",
+            extension: data.data.results[0].thumbnail?.extension || "jpg",
+          },
+          price: data.data.results[0].prices?.[0]?.price || 0,
+          creators:
+            data.data.results[0].creators?.items?.map(
+              (creator) => creator.name
+            ) || [],
+          characters:
+            data.data.results[0].characters?.items?.map(
+              (character) => character.name
+            ) || [],
+        };
+        return transformedComic;
+      }
+      return null;
     } catch (error) {
       console.error("Error fetching comic:", error);
       throw error;

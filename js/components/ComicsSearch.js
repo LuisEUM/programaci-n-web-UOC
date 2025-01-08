@@ -105,41 +105,16 @@ class ComicsSearch {
 
   applyAllFilters() {
     const activeFilters = this.filterBadges.getActiveFilters();
-    let filteredComics = [...window.comicsGrid.allComics];
 
-    // Aplicar filtros de nombre
-    const nameFilters = Object.entries(activeFilters)
-      .filter(([key]) => key.startsWith("name"))
-      .map(([_, filter]) => filter.value);
+    // Enviar los filtros actualizados al grid
+    window.comicsGrid.updateFilters(activeFilters);
 
-    if (nameFilters.length > 0) {
-      filteredComics = filteredComics.filter((comic) =>
-        nameFilters.some((term) =>
-          comic.title.toLowerCase().includes(term.toLowerCase())
-        )
-      );
-    }
-
-    // Aplicar filtro de ID
-    if (activeFilters.id) {
-      filteredComics = filteredComics.filter(
-        (comic) => comic.id === parseInt(activeFilters.id.value)
-      );
-    }
-
-    // Aplicar filtro de precio
-    if (activeFilters.price) {
-      filteredComics = filteredComics.filter(
-        (comic) => comic.price <= parseFloat(activeFilters.price.value)
-      );
-    }
-
-    // Emitir evento con los resultados filtrados
+    // Emitir evento con la cantidad de filtros activos
     document.dispatchEvent(
       new CustomEvent("filtersUpdated", {
         detail: {
-          filters: filteredComics,
-          resultCount: filteredComics.length,
+          filters: activeFilters,
+          resultCount: window.comicsGrid.filteredComics.length,
         },
       })
     );

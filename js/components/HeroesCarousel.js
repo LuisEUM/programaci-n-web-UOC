@@ -42,7 +42,7 @@ class HeroesCarousel {
     card.dataset.id = hero.id;
 
     card.innerHTML = `
-      <img src="${hero.image}" alt="${hero.name}">
+      <img src="${hero.thumbnail.path}.${hero.thumbnail.extension}" alt="${hero.name}">
       <div class="hero-info">
         <h3>${hero.name}</h3>
       </div>

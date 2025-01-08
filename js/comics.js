@@ -16,14 +16,14 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  // Inicializar preferencia de fuente de datos si no existe
+  if (!localStorage.getItem("dataSourcePreference")) {
+    localStorage.setItem("dataSourcePreference", "mock");
+    Config.USE_MOCK_DATA = true;
+  }
+
   // Inicializar manejador de favoritos
   favoritesManager = new Favorites();
-
-  // Esperar a que el Navbar esté listo
-  setTimeout(() => {
-    // Configurar botón de cambio de datos
-    setupDataToggle();
-  }, 0);
 
   // Inicializar componentes
   comicsGrid = new ComicsGrid(".comics-grid");
@@ -45,44 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Event Listeners para eventos personalizados
   setupCustomEventListeners();
 });
-
-function setupDataToggle() {
-  const dataStatusSpan = document.querySelector(".data-status");
-  if (!dataStatusSpan) return; // Si no existe el elemento, salimos
-
-  dataStatusSpan.textContent = Config.USE_MOCK_DATA
-    ? "Usando Data Mockeada"
-    : "Usando API Marvel";
-  dataStatusSpan.style.cursor = "pointer";
-
-  // Asegurarnos de que el ícono esté presente
-  const icon = document.createElement("i");
-  icon.className = "fas fa-database";
-  icon.setAttribute("aria-hidden", "true");
-
-  // Si ya existe un ícono, no lo agregamos
-  if (!dataStatusSpan.querySelector("i")) {
-    dataStatusSpan.insertBefore(icon, dataStatusSpan.firstChild);
-    dataStatusSpan.insertBefore(
-      document.createTextNode(" "),
-      dataStatusSpan.lastChild
-    );
-  }
-
-  dataStatusSpan.addEventListener("click", function () {
-    Config.USE_MOCK_DATA = !Config.USE_MOCK_DATA;
-    const text = Config.USE_MOCK_DATA
-      ? "Usando Data Mockeada"
-      : "Usando API Marvel";
-
-    // Mantener el ícono al actualizar el texto
-    this.innerHTML = "";
-    this.appendChild(icon);
-    this.appendChild(document.createTextNode(" " + text));
-
-    comicsGrid.loadComics();
-  });
-}
 
 function setupPagination() {
   document
@@ -127,6 +89,18 @@ function setupPagination() {
 }
 
 function setupCustomEventListeners() {
+  // Escuchar cambios en la fuente de datos
+  window.addEventListener("dataSourceChanged", (e) => {
+    const { isUsingMock } = e.detail;
+    // Recargar los cómics con la nueva fuente de datos
+    comicsGrid.loadComics();
+    // Mostrar notificación del cambio
+    showToast(
+      `Cambiado a ${isUsingMock ? "datos mockeados" : "datos de la API"}`,
+      "info"
+    );
+  });
+
   // Escuchar eventos de filtros
   document.addEventListener("filtersUpdated", (e) => {
     const { filters, resultCount } = e.detail;
