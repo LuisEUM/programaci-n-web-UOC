@@ -1,0 +1,242 @@
+.comic-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  overflow-y: auto;
+}
+
+.comic-modal.show {
+  display: block;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.comic-modal-content {
+  background-color: var(--white);
+  margin: 2rem auto;
+  padding: 1rem 0.75rem;
+  width: 90%;
+  max-width: 800px;
+  position: relative;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+}
+
+.comic-modal-header {
+  background-color: var(--white);
+  color: var(--black);
+  padding: 1rem;
+  border-radius: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.comic-modal-title {
+  margin: 0 20px;
+  font-size: 1.5rem;
+  color: var(--black);
+  text-align: center;
+}
+
+.close-modal {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--black);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: transform 0.3s ease;
+}
+
+.close-modal:hover {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.comic-modal-body {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+  padding: 1rem;
+}
+
+.comic-modal-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.comic-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.comic-metadata {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  background-color: var(--input-bg);
+  padding: 1.2rem;
+  border-radius: 8px;
+}
+
+.metadata-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.metadata-label {
+  font-size: 0.9em;
+  color: var(--secondary-color);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.metadata-value {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.comic-description {
+  line-height: 1.5;
+  color: var(--text-color);
+  background-color: var(--input-bg);
+  padding: 1.2rem;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+}
+
+/* Accordion customization */
+.comic-modal .accordion-section {
+  margin-top: 1.5rem;
+  background-color: var(--input-bg);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.comic-modal .accordion-header {
+  padding: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.comic-modal .accordion-header:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.comic-modal .accordion-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--black);
+  font-weight: bold;
+}
+
+.comic-modal .accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  padding: 0 1.2rem;
+}
+
+.comic-modal .accordion-content.active {
+  max-height: 500px;
+  padding: 1.2rem;
+}
+
+/* Character links */
+.comic-modal .characters-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.comic-modal .characters-list li {
+  margin: 0;
+}
+
+.comic-modal .characters-list a {
+  color: var(--primary-color);
+  text-decoration: none;
+  display: inline-block;
+  padding: 0.3rem 0;
+  transition: all 0.3s ease;
+}
+
+.comic-modal .characters-list a:hover {
+  color: var(--secondary-color);
+  transform: translateX(5px);
+}
+
+.comic-modal .creators-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.comic-modal .creators-list li {
+  color: var(--text-color);
+  padding: 0.3rem 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .comic-modal-content {
+    width: 95%;
+    margin: 1rem auto;
+    padding: 1rem;
+  }
+
+  .comic-modal-body {
+    grid-template-columns: 1fr;
+  }
+
+  .comic-modal-image {
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  .comic-modal-header {
+    padding: 0.8rem;
+  }
+
+  .comic-modal-title {
+    font-size: 1.2rem;
+  }
+
+  .comic-description,
+  .comic-metadata,
+  .comic-modal .accordion-header,
+  .comic-modal .accordion-content.active {
+    padding: 1rem;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

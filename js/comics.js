@@ -5,6 +5,7 @@ let comicsSearch;
 let comicsActionsBar;
 let comicsCollectionModal;
 let heroesCarousel;
+let comicModal;
 
 document.addEventListener("DOMContentLoaded", () => {
   // Verificar autenticación
@@ -35,6 +36,8 @@ document.addEventListener("DOMContentLoaded", () => {
   comicsActionsBar = new ComicsActionsBar();
   comicsCollectionModal = new ComicsCollectionModal();
   heroesCarousel = new HeroesCarousel(".carousel-wrapper");
+  comicModal = new ComicModal();
+  window.comicModal = comicModal; // Para acceso global
 
   // Configurar paginación
   setupPagination();

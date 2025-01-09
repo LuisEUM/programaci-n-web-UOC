@@ -609,7 +609,8 @@ body {
 }
 
 .add-collection-btn,
-.remove-collection-btn {
+.remove-collection-btn,
+.view-details-btn {
   width: 100%;
   padding: 0.5rem;
   border-radius: 8px;
@@ -628,8 +629,32 @@ body {
   color: var(--primary-color);
 }
 
+.view-details-btn {
+  border: 2px solid var(--secondary-color);
+  background: transparent;
+  color: var(--secondary-color);
+  margin-bottom: 0.5rem;
+}
+
+.remove-collection-btn {
+  border: 2px solid var(--error-color);
+  background: transparent;
+  color: var(--error-color);
+  display: none;
+}
+
 .add-collection-btn:hover {
   background-color: var(--primary-color);
+  color: white;
+}
+
+.view-details-btn:hover {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.remove-collection-btn:hover {
+  background-color: var(--error-color);
   color: white;
 }
 
@@ -643,25 +668,15 @@ body {
   color: var(--primary-color);
 }
 
-.remove-collection-btn {
-  border: 2px solid var(--secondary-color);
-  background-color: var(--secondary-color);
-  color: white;
-}
-
-.remove-collection-btn:hover {
-  background-color: #3a3636;
-  border-color: #3a3636;
-}
-
 .remove-collection-btn.removing {
-  background-color: var(--secondary-color);
+  display: flex;
+  background-color: var(--error-color);
   color: white;
 }
 
 .remove-collection-btn.removing:hover {
-  background-color: #3a3636;
-  border-color: #3a3636;
+  background-color: transparent;
+  color: var(--error-color);
 }
 
 /* Modal Collection Buttons */

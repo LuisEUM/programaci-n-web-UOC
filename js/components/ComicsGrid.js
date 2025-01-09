@@ -273,6 +273,9 @@ class ComicsGrid {
           <button class="remove-collection-btn">
             <i class="fas fa-trash"></i> Quitar de Colecciones
           </button>
+          <button class="view-details-btn">
+            <i class="fas fa-info-circle"></i> Ver detalles
+          </button>
         </div>
       </div>
     `;
@@ -292,6 +295,7 @@ class ComicsGrid {
     // Eventos de botones de colecciones
     const addCollectionBtn = card.querySelector(".add-collection-btn");
     const removeCollectionBtn = card.querySelector(".remove-collection-btn");
+    const viewDetailsBtn = card.querySelector(".view-details-btn");
 
     addCollectionBtn.addEventListener("click", () => {
       document.dispatchEvent(
@@ -307,6 +311,12 @@ class ComicsGrid {
           detail: { isIndividual: true, comicId: comic.id },
         })
       );
+    });
+
+    viewDetailsBtn.addEventListener("click", () => {
+      if (window.comicModal) {
+        window.comicModal.show(comic);
+      }
     });
   }
 

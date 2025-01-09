@@ -414,7 +414,9 @@ class HeroesGrid {
         <div class="hero-info">
           <h3 class="hero-name">${hero.name}</h3>
           <p class="hero-id">ID: ${hero.id}</p>
-          <button class="view-more-btn">Ver más</button>
+          <button class="view-details-btn">
+            <i class="fas fa-info-circle"></i> Ver detalles
+          </button>
         </div>
       </div>
     `;
