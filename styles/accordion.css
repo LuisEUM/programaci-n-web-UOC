@@ -1,0 +1,106 @@
+.accordion-section {
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: var(--white);
+}
+
+.accordion-header {
+  background-color: var(--input-bg);
+  padding: 1rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.accordion-header:hover {
+  background-color: #e9ecef;
+}
+
+.accordion-header h3 {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.accordion-header i {
+  color: var(--secondary-color);
+  transition: transform 0.3s ease;
+}
+
+.accordion-content {
+  max-height: 0;
+  padding: 0 1rem;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.3s ease-out;
+  background-color: var(--white);
+}
+
+.accordion-content.active {
+  max-height: 300px;
+  padding: 1rem;
+  opacity: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Scrollbar styles */
+.accordion-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.accordion-content::-webkit-scrollbar-track {
+  background: var(--input-bg);
+  border-radius: 3px;
+}
+
+.accordion-content::-webkit-scrollbar-thumb {
+  background: var(--secondary-color);
+  border-radius: 3px;
+}
+
+.accordion-content::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+/* Estilos específicos para el contenido dentro del acordeón */
+.accordion-content p {
+  margin: 0.5rem 0;
+  color: var(--text-color);
+  line-height: 1.5;
+}
+
+.accordion-content .comics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  word-break: break-word;
+}
+
+.accordion-content .comics-list p {
+  color: var(--text-color);
+  margin: 0;
+  padding: 0.3rem 0;
+  white-space: normal;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .accordion-header {
+    padding: 0.8rem;
+  }
+
+  .accordion-header h3 {
+    font-size: 1rem;
+  }
+
+  .accordion-content.active {
+    max-height: 250px;
+  }
+}

@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="styles/navbar.css">
   <link rel="stylesheet" href="styles/heroes.css">
   <link rel="stylesheet" href="styles/spinner.css">
+  <link rel="stylesheet" href="styles/heroModal.css">
+  <link rel="stylesheet" href="styles/accordion.css">
   <link rel="icon" type="image/png" href="assets/images/marvel-logo.png">
 </head>
 
@@ -78,24 +80,7 @@
     <!-- Hero Details Modal -->
     <div class="hero-modal" id="heroModal">
       <div class="modal-content">
-        <div class="modal-header">
-          <h2 class="modal-title"></h2>
-          <button class="close-modal">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="hero-details">
-            <img src="" alt="" class="hero-modal-image">
-            <p class="hero-description"></p>
-          </div>
-          <div class="comics-list">
-            <h3>Comics</h3>
-            <div class="comics-container">
-              <!-- La lista de comics se cargará dinámicamente aquí -->
-            </div>
-          </div>
-        </div>
+        <!-- Content will be dynamically inserted here -->
       </div>
     </div>
   </main>
@@ -120,6 +105,8 @@
   <script src="js/components/Spinner.js"></script>
   <script src="js/components/Navbar.js"></script>
   <script src="js/components/FilterBadges.js"></script>
+  <script src="js/components/Accordion.js"></script>
+  <script src="js/components/HeroModal.js"></script>
   <script src="js/components/HeroesGrid.js"></script>
   <script src="js/components/HeroesSearch.js"></script>
 

@@ -44,8 +44,27 @@ class ComicsGrid {
           total: comicsToShow.length,
         };
       } else {
+        // Verificar si es búsqueda por héroe
+        if (this.currentFilters.hero) {
+          const response = await fetch(
+            `${Config.MARVEL_API_BASE_URL}/characters/${
+              this.currentFilters.hero.value
+            }/comics?${this.getQueryParams()}`
+          );
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          const data = await response.json();
+          comicsData = {
+            results: data.data.results.map((comic) => Comic.fromAPI(comic)),
+            total: data.data.total,
+            limit: data.data.limit,
+            offset: data.data.offset,
+            count: data.data.count,
+          };
+        }
         // Verificar si es búsqueda por ID específico
-        if (this.currentFilters.id && !this.currentFilters.name_) {
+        else if (this.currentFilters.id && !this.currentFilters.name_) {
           // Usar getComicById para búsqueda específica
           const comicData = await MarvelAPI.getComicById(
             this.currentFilters.id.value
@@ -59,8 +78,8 @@ class ComicsGrid {
           // Búsqueda normal con filtros
           const { params, hasLocalFilters } = this.getAPIFilterParams();
           const apiParams = {
-            offset: offset,
-            limit: hasLocalFilters ? 100 : this.itemsPerPage,
+            offset: 0, // Traer más resultados cuando hay filtro de nombre
+            limit: this.currentFilters.name ? 100 : this.itemsPerPage,
             ...params,
           };
 
@@ -70,7 +89,8 @@ class ComicsGrid {
             Comic.fromAPI(comic)
           );
 
-          if (hasLocalFilters) {
+          // Aplicar filtrado local si hay filtro de nombre o precio
+          if (hasLocalFilters || this.currentFilters.name) {
             comicsData.results = this.applyLocalFilters(comicsData.results);
             comicsData.total = comicsData.results.length;
 
@@ -128,16 +148,28 @@ class ComicsGrid {
       newUrl.searchParams.delete("page");
     }
 
-    // Mantener filtros existentes
+    // Actualizar parámetros según los filtros activos
     if (this.currentFilters.id) {
       newUrl.searchParams.set("id", this.currentFilters.id.value);
-    }
-    if (this.currentFilters.price) {
-      newUrl.searchParams.set("price", this.currentFilters.price.value);
+    } else {
+      newUrl.searchParams.delete("id");
     }
 
-    // Manejar múltiples nombres
+    if (this.currentFilters.hero) {
+      newUrl.searchParams.set("hero", this.currentFilters.hero.value);
+    } else {
+      newUrl.searchParams.delete("hero");
+    }
+
+    if (this.currentFilters.price) {
+      newUrl.searchParams.set("price", this.currentFilters.price.value);
+    } else {
+      newUrl.searchParams.delete("price");
+    }
+
+    // Limpiar todos los parámetros existentes primero
     newUrl.searchParams.delete("name");
+
     Object.entries(this.currentFilters)
       .filter(([key]) => key.startsWith("name_"))
       .forEach(([_, filter]) => {
@@ -150,16 +182,12 @@ class ComicsGrid {
   applyLocalFilters(comics) {
     let filtered = [...comics];
 
-    // Aplicar filtros de nombre
-    const nameFilters = Object.entries(this.currentFilters)
-      .filter(([key]) => key.startsWith("name"))
-      .map(([_, filter]) => filter.value);
-
-    if (nameFilters.length > 0) {
+    // Filtro por nombre
+    if (this.currentFilters.name) {
       filtered = filtered.filter((comic) =>
-        nameFilters.some((term) =>
-          comic.title.toLowerCase().includes(term.toLowerCase())
-        )
+        comic.title
+          .toLowerCase()
+          .includes(this.currentFilters.name.value.toLowerCase())
       );
     }
 
@@ -170,6 +198,13 @@ class ComicsGrid {
       );
     }
 
+    // Filtro por héroe
+    if (this.currentFilters.hero) {
+      filtered = filtered.filter((comic) =>
+        comic.characters.includes(parseInt(this.currentFilters.hero.value))
+      );
+    }
+
     // Filtro por precio
     if (this.currentFilters.price) {
       filtered = filtered.filter(
@@ -177,30 +212,25 @@ class ComicsGrid {
       );
     }
 
+    this.filteredComics = filtered;
     return filtered;
   }
 
   getAPIFilterParams() {
     const params = {};
 
-    // Buscar filtros de nombre (pueden ser múltiples con name_)
-    const nameFilters = Object.entries(this.currentFilters)
-      .filter(([key]) => key.startsWith("name_"))
-      .map(([_, filter]) => filter.value);
-
-    if (nameFilters.length > 0) {
-      // Usar el primer término de búsqueda para la API
-      params.titleStartsWith = nameFilters[0];
+    // Buscar filtro de nombre
+    if (this.currentFilters.name) {
+      params.titleStartsWith = this.currentFilters.name.value;
     }
 
     // Solo incluir ID en los parámetros si hay otros filtros activos
-    if (this.currentFilters.id && nameFilters.length > 0) {
+    if (this.currentFilters.id) {
       params.id = this.currentFilters.id.value;
     }
 
     // Nota: El filtro de precio se aplicará después ya que la API no soporta filtro por precio
-    // Si hay filtro de precio, tendremos que filtrar los resultados después de recibirlos
-    const hasLocalFilters = this.currentFilters.price || nameFilters.length > 1;
+    const hasLocalFilters = this.currentFilters.price;
 
     return { params, hasLocalFilters };
   }
@@ -348,5 +378,24 @@ class ComicsGrid {
     // Actualizar URL antes de cargar
     this.updateUrlWithCurrentState();
     this.loadComics();
+  }
+
+  getQueryParams() {
+    const timestamp = new Date().getTime().toString();
+    const hash = Utils.generateMarvelHash(
+      timestamp,
+      Config.MARVEL_PRIVATE_KEY,
+      Config.MARVEL_PUBLIC_KEY
+    );
+
+    const params = new URLSearchParams({
+      ts: timestamp,
+      apikey: Config.MARVEL_PUBLIC_KEY,
+      hash: hash,
+      limit: this.itemsPerPage,
+      offset: (this.currentPage - 1) * this.itemsPerPage,
+    });
+
+    return params.toString();
   }
 }

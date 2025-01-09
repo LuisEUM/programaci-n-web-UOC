@@ -245,16 +245,26 @@ const MarvelAPI = {
     }
   },
 
-  async getHeroComics(heroId) {
+  async getHeroComics(heroId, params = {}) {
     if (Config.USE_MOCK_DATA) {
       return new Promise((resolve) => {
         const mockData = require("./data/comics.json");
+        const start = params.offset || 0;
+        const limit = params.limit || Config.LIMIT;
         const heroComics = mockData.comics.filter((comic) =>
           comic.characters?.includes(parseInt(heroId))
         );
+        const paginatedComics = heroComics.slice(start, start + limit);
+
         resolve({
           data: {
-            results: heroComics,
+            results: paginatedComics.map((comic) =>
+              this.transformComicData(comic)
+            ),
+            total: heroComics.length,
+            limit: limit,
+            offset: start,
+            count: paginatedComics.length,
           },
         });
       });
@@ -266,6 +276,8 @@ const MarvelAPI = {
       ts: timestamp,
       apikey: this.PUBLIC_KEY,
       hash: hash,
+      limit: params.limit || Config.LIMIT,
+      offset: params.offset || 0,
     });
 
     try {
@@ -275,7 +287,18 @@ const MarvelAPI = {
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-      return await response.json();
+      const data = await response.json();
+      return {
+        data: {
+          results: data.data.results.map((comic) =>
+            this.transformComicData(comic)
+          ),
+          total: data.data.total,
+          limit: data.data.limit,
+          offset: data.data.offset,
+          count: data.data.count,
+        },
+      };
     } catch (error) {
       console.error("Error fetching hero comics:", error);
       throw error;

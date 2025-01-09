@@ -1,7 +1,6 @@
 class HeroesGrid {
   constructor() {
     this.container = document.getElementById("heroesGrid");
-    this.modal = document.getElementById("heroModal");
     this.itemsPerPage =
       parseInt(document.getElementById("itemsPerPage").value) || 10;
     this.currentFilters = {};
@@ -15,7 +14,6 @@ class HeroesGrid {
     this.currentPage = pageParam && pageParam > 0 ? pageParam : 1;
     this.totalPages = 1;
 
-    this.setupModal();
     this.setupPagination();
     this.initialize();
   }
@@ -55,14 +53,6 @@ class HeroesGrid {
     } else {
       await this.loadHeroes();
     }
-  }
-
-  setupModal() {
-    const closeBtn = this.modal.querySelector(".close-modal");
-    closeBtn.addEventListener("click", () => this.closeModal());
-    this.modal.addEventListener("click", (e) => {
-      if (e.target === this.modal) this.closeModal();
-    });
   }
 
   setupPagination() {
@@ -459,115 +449,15 @@ class HeroesGrid {
 
   async showHeroDetails(heroId) {
     try {
-      // Asegurarnos de que el modal existe
-      if (!this.modal) {
-        this.modal = document.getElementById("heroModal");
-        if (!this.modal) {
-          throw new Error("Modal element not found");
-        }
+      if (window.heroModal) {
+        await window.heroModal.show(heroId);
+        window.showToast("Detalles del héroe cargados con éxito", "success");
+      } else {
+        throw new Error("HeroModal component not found");
       }
-
-      // Limpiar el contenido anterior
-      const modalTitle = this.modal.querySelector(".modal-title");
-      const modalBody = this.modal.querySelector(".modal-body");
-
-      if (!modalTitle || !modalBody) {
-        throw new Error("Modal elements not found");
-      }
-
-      // Preparar el contenido del modal
-      modalTitle.textContent = "Cargando...";
-      modalBody.innerHTML = `
-        <div class="loading-container"></div>
-        <div class="hero-content" style="display: none;">
-          <div class="hero-details">
-            <img src="" alt="" class="hero-modal-image">
-            <p class="hero-description"></p>
-          </div>
-          <div class="comics-list">
-            <h3>Comics</h3>
-            <div class="comics-container"></div>
-          </div>
-        </div>
-      `;
-
-      // Mostrar el modal y el spinner
-      this.openModal();
-      Spinner.show(
-        modalBody.querySelector(".loading-container"),
-        "Cargando detalles..."
-      );
-
-      const heroResponse = await MarvelAPI.getHeroById(heroId);
-      if (!heroResponse.data.results.length) {
-        throw new Error("Héroe no encontrado");
-      }
-
-      // Usar el método fromAPI para crear la instancia de Hero
-      const hero = Hero.fromAPI(heroResponse.data.results[0]);
-      this.renderModal(hero);
     } catch (error) {
       console.error("Error loading hero details:", error);
       window.showToast("Error al cargar los detalles del héroe", "error");
-      this.closeModal();
-    }
-  }
-
-  renderModal(hero) {
-    try {
-      const modalTitle = this.modal.querySelector(".modal-title");
-      const modalBody = this.modal.querySelector(".modal-body");
-      const heroContent = modalBody.querySelector(".hero-content");
-      const loadingContainer = modalBody.querySelector(".loading-container");
-
-      if (!modalTitle || !heroContent || !loadingContainer) {
-        throw new Error("Modal elements not found");
-      }
-
-      // Actualizar el contenido
-      modalTitle.textContent = hero.name;
-      heroContent.innerHTML = `
-        <div class="hero-details">
-          <div class="hero-image-container">
-            <img src="${hero.getThumbnailURL()}" alt="${
-        hero.name
-      }" class="hero-modal-image">
-          </div>
-          <div class="hero-info-container">
-            <div class="hero-info-section">
-              <h3>Información General</h3>
-              <p><strong>ID:</strong> ${hero.id}</p>
-              <p><strong>Nombre:</strong> ${hero.name}</p>
-              <p><strong>Última modificación:</strong> ${new Date(
-                hero.modified
-              ).toLocaleDateString()}</p>
-              <p><strong>URI del recurso:</strong> ${hero.resourceURI}</p>
-            </div>
-            <div class="hero-description-section">
-              <h3>Descripción</h3>
-              <p>${hero.description || "No hay descripción disponible."}</p>
-            </div>
-            <div class="hero-comics-section">
-              <h3>Comics</h3>
-              <div class="comics-list">
-                ${
-                  hero.comics && hero.comics.length > 0
-                    ? hero.comics.map((comic) => `<p>• ${comic}</p>`).join("")
-                    : "<p>No hay comics disponibles.</p>"
-                }
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-
-      // Ocultar spinner y mostrar contenido
-      loadingContainer.style.display = "none";
-      heroContent.style.display = "block";
-    } catch (error) {
-      console.error("Error rendering modal:", error);
-      window.showToast("Error al mostrar los detalles del héroe", "error");
-      this.closeModal();
     }
   }
 
@@ -597,16 +487,6 @@ class HeroesGrid {
         },
       })
     );
-  }
-
-  openModal() {
-    this.modal.style.display = "block";
-    document.body.style.overflow = "hidden";
-  }
-
-  closeModal() {
-    this.modal.style.display = "none";
-    document.body.style.overflow = "";
   }
 
   showToast(message, type = "info") {

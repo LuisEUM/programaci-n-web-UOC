@@ -9,6 +9,23 @@
   --hover-red: #c42f2f;
   --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --input-border: #e1e1e1;
+  --success-color: #28a745;
+  --error-color: #dc3545;
+  --info-color: #2196f3;
+}
+
+/* Reset y estilos base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Arial", sans-serif;
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: var(--background-color);
 }
 
 /* Container principal */
@@ -298,35 +315,14 @@
   z-index: 1000;
 }
 
-.modal-content {
-  position: relative;
-  background: var(--white);
-  width: 90%;
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 2rem;
-  border-radius: 12px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 2rem;
-}
-
-.modal-title {
-  font-size: 1.8rem;
-  color: var(--text-color);
-}
-
 .close-modal {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: var(--secondary-color);
+  color: var(--white);
   cursor: pointer;
   padding: 0.5rem;
   transition: all 0.3s ease;
@@ -338,54 +334,72 @@
 }
 
 .modal-body {
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.hero-details img {
+.hero-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.hero-modal-image {
   width: 100%;
+  height: auto;
   border-radius: 8px;
-  margin-bottom: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.hero-description {
+.view-comics-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--primary-color);
+  color: var(--white);
+  padding: 0.8rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  margin: 0.5rem auto;
+  width: 100%;
+}
+
+.view-comics-btn:hover {
+  background-color: var(--primary-color-dark);
+  transform: translateY(-2px);
+}
+
+.hero-description-section,
+.hero-info-section,
+.hero-comics-section {
+  background-color: var(--white);
+  border-radius: 8px;
+  padding: 1.5rem;
   color: var(--text-color);
-  line-height: 1.6;
-  margin-bottom: 2rem;
+}
+
+.hero-description-section h3,
+.hero-info-section h3,
+.hero-comics-section h3 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
 .comics-list {
-  background: var(--background-color);
-  padding: 1.5rem;
-  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.comics-list h3 {
-  margin-bottom: 1rem;
+.comics-list p {
+  margin: 0;
   color: var(--text-color);
-}
-
-.comic-item {
-  padding: 0.8rem;
-  background: var(--white);
-  border-radius: 6px;
-  margin-bottom: 0.8rem;
-  transition: transform 0.3s ease;
-}
-
-.comic-item:hover {
-  transform: translateX(5px);
-}
-
-.comic-name {
-  font-weight: 500;
-  color: var(--text-color);
-}
-
-.comic-id {
-  font-size: 0.9rem;
-  color: var(--secondary-color);
 }
 
 /* Filter Badges */
@@ -519,11 +533,6 @@
     grid-template-columns: 1fr;
   }
 
-  .modal-content {
-    padding: 1rem;
-    margin: 1rem;
-  }
-
   .search-section {
     padding: 1rem;
   }
@@ -537,78 +546,49 @@
   }
 }
 
-/* Modal Styles */
-.hero-details {
-  display: flex;
-  gap: 2rem;
-  padding: 1rem;
+/* Toast Styles */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 1rem 2rem;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateY(100%);
+  transition: all 0.3s ease;
+  z-index: 9999;
 }
 
-.hero-image-container {
-  flex: 0 0 300px;
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
-.hero-modal-image {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.toast.success {
+  background-color: var(--success-color);
+  color: var(--white);
 }
 
-.hero-info-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+.toast.error {
+  background-color: var(--error-color);
+  color: var(--white);
 }
 
-.hero-info-section,
-.hero-description-section,
-.hero-comics-section {
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+.toast.info {
+  background-color: var(--info-color);
+  color: var(--white);
 }
 
-.hero-info-section h3,
-.hero-description-section h3,
-.hero-comics-section h3 {
-  color: #333;
-  margin-bottom: 1rem;
-  border-bottom: 2px solid #e9ecef;
-  padding-bottom: 0.5rem;
-}
-
-.hero-info-section p {
-  margin: 0.5rem 0;
-  line-height: 1.6;
-}
-
-.hero-description-section p {
-  line-height: 1.6;
-  color: #555;
-}
-
-.comics-list {
-  max-height: 200px;
-  overflow-y: auto;
-  padding-right: 1rem;
-}
-
-.comics-list p {
-  margin: 0.5rem 0;
-  color: #555;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .hero-details {
-    flex-direction: column;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
   }
-
-  .hero-image-container {
-    flex: 0 0 auto;
-    max-width: 100%;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

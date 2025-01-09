@@ -1,0 +1,186 @@
+/* Variables from main theme */
+:root {
+  --primary-color: #e23636;
+  --secondary-color: #504a4a;
+  --background-color: #f5f5f5;
+  --text-color: #333;
+  --white: #ffffff;
+  --input-bg: #f8f9fa;
+  --input-border: #e1e1e1;
+  --success-color: #28a745;
+  --error-color: #dc3545;
+}
+
+.hero-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.modal-content {
+  background-color: var(--white);
+  margin: 2rem auto;
+  padding: 1rem 0.75rem;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.modal-header {
+  background-color: var(--white);
+  color: var(--black);
+  padding: 1rem;
+  border-radius: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.modal-title {
+  margin: 0 20px;
+  font-size: 1.5rem;
+  color: var(--black);
+  text-align: center;
+}
+
+.close-modal {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--black);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: transform 0.3s ease;
+}
+
+.close-modal:hover {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.modal-body {
+  padding: 0;
+}
+
+/* Hero Details Styles */
+.hero-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.hero-image-container {
+  width: 100%;
+  margin:  auto;
+}
+
+.hero-modal-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.hero-info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0rem;
+}
+
+.hero-description-section,
+.hero-comics-section,
+.hero-info-section {
+  background-color: var(--input-bg);
+  border-radius: 8px;
+  padding: 1.2rem;
+}
+
+.hero-description-section h3,
+.hero-comics-section h3,
+.hero-info-section h3 {
+  color: var(--primary-color);
+  margin-bottom: 0.8rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.hero-description-section p,
+.hero-comics-section p,
+.hero-info-section p {
+  color: var(--text-color);
+  line-height: 1.5;
+  margin: 0.5rem 0;
+}
+
+/* Comics List Styles */
+.comics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.comics-list p {
+  color: var(--text-color);
+  margin: 0;
+  padding: 0.3rem 0;
+}
+
+/* View Comics Button */
+.view-comics-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--primary-color);
+  color: var(--white);
+  padding: 0.8rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.view-comics-btn:hover {
+  background-color: var(--secondary-color);
+  transform: translateY(-2px);
+}
+
+.view-comics-btn i {
+  font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .modal-content {
+    width: 95%;
+    margin: 1rem auto;
+    padding: 1rem;
+  }
+
+  .modal-header {
+    padding: 0.8rem;
+  }
+
+  .modal-title {
+    font-size: 1.2rem;
+  }
+
+  .hero-description-section,
+  .hero-comics-section,
+  .hero-info-section {
+    padding: 1rem;
+  }
+}

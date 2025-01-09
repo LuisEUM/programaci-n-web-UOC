@@ -1,6 +1,7 @@
 // Variables globales
 let heroesGrid;
 let heroesSearch;
+let heroModal;
 
 document.addEventListener("DOMContentLoaded", () => {
   // Verificar autenticación
@@ -17,6 +18,10 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("dataSourcePreference", "mock");
     Config.USE_MOCK_DATA = true;
   }
+
+  // Inicializar el modal primero
+  heroModal = new HeroModal();
+  window.heroModal = heroModal; // Hacer el modal disponible globalmente
 
   // Inicializar componentes
   heroesGrid = new HeroesGrid();
@@ -75,7 +80,7 @@ function setupCustomEventListeners() {
 }
 
 // Función auxiliar para mostrar notificaciones toast
-function showToast(message, type = "info") {
+window.showToast = function (message, type = "info") {
   const toast = document.createElement("div");
   toast.className = `toast ${type}`;
   toast.textContent = message;
@@ -90,4 +95,4 @@ function showToast(message, type = "info") {
       }, 300);
     }, 3000);
   }, 100);
-}
+};

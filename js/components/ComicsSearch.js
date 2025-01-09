@@ -18,7 +18,13 @@ class ComicsSearch {
       initialFilters.id = { value: id, displayText: `ID: ${id}` };
       document.querySelector("#searchById").value = id;
     }
-    // Si no hay ID, procesar precio
+    // Si no hay ID, procesar héroe
+    else if (urlParams.get("hero")) {
+      const heroId = urlParams.get("hero");
+      initialFilters.hero = { value: heroId, displayText: `Héroe: ${heroId}` };
+      document.querySelector("#searchByHero").value = heroId;
+    }
+    // Si no hay ID ni héroe, procesar precio
     else {
       const price = urlParams.get("price");
       if (price) {
@@ -60,45 +66,29 @@ class ComicsSearch {
       .querySelector("#searchByIdBtn")
       .addEventListener("click", () => this.handleSearchById());
     document
+      .querySelector("#searchByHeroBtn")
+      .addEventListener("click", () => this.handleSearchByHero());
+    document
       .querySelector("#filterByPriceBtn")
       .addEventListener("click", () => this.handlePriceFilter());
   }
 
   handleSearchByName() {
     const searchInput = document.querySelector("#searchByName");
-    const searchTerms = searchInput.value
-      .trim()
-      .toLowerCase()
-      .split(",")
-      .map((term) => term.trim())
-      .filter((term) => term.length > 0);
+    const searchTerm = searchInput.value.trim();
 
-    if (searchTerms.length === 0) {
+    if (!searchTerm) {
       this.filterBadges.removeFilter("name");
       return;
     }
 
-    // Añadir un badge por cada término de búsqueda
-    searchTerms.forEach((term, index) => {
-      const activeFilters = this.filterBadges.getActiveFilters();
-      const isDuplicate = Object.entries(activeFilters).some(
-        ([key, filter]) =>
-          key.startsWith("name") &&
-          filter.value.toLowerCase() === term.toLowerCase()
-      );
+    // Eliminar filtro de nombre anterior si existe
+    this.filterBadges.removeFilter("name");
 
-      if (!isDuplicate) {
-        this.filterBadges.addFilter(
-          `name_${Date.now()}`,
-          term,
-          `Nombre: ${term}`
-        );
-        searchInput.value = "";
-      } else {
-        showToast("Este filtro ya está aplicado", "info");
-      }
-    });
+    // Añadir el nuevo filtro de nombre
+    this.filterBadges.addFilter("name", searchTerm, `Nombre: ${searchTerm}`);
 
+    searchInput.value = "";
     this.applyAllFilters();
   }
 
@@ -134,10 +124,25 @@ class ComicsSearch {
     this.applyAllFilters();
   }
 
+  handleSearchByHero() {
+    const searchInput = document.querySelector("#searchByHero");
+    const heroId = parseInt(searchInput.value);
+
+    if (isNaN(heroId)) {
+      showToast("Por favor ingresa un ID de héroe válido", "error");
+      return;
+    }
+
+    this.filterBadges.addFilter("hero", heroId, `Héroe: ${heroId}`);
+    searchInput.value = "";
+    this.applyAllFilters();
+  }
+
   handleRemoveFilter(type) {
     if (type === "all") {
       document.querySelector("#searchByName").value = "";
       document.querySelector("#searchById").value = "";
+      document.querySelector("#searchByHero").value = "";
       document.querySelector("#priceFilter").value = "";
       document.dispatchEvent(
         new CustomEvent("filtersUpdated", { detail: { filters: [] } })
