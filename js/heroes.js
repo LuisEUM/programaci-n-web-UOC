@@ -62,10 +62,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.dispatchEvent(new CustomEvent("collectionsManagerReady"));
 
   // Inicializar componentes necesarios para la página de héroes
-  heroesGrid = new HeroesGrid(".heroes-grid");
-  heroesSearch = new HeroesSearch(
-    document.getElementById("filterBadgesContainer")
-  );
+  heroesGrid = new HeroesGrid();
+  window.heroesGrid = heroesGrid;
+
+  // Luego pasar la instancia a HeroesSearch
+  heroesSearch = new HeroesSearch(heroesGrid);
 
   // Configurar paginación
   setupPagination();
@@ -75,6 +76,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Event Listeners para eventos personalizados
   setupCustomEventListeners();
+
+  window.heroModal = new HeroModal();
 });
 
 function setupCustomEventListeners() {

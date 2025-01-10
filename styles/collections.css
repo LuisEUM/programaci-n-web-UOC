@@ -555,3 +555,27 @@ body {
 .collections-tabs .tab-btn.active .collection-count {
   color: #fff;
 }
+
+
+.marvel-footer {
+  text-align: center;
+  padding: 20px;
+  background-color: #202020;
+  color: #fff;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  font-size: 14px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+}
+
+.marvel-footer p {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Ajuste para el contenido principal */
+main {
+  padding-bottom: 70px; /* Altura del footer + espacio extra */
+}

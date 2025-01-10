@@ -46,10 +46,9 @@ class ComicsGrid {
       } else {
         // Verificar si es búsqueda por héroe
         if (this.currentFilters.hero) {
+          const queryParams = this.getQueryParams();
           const response = await fetch(
-            `${Config.MARVEL_API_BASE_URL}/characters/${
-              this.currentFilters.hero.value
-            }/comics?${this.getQueryParams()}`
+            `${Config.MARVEL_API_BASE_URL}/characters/${this.currentFilters.hero.value}/comics?${queryParams}`
           );
           if (!response.ok) {
             throw new Error("Network response was not ok");

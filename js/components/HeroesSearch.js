@@ -1,5 +1,8 @@
 class HeroesSearch {
   constructor(heroesGrid) {
+    if (!heroesGrid) {
+      throw new Error("HeroesGrid instance is required");
+    }
     this.heroesGrid = heroesGrid;
     this.filterBadges = new FilterBadges(
       document.getElementById("filterBadgesContainer"),
