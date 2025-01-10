@@ -2,13 +2,11 @@ class MarvelAPI {
   static BASE_URL = Config.MARVEL_API_BASE_URL;
   static PUBLIC_KEY = Config.MARVEL_PUBLIC_KEY;
   static PRIVATE_KEY = Config.MARVEL_PRIVATE_KEY;
-
   static generateHash(timestamp) {
     return CryptoJS.MD5(
       timestamp + this.PRIVATE_KEY + this.PUBLIC_KEY
     ).toString();
   }
-
   static async getComics(params = {}) {
     const timestamp = new Date().getTime().toString();
     const hash = this.generateHash(timestamp);
@@ -22,7 +20,6 @@ class MarvelAPI {
         titleStartsWith: params.titleStartsWith,
       }),
     });
-
     try {
       const response = await fetch(`${this.BASE_URL}/comics?${queryParams}`);
       if (!response.ok) {
@@ -34,7 +31,6 @@ class MarvelAPI {
       throw error;
     }
   }
-
   static async getComicById(id) {
     const timestamp = new Date().getTime().toString();
     const hash = this.generateHash(timestamp);
@@ -43,7 +39,6 @@ class MarvelAPI {
       apikey: this.PUBLIC_KEY,
       hash: hash,
     });
-
     try {
       const response = await fetch(
         `${this.BASE_URL}/comics/${id}?${queryParams}`
@@ -52,7 +47,6 @@ class MarvelAPI {
         throw new Error("Network response was not ok");
       }
       const data = await response.json();
-
       // Transformar el resultado usando el mismo método que getComics
       if (data.data?.results?.[0]) {
         const transformedComic = {
@@ -86,7 +80,6 @@ class MarvelAPI {
       throw error;
     }
   }
-
   static async getHeroes(params = {}) {
     const timestamp = new Date().getTime().toString();
     const hash = this.generateHash(timestamp);
@@ -98,7 +91,6 @@ class MarvelAPI {
       offset: params.offset || 0,
       ...(params.nameStartsWith && { nameStartsWith: params.nameStartsWith }),
     });
-
     try {
       const response = await fetch(
         `${this.BASE_URL}/characters?${queryParams}`
@@ -112,7 +104,6 @@ class MarvelAPI {
       throw error;
     }
   }
-
   static async getHeroById(id) {
     const timestamp = new Date().getTime().toString();
     const hash = this.generateHash(timestamp);
@@ -121,7 +112,6 @@ class MarvelAPI {
       apikey: this.PUBLIC_KEY,
       hash: hash,
     });
-
     try {
       const response = await fetch(
         `${this.BASE_URL}/characters/${id}?${queryParams}`
@@ -136,6 +126,5 @@ class MarvelAPI {
     }
   }
 }
-
 // Crear una instancia global
 window.marvelAPI = new MarvelAPI();

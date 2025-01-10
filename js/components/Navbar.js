@@ -91,7 +91,7 @@ class Navbar {
       navbar.innerHTML = `
         <div class="nav-content">
           <div class="logo">
-            <a href="home.html" title="Ir a inicio">
+            <a href="index.html" title="Ir a inicio">
               <img src="images/marvel.svg" alt="Marvel Logo" class="marvel-logo">
             </a>
           </div>
@@ -117,7 +117,7 @@ class Navbar {
     } else {
       navbar.innerHTML = `
         <div class="logo">
-          <a href="home.html" title="Ir a inicio">
+          <a href="index.html" title="Ir a inicio">
             <img src="images/marvel.svg" alt="Marvel Logo" class="marvel-logo">
           </a>
         </div>

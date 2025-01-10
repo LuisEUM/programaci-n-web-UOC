@@ -10,40 +10,107 @@ class Comic {
 -id: number
 -title: string
 -price: number
+-description: string
+-thumbnail: object
+-characters: array
+-creators: array
+-issueNumber: number
+-pageCount: number
 +getThumbnailURL()
 +static fromAPI()
 }
+
 class Hero {
 -id: number
 -name: string
+-description: string
+-thumbnail: object
+-comics: array
+-modified: string
+-resourceURI: string
 +getThumbnailURL()
 +static fromAPI()
 }
+
 class Collections {
--collections: Array
+-collections: object
+-dataSource: string
 +addCollection()
 +removeCollection()
++isCollection()
 +calculateAveragePrice()
++saveCollections()
++loadCollections()
 }
-class UI {
-+init()
-+renderItems()
-+handleSearch()
+
+class ComicsGrid {
+-container: Element
+-itemsPerPage: number
+-currentPage: number
+-currentFilters: object
++loadComics()
++createComicCard()
++updateFilters()
++setPage()
 }
-class DataService {
-+static fetchItems()
-+static fetchItemById()
+
+class HeroesGrid {
+-container: Element
+-itemsPerPage: number
+-currentPage: number
+-currentFilters: object
++loadHeroes()
++createHeroCard()
++updateFilters()
++setPage()
 }
+
+class ComicModal {
+-modal: Element
++show()
++hide()
++updateModalContent()
+}
+
+class HeroModal {
+-modal: Element
++show()
++hide()
++updateModalContent()
+}
+
+class CollectionModal {
+-modal: Element
+-currentAction: string
+-currentComicId: number
++open()
++close()
++handleCollectionSelection()
++updateButtonStates()
+}
+
 class MarvelAPI {
 +getComics()
 +getHeroes()
++getComicById()
++getHeroById()
 }
-UI --> DataService
+
+class DataService {
++static fetchItems()
++static fetchItemById()
++static processResponse()
+}
+
+ComicsGrid --> Comic
+HeroesGrid --> Hero
+ComicsGrid --> ComicModal
+HeroesGrid --> HeroModal
+ComicsGrid --> CollectionModal
 DataService --> MarvelAPI
-UI --> Collections
+Comic ..> MarvelAPI
+Hero ..> MarvelAPI
 Collections --> Comic
-DataService --> Comic
-DataService --> Hero
 ```
 
 ### Diagrama de Flujo de Datos
@@ -51,13 +118,16 @@ DataService --> Hero
 ```mermaid
 flowchart TD
 A[Usuario] -->|Interactúa| B[UI]
-B -->|Solicita Datos| C[DataService]
-C -->|Consulta| D[MarvelAPI]
-D -->|Responde| C
-C -->|Transforma| E[Comic/Hero]
-E -->|Renderiza| B
-B -->|Gestiona| F[Collections]
-F -->|Persiste| G[LocalStorage]
+B -->|Búsqueda/Filtros| C[ComicsGrid/HeroesGrid]
+C -->|Solicita Datos| D[DataService]
+D -->|Consulta API| E[MarvelAPI]
+E -->|Responde| D
+D -->|Transforma| F[Comic/Hero]
+F -->|Renderiza| C
+C -->|Gestiona| G[Collections]
+G -->|Persiste| H[LocalStorage]
+C -->|Muestra| I[Modales]
+I -->|Actualiza| G
 ```
 
 ### Diagrama de Componentes
@@ -65,14 +135,19 @@ F -->|Persiste| G[LocalStorage]
 ```mermaid
 graph TB
 A[index.html] --> B[UI]
-B --> C[Card]
-B --> D[Pagination]
-B --> E[CollectionModal]
-B --> F[MainTabs]
-B --> G[CollectionsTabs]
-C --> H[Comic]
-C --> I[Hero]
-G --> J[Collections]
+B --> C[ComicsGrid]
+B --> D[HeroesGrid]
+B --> E[ComicsSearch]
+B --> F[HeroesSearch]
+B --> G[FilterBadges]
+B --> H[ComicsActionsBar]
+B --> I[Navbar]
+B --> J[HeroesCarousel]
+C --> K[ComicModal]
+C --> L[CollectionModal]
+D --> M[HeroModal]
+C & D --> N[Spinner]
+K & L & M --> O[Accordion]
 ```
 
 ## 🛠️ Tecnologías y Patrones
@@ -80,205 +155,116 @@ G --> J[Collections]
 ### Tecnologías Core
 
 - JavaScript ES6+
-  - Campos privados
+  - Clases y Herencia
   - Módulos ES6
   - Async/Await
+  - LocalStorage
 - HTML5 & CSS3
   - Grid Layout
   - Flexbox
   - Variables CSS
+  - Animaciones
 - Marvel API
   - REST API
   - Autenticación Hash
-- LocalStorage
-  - Persistencia de datos
-  - Gestión de estado
+  - Endpoints de Comics y Heroes
 
 ### Patrones de Diseño
 
 1. **Singleton**
 
-   - Gestión de estado global
+   - Gestión de estado global (Collections)
    - Configuración centralizada
-   - Instancia única de servicios
+   - Instancia única de modales
 
 2. **Observer**
 
-   - Sistema de eventos
-   - Actualizaciones de UI
+   - Sistema de eventos para actualizaciones
    - Comunicación entre componentes
+   - Manejo de cambios en colecciones
 
 3. **Factory**
 
-   - Creación de componentes
-   - Transformación de datos
-   - Instanciación de objetos
+   - Creación de componentes UI
+   - Transformación de datos API
+   - Instanciación de modelos
 
 4. **Proxy**
    - Validación de datos
    - Control de acceso
    - Caché de datos
 
-### Principios SOLID
+## 📊 Características Principales
 
-1. **Single Responsibility**
+### Gestión de Comics
 
-   - Clases con propósito único
-   - Separación de responsabilidades
-   - Cohesión alta
+- Búsqueda por nombre, ID y héroe
+- Filtrado por precio
+- Vista detallada en modal
+- Paginación dinámica
 
-2. **Open/Closed**
+### Gestión de Héroes
 
-   - Extensibilidad de componentes
-   - Herencia y composición
-   - Plugins y middleware
+- Búsqueda por nombre e ID
+- Vista detallada con comics relacionados
+- Carrusel de héroes populares
+- Paginación avanzada
 
-3. **Interface Segregation**
+### Sistema de Colecciones
 
-   - APIs específicas
-   - Contratos claros
-   - Dependencias mínimas
+- Múltiples colecciones (Wishlist, Por Leer, Leyendo, Leídos, Favoritos)
+- Mover y clonar comics entre colecciones
+- Validación de duplicados
+- Persistencia en LocalStorage
 
-4. **Dependency Inversion**
-   - Inyección de dependencias
-   - Acoplamiento reducido
-   - Inversión de control
+### Interfaz de Usuario
 
-## 📊 Características Técnicas
-
-### Encapsulación
-
-```javascript
-class Comic {
-  #id;
-  #title;
-  #price;
-
-  constructor(id, title, price) {
-    this.#validateData(id, title, price);
-    this.#id = id;
-    this.#title = title;
-    this.#price = price;
-  }
-}
-```
-
-### Programación Funcional
-
-```javascript
-const affordableComics = comics
-  .filter((comic) => comic.price <= maxPrice)
-  .map((comic) => comic.title);
-```
-
-### Asincronía
-
-```javascript
-async function loadComics() {
-  try {
-    const response = await DataService.fetchItems("comics");
-    return response.results;
-  } catch (error) {
-    console.error(error);
-  }
-}
-```
-
-## 🧪 Testing
-
-### Tests Unitarios
-
-```mermaid
-flowchart LR
-A[Test Runner] -->|Ejecuta| B[Comic Tests]
-A -->|Ejecuta| C[Hero Tests]
-A -->|Ejecuta| D[Collections Tests]
-B --> E[Assertions]
-C --> E
-D --> E
-```
-
-### Cobertura
-
-- Clases principales
-  - Comic
-  - Hero
-  - Collections
-- Métodos críticos
-  - addCollection
-  - calculateAveragePrice
-  - findComicById
-- Casos edge
-  - Datos inválidos
-  - Límites de paginación
-  - Estado vacío
-
-## 📱 Responsive Design
-
-- Grid system adaptativo
-- Media queries
-- Mobile-first approach
-- Flexbox layout
-
-## 🔐 Seguridad
-
-- Validación de inputs
-- Sanitización de datos
-- Control de acceso
-- Manejo seguro de API keys
-
-## 🚀 Performance
-
-- Lazy loading
-- Paginación eficiente
-- Caché local
-- Optimización de re-renders
+- Diseño responsive
+- Animaciones fluidas
+- Feedback visual (toasts)
+- Modales interactivos
 
 ## 📂 Estructura del Proyecto
 
 ```
 marvel-comics/
 ├── index.html
-├── tests.html
+├── comics.html
+├── heroes.html
+├── collections.html
 ├── styles/
-│   └── main.css
+│   ├── comics.css
+│   ├── heroes.css
+│   ├── comicModal.css
+│   ├── collection-modal.css
+│   ├── navbar.css
+│   └── spinner.css
 ├── js/
-│   ├── classes/
+│   ├── models/
 │   │   ├── Comic.js
 │   │   ├── Hero.js
 │   │   └── Collections.js
 │   ├── components/
-│   │   ├── Card.js
-│   │   ├── Pagination.js
-│   │   └── ...
+│   │   ├── ComicsGrid.js
+│   │   ├── HeroesGrid.js
+│   │   ├── ComicModal.js
+│   │   ├── CollectionModal.js
+│   │   ├── FilterBadges.js
+│   │   ├── Spinner.js
+│   │   └── Accordion.js
+│   ├── controllers/
+│   │   ├── comics.js
+│   │   ├── heroes.js
+│   │   └── collections.js
 │   ├── services/
-│   │   └── DataService.js
-│   ├── api.js
-│   ├── config.js
-│   ├── ui.js
-│   └── utils.js
-└── README.md
+│   │   ├── MarvelAPI.js
+│   │   ├── DataService.js
+│   │   └── Config.js
+│   └── utils/
+│       └── utils.js
+└── assets/
+    └── images/
 ```
-
-## 🤝 Contribución
-
-El proyecto está estructurado para facilitar contribuciones futuras:
-
-- Código modular
-- Documentación exhaustiva
-- Tests automatizados
-
-## 📝 Licencia
-
-Este proyecto es parte de una práctica académica y utiliza la API de Marvel bajo sus términos y condiciones.
-
-## 🎯 Objetivos Cumplidos
-
-1. ✅ Implementación de clases base
-2. ✅ Sistema de gestión de colecciones
-3. ✅ Funciones recursivas y funcionales
-4. ✅ Interfaz intuitiva y responsive
-5. ✅ Tests completos
 
 ## 🔄 Ciclo de Desarrollo
 
@@ -292,8 +278,23 @@ D -->|OK| E[Despliegue]
 E -->|Feedback| A
 ```
 
+## 📚 Objetivos Cumplidos
+
+1. ✅ Sistema de búsqueda y filtrado avanzado
+2. ✅ Gestión completa de colecciones
+3. ✅ Interfaz moderna y responsive
+4. ✅ Modales interactivos
+5. ✅ Persistencia de datos
+6. ✅ Optimización de rendimiento
+
 ## 📚 Referencias
 
 - [Marvel API Documentation](https://developer.marvel.com/docs)
 - [MDN Web Docs](https://developer.mozilla.org/)
 - [JavaScript Design Patterns](https://www.patterns.dev/)
+
+## 📝 Licencia
+
+Este proyecto es parte de una práctica académica y utiliza la API de Marvel bajo sus términos y condiciones.
+
+Data provided by Marvel. © 2014 Marvel

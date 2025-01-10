@@ -22,7 +22,7 @@ class ComicsGrid {
       if (Config.USE_MOCK_DATA) {
         // Cargar cómics desde comics.json solo si no están cargados
         if (this.allComics.length === 0) {
-          const response = await fetch("js/data/comics.json");
+          const response = await fetch("data/comics.json");
           if (!response.ok) {
             throw new Error("Error fetching comics from comics.json");
           }

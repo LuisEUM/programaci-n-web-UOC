@@ -5,7 +5,7 @@ let collectionsManager;
 // Función para cargar los datos mock
 async function loadMockData() {
   try {
-    const response = await fetch("js/data/comics.json");
+    const response = await fetch("data/comics.json");
     mockComicsData = await response.json();
   } catch (error) {
     console.error("Error loading mock data:", error);

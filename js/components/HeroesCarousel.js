@@ -6,7 +6,7 @@ class HeroesCarousel {
 
   async loadHeroes() {
     try {
-      const response = await fetch("js/data/heroes.json");
+      const response = await fetch("data/heroes.json");
       const data = await response.json();
       const heroesInner = this.container.querySelector(".heroes-inner");
 

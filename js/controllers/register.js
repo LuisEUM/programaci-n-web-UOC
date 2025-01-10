@@ -121,7 +121,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   if (testUserButton) {
     testUserButton.addEventListener("click", async function () {
       try {
-        const response = await fetch("js/data/luis-test-user.json");
+        const response = await fetch("data/luis-test-user.json");
         const testUser = await response.json();
 
         // Rellenar los campos con los datos de prueba
@@ -168,9 +168,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   try {
     const [comunidadesResponse, cpResponse, comunidadesProvinciasResponse] =
       await Promise.all([
-        fetch("js/data/comunidades-autonomas.json"),
-        fetch("js/data/comunidades-cp.json"),
-        fetch("js/data/comunidades-provincias.json"),
+        fetch("data/comunidades-autonomas.json"),
+        fetch("data/comunidades-cp.json"),
+        fetch("data/comunidades-provincias.json"),
       ]);
 
     const comunidadesAutonomas = await comunidadesResponse.json();

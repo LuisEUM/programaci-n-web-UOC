@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // Cargar el usuario de prueba desde el JSON
   try {
-    const response = await fetch("js/data/test-user.json");
+    const response = await fetch("data/test-user.json");
     const testUser = await response.json();
 
     // Asegurar que el usuario de prueba esté disponible en localStorage
@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         localStorage.setItem("userToken", userData.token);
         localStorage.setItem("userName", userData.username);
 
-        window.location.href = "home.html";
+        window.location.href = "index.html";
       } else {
         showError("Usuario o contraseña incorrectos");
       }

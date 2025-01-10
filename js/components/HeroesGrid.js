@@ -158,7 +158,7 @@ class HeroesGrid {
 
         if (Config.USE_MOCK_DATA) {
           if (this.allHeroes.length === 0) {
-            const response = await fetch("js/data/heroes.json");
+            const response = await fetch("data/heroes.json");
             // Verificar después de cada operación asíncrona
             if (searchId !== this.lastSearchId) return;
 

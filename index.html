@@ -4,113 +4,68 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UOC - Programación Web</title>
-  <link rel="stylesheet" href="styles/main.css">
+  <title>Marvel Comics API - UOC</title>
+  <link rel="stylesheet" href="styles/home.css">
+  <link rel="stylesheet" href="styles/navbar.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-  <script src="js/classes/Comic.js"></script>
-  <script src="js/classes/Hero.js"></script>
-  <script src="js/classes/Collections.js"></script>
-  <script src="js/services/DataService.js"></script>
-  <script src="js/components/Tabs.js"></script>
-  <script src="js/components/Card.js"></script>
-  <script src="js/components/CollectionModal.js"></script>
-  <script src="js/components/MainTabs.js"></script>
-  <script src="js/components/CollectionsTabs.js"></script>
-  <script src="js/components/Pagination.js"></script>
-  <script src="js/components/HeroesPagination.js"></script>
-
+  <link rel="icon" type="image/png" href="assets/images/marvel-logo.png">
 </head>
 
 <body>
-  <div class="container">
-    <button id="toggleDataBtn">Usar Data Mockeada</button>
+  <!-- El navbar se insertará dinámicamente aquí -->
 
-    <h1 class="main-title">UOC - Programación Web</h1>
-
-    <div class="tabs-container">
-      <!-- Los tabs principales se generarán dinámicamente aquí -->
+  <!-- Hero Banner -->
+  <section class="hero-banner">
+    <div class="banner-content">
+      <h2>Explora el Universo Marvel</h2>
+      <p>Descubre miles de cómics, personajes e historias épicas</p>
+      <a href="register.html" class="btn register cta-button">
+        <i class="fas fa-rocket"></i>
+        <span>¡Únete Ahora!</span>
+      </a>
     </div>
-
-    <!-- Contenedor específico para Comics -->
-    <div id="comicsTab" class="tab-content active">
-      <div class="search-section">
-        <div class="search-container">
-          <input type="text" id="searchInput" placeholder="Buscar por nombre...">
-          <i class="fas fa-search search-icon"></i>
-          <button class="search-btn" id="searchByNameBtn">
-            Buscar
-          </button>
-        </div>
-        <div class="search-container">
-          <input type="number" id="searchById" placeholder="Buscar por ID...">
-          <i class="fas fa-hashtag search-icon"></i>
-          <button class="search-btn" id="searchByIdBtn">
-            Buscar
-          </button>
-        </div>
-      </div>
-      <div id="comicsContainer" class="comics-grid">
-        <!-- Las tarjetas de cómics se generarán aquí -->
-      </div>
-      <div class="pagination">
-        <button id="prevPage" class="page-btn"><i class="fas fa-chevron-left"></i></button>
-        <span id="pageInfo">1 of 2</span>
-        <button id="nextPage" class="page-btn"><i class="fas fa-chevron-right"></i></button>
-      </div>
+    <div class="image-credits">
+      Foto de <a
+        href="https://unsplash.com/es/@introspectivedsgn?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Erik
+        Mclean</a> en <a
+        href="https://unsplash.com/es/fotos/la-teoria-del-big-bang-dvd-27kCu7bXGEI?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash">Unsplash</a>
     </div>
+  </section>
 
-    <!-- Contenedor específico para Heroes -->
-    <div id="heroesTab" class="tab-content">
-      <div id="heroesContainer" class="comics-grid">
-        <!-- Las tarjetas de héroes se generarán aquí -->
-      </div>
-      <div class="heroes-pagination">
-        <!-- La paginación de héroes se generará aquí -->
-      </div>
+  <!-- Features Section -->
+  <section class="features">
+    <h2>¿Qué puedes hacer?</h2>
+    <div class="features-grid">
+      <a href="/comics.html" class="feature-card">
+        <i class="fas fa-book-open"></i>
+        <h3>Explorar Cómics</h3>
+        <p>Accede a una extensa biblioteca de cómics Marvel</p>
+      </a>
+      <a href="/heroes.html" class="feature-card">
+        <i class="fas fa-mask"></i>
+        <h3>Conoce Héroes</h3>
+        <p>Descubre todos los personajes del universo Marvel</p>
+      </a>
+      <a href="/collections.html" class="feature-card">
+        <i class="fas fa-heart"></i>
+        <h3>Crea tus Colecciones</h3>
+        <p>Guarda tus cómics en nuestras colecciones pensadas para ti</p>
+      </a>
     </div>
+  </section>
 
-    <!-- Contenedor específico para Collections -->
-    <div id="collectionsTab" class="tab-content">
-      <div class="collections-tabs">
-        <!-- Los tabs de colecciones se generarán aquí -->
-      </div>
-      <div id="collectionsContainer">
-        <!-- El contenido de las colecciones se generará aquí -->
-      </div>
-    </div>
+  <!-- Footer -->
+  <footer class="marvel-footer">
+    <p>Data provided by Marvel. © 2014 Marvel</p>
+  </footer>
 
-    <!-- Barra de acciones -->
-    <div class="actions-bar" id="actionsBar">
-      <span class="selected-count">0 cómics seleccionados</span>
-      <button class="save-collections-btn" onclick="UI.saveCollections()">
-        Guardar en Colecciones
-      </button>
-      <button class="remove-collections-btn" onclick="UI.removeCollections()">
-        Remover de Colecciones
-      </button>
-    </div>
-  </div>
+  <!-- Scripts necesarios -->
+  <script src="js/services/Config.js"></script>
+  <script src="js/utils/utils.js"></script>
+  <script src="js/models/Collections.js"></script>
+  <script src="js/components/Navbar.js"></script>
+  <script src="js/controllers/home.js"></script>
 
-  <!-- Modal para selección de colección -->
-  <div id="collectionModal" class="modal">
-    <div class="modal-content">
-      <h2>Selecciona una colección</h2>
-      <button class="collection-btn" data-collection="wishlist">Lista de Deseos</button>
-      <button class="collection-btn" data-collection="toread">Por Leer</button>
-      <button class="collection-btn" data-collection="reading">Leyendo</button>
-      <button class="collection-btn" data-collection="read">Leídos</button>
-      <button class="collection-btn" data-collection="collections">Mis Favoritos</button>
-      <button id="closeModal" class="close-modal-btn">Cancelar</button>
-    </div>
-  </div>
-
-  <!-- Scripts en orden específico -->
-  <script src="js/utils.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/mock-data.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/ui.js"></script>
 </body>
 
 </html>
