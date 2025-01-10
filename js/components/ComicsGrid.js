@@ -20,15 +20,10 @@ class ComicsGrid {
       const offset = (this.currentPage - 1) * this.itemsPerPage;
 
       if (Config.USE_MOCK_DATA) {
-        // Cargar cómics desde comics.json solo si no están cargados
-        if (this.allComics.length === 0) {
-          const response = await fetch("data/comics.json");
-          if (!response.ok) {
-            throw new Error("Error fetching comics from comics.json");
-          }
-          const data = await response.json();
-          this.allComics = data.comics.map((comic) => Comic.fromAPI(comic));
-        }
+        // Usar datos directamente del objeto Config
+        this.allComics = Config.MOCK_DATA.comics.map((comic) =>
+          Comic.fromAPI(comic)
+        );
 
         // Aplicar filtros localmente en modo mock
         let comicsToShow = this.allComics;

@@ -119,10 +119,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Botón de usuario de prueba
   const testUserButton = document.getElementById("testUserButton");
   if (testUserButton) {
-    testUserButton.addEventListener("click", async function () {
+    testUserButton.addEventListener("click", function () {
       try {
-        const response = await fetch("data/luis-test-user.json");
-        const testUser = await response.json();
+        const testUser = Config.MOCK_DATA.testUser;
 
         // Rellenar los campos con los datos de prueba
         document.getElementById("nombre").value = testUser.nombre;
@@ -166,23 +165,14 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // Cargar todos los datos necesarios
   try {
-    const [comunidadesResponse, cpResponse, comunidadesProvinciasResponse] =
-      await Promise.all([
-        fetch("data/comunidades-autonomas.json"),
-        fetch("data/comunidades-cp.json"),
-        fetch("data/comunidades-provincias.json"),
-      ]);
-
-    const comunidadesAutonomas = await comunidadesResponse.json();
-    codigosPostales = await cpResponse.json();
-    comunidadesData = await comunidadesProvinciasResponse.json();
-
+    // Usar datos directamente desde Config.MOCK_DATA.location.spain
+    const comunidadesData = Config.MOCK_DATA.location.spain.comunidades;
     const select = document.getElementById("comunidadAutonoma");
 
-    comunidadesAutonomas.comunidadesAutonomas.forEach((comunidad) => {
+    comunidadesData.forEach((comunidad) => {
       const option = document.createElement("option");
-      option.value = comunidad;
-      option.textContent = comunidad;
+      option.value = comunidad.nombreComunidad;
+      option.textContent = comunidad.nombreComunidad;
       select.appendChild(option);
     });
 
@@ -190,8 +180,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     select.addEventListener("change", function () {
       const codigoPostalInput = document.getElementById("codigoPostal");
       const comunidadSeleccionada = this.value;
-      if (codigosPostales[comunidadSeleccionada]) {
-        codigoPostalInput.value = codigosPostales[comunidadSeleccionada];
+      const comunidad = comunidadesData.find(
+        (c) => c.nombreComunidad === comunidadSeleccionada
+      );
+
+      if (comunidad) {
+        codigoPostalInput.value = comunidad.codigoPostalPrincipal;
         validarCodigoPostal(codigoPostalInput);
       }
     });
@@ -207,6 +201,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       // Limpiar estados previos
       inputGroup.classList.remove("error", "success");
       cpValidationMessage.textContent = "";
+      cpValidationMessage.className = "validation-message";
 
       if (cp.length === 5) {
         if (validarCodigoPostalEspanol(cp)) {
@@ -214,25 +209,26 @@ document.addEventListener("DOMContentLoaded", async function () {
           if (resultado) {
             select.value = resultado.comunidad;
             inputGroup.classList.add("success");
-            cpValidationMessage.textContent = `Provincia: ${resultado.provincia}`;
-            cpValidationMessage.style.color = "var(--success-color)";
+            cpValidationMessage.className = "validation-message success";
+            cpValidationMessage.innerHTML =
+              '<i class="fas fa-check"></i> Provincia: ' + resultado.provincia;
           } else {
             inputGroup.classList.add("error");
-            cpValidationMessage.textContent =
-              "El código postal no corresponde a ninguna comunidad autónoma";
-            cpValidationMessage.style.color = "var(--error-color)";
+            cpValidationMessage.className = "validation-message error";
+            cpValidationMessage.innerHTML =
+              '<i class="fas fa-times"></i> El código postal no corresponde a ninguna comunidad autónoma';
           }
         } else {
           inputGroup.classList.add("error");
-          cpValidationMessage.textContent =
-            "Código postal inválido para España";
-          cpValidationMessage.style.color = "var(--error-color)";
+          cpValidationMessage.className = "validation-message error";
+          cpValidationMessage.innerHTML =
+            '<i class="fas fa-times"></i> Código postal inválido para España';
         }
       } else if (cp.length > 0) {
         inputGroup.classList.add("error");
-        cpValidationMessage.textContent =
-          "El código postal debe tener 5 dígitos";
-        cpValidationMessage.style.color = "var(--error-color)";
+        cpValidationMessage.className = "validation-message error";
+        cpValidationMessage.innerHTML =
+          '<i class="fas fa-times"></i> El código postal debe tener 5 dígitos';
       }
     }
 
@@ -251,7 +247,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     function encontrarComunidadYProvinciaPorCP(cp) {
       const cpNum = parseInt(cp, 10);
 
-      for (const comunidad of comunidadesData.comunidades) {
+      for (const comunidad of comunidadesData) {
         for (const provincia of comunidad.provincias) {
           if (cpNum >= provincia.minCP && cpNum <= provincia.maxCP) {
             return {
@@ -563,19 +559,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   });
 });
 
-function validarCPyComunidad(cp, comunidad) {
-  // Convertir a número para comparación correcta
-  const cpNum = parseInt(cp, 10);
-  const rango = rangosCP.rangos[comunidad];
-
-  if (!rango) return false;
-
-  const startNum = parseInt(rango.start, 10);
-  const endNum = parseInt(rango.end, 10);
-
-  return cpNum >= startNum && cpNum <= endNum;
-}
-
 function showToast(message, type = "info") {
   const backgroundColor =
     type === "success" ? "#28a745" : type === "error" ? "#dc3545" : "#17a2b8";
@@ -585,7 +568,9 @@ function showToast(message, type = "info") {
     duration: 3000,
     gravity: "top",
     position: "right",
-    backgroundColor,
+    style: {
+      background: backgroundColor,
+    },
     stopOnFocus: true,
   }).showToast();
 }

@@ -157,28 +157,19 @@ class HeroesGrid {
         const offset = (this.currentPage - 1) * this.itemsPerPage;
 
         if (Config.USE_MOCK_DATA) {
-          if (this.allHeroes.length === 0) {
-            const response = await fetch("data/heroes.json");
-            // Verificar después de cada operación asíncrona
-            if (searchId !== this.lastSearchId) return;
-
-            if (!response.ok) {
-              throw new Error("Error fetching heroes from heroes.json");
-            }
-            const data = await response.json();
-            this.allHeroes = data.heroes.map(
-              (hero) =>
-                new Hero(
-                  hero.id,
-                  hero.name,
-                  hero.description,
-                  hero.modified,
-                  hero.thumbnail,
-                  hero.resourceURI,
-                  hero.comics
-                )
-            );
-          }
+          // Usar datos directamente del objeto Config
+          this.allHeroes = Config.MOCK_DATA.heroes.map(
+            (hero) =>
+              new Hero(
+                hero.id,
+                hero.name,
+                hero.description,
+                hero.modified,
+                hero.thumbnail,
+                hero.resourceURI,
+                hero.comics
+              )
+          );
 
           let heroesToShow = this.allHeroes;
           if (Object.keys(this.currentFilters).length > 0) {

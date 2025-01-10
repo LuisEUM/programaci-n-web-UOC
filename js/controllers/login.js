@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", async function () {
+document.addEventListener("DOMContentLoaded", function () {
   // Verificar si el usuario ya está logueado
   const userToken = localStorage.getItem("userToken");
   const userName = localStorage.getItem("userName");
@@ -8,10 +8,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     return;
   }
 
-  // Cargar el usuario de prueba desde el JSON
+  // Cargar el usuario de prueba desde Config
   try {
-    const response = await fetch("data/test-user.json");
-    const testUser = await response.json();
+    const testUser = Config.MOCK_DATA.loginTestUser;
 
     // Asegurar que el usuario de prueba esté disponible en localStorage
     const registeredUsers =
@@ -115,7 +114,9 @@ function showToast(message, type = "info") {
     duration: 3000,
     gravity: "top",
     position: "right",
-    backgroundColor,
+    style: {
+      background: backgroundColor,
+    },
     stopOnFocus: true,
   }).showToast();
 }

@@ -6,8 +6,8 @@ class HeroesCarousel {
 
   async loadHeroes() {
     try {
-      const response = await fetch("data/heroes.json");
-      const data = await response.json();
+      // Usar directamente los datos de Config.MOCK_DATA
+      const data = { heroes: Config.MOCK_DATA.heroes };
       const heroesInner = this.container.querySelector(".heroes-inner");
 
       // Dividir los héroes en grupos de 9
