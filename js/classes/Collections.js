@@ -313,9 +313,16 @@ class Collections {
   getTotalUniqueComics() {
     const collections = JSON.parse(localStorage.getItem("collections")) || {
       mock: {},
-      api: {},
+      api: {}
     };
-    return Utils.getUniqueComicsCount(collections);
+    
+    // Usar solo la fuente actual
+    const source = localStorage.getItem('dataSourcePreference') || 'mock';
+    const currentCollections = {
+      [source]: collections[source] || {}
+    };
+    
+    return Utils.getUniqueComicsCount(currentCollections);
   }
 
   #notifyCollectionUpdate() {

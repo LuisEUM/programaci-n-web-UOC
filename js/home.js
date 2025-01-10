@@ -1,43 +1,45 @@
 document.addEventListener("DOMContentLoaded", function () {
   // Verificar si el usuario está autenticado
-  const userToken =
-    localStorage.getItem("userToken") || sessionStorage.getItem("userToken");
-  const userName =
-    localStorage.getItem("userName") || sessionStorage.getItem("userName");
+  const userToken = localStorage.getItem("userToken");
+  const userName = localStorage.getItem("userName");
+  const isAuthenticated = userToken && userName;
 
-  if (userToken && userName) {
-    // Usuario autenticado - Modificar la barra de navegación
-    const authButtons = document.querySelector(".auth-buttons");
-    authButtons.innerHTML = `
-            <span class="welcome-text">Bienvenido, ${userName}</span>
-            <button class="logout-button" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-            </button>
-        `;
-
-    // Modificar el CTA del banner si el usuario está autenticado
-    const ctaButton = document.querySelector(".cta-button");
-    ctaButton.href = "/comics";
-    ctaButton.textContent = "Explorar Comics";
-
-    // Agregar estilos para los nuevos elementos
-    const style = document.createElement("style");
-    style.textContent = `
-            .welcome-text {
-                color: var(--secondary-color);
-                margin-right: 1rem;
-            }
-            .logout {
-                background-color: var(--error-color) !important;
-                color: var(--white) !important;
-            }
-            .logout:hover {
-                opacity: 0.9;
-            }
-        `;
-    document.head.appendChild(style);
+  // Inicializar collectionsManager solo si el usuario está autenticado
+  if (isAuthenticated) {
+    const collectionsManager = new Collections();
+    window.collectionsManager = collectionsManager;
+    window.dispatchEvent(new CustomEvent("collectionsManagerReady"));
   }
+
+  // Modificar el CTA del banner según el estado de autenticación
+  const ctaButton = document.querySelector(".cta-button");
+  if (ctaButton) {
+    if (isAuthenticated) {
+      ctaButton.href = "comics.html";
+      ctaButton.innerHTML = `
+        <i class="fas fa-book-open"></i>
+        <span>Explorar Comics</span>
+      `;
+    } else {
+      ctaButton.href = "register.html";
+      ctaButton.innerHTML = `
+        <i class="fas fa-rocket"></i>
+        <span>¡Únete Ahora!</span>
+      `;
+    }
+  }
+
+  // Modificar los enlaces de las feature cards según autenticación
+  const featureCards = document.querySelectorAll('.feature-card');
+  featureCards.forEach(card => {
+    const originalHref = card.getAttribute('href');
+    if (!isAuthenticated) {
+      card.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'login.html';
+      });
+    }
+  });
 });
 
 // Función para cerrar sesión

@@ -2,7 +2,7 @@
  * Utilidades generales para la aplicación
  * Proporciona funciones auxiliares reutilizables
  */
-const Utils = {
+class Utils {
   /**
    * Genera un hash MD5 para autenticación con la API de Marvel
    * La API requiere un hash específico para validar las peticiones
@@ -12,9 +12,9 @@ const Utils = {
    * @param {string} publicKey - Clave pública de la API
    * @returns {string} Hash MD5 generado
    */
-  generateMarvelHash(timestamp, privateKey, publicKey) {
+  static generateMarvelHash(timestamp, privateKey, publicKey) {
     return CryptoJS.MD5(timestamp + privateKey + publicKey).toString();
-  },
+  }
 
   /**
    * Trunca un texto a una longitud máxima añadiendo "..."
@@ -24,12 +24,12 @@ const Utils = {
    * @param {number} maxLength - Longitud máxima deseada
    * @returns {string} Texto truncado con elipsis si es necesario
    */
-  truncateText(text, maxLength) {
+  static truncateText(text, maxLength) {
     if (!text) return "";
     return text.length > maxLength
       ? text.substring(0, maxLength) + "..."
       : text;
-  },
+  }
 
   /**
    * Implementa el patrón debounce para limitar la frecuencia de llamadas
@@ -39,7 +39,7 @@ const Utils = {
    * @param {number} wait - Tiempo de espera en milisegundos
    * @returns {Function} Función con debounce aplicado
    */
-  debounce(func, wait) {
+  static debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
       const later = () => {
@@ -49,7 +49,7 @@ const Utils = {
       clearTimeout(timeout);
       timeout = setTimeout(later, wait);
     };
-  },
+  }
 
   /**
    * Realiza una copia profunda de un objeto
@@ -58,9 +58,9 @@ const Utils = {
    * @param {Object} obj - Objeto a clonar
    * @returns {Object} Copia profunda del objeto
    */
-  deepClone(obj) {
+  static deepClone(obj) {
     return JSON.parse(JSON.stringify(obj));
-  },
+  }
 
   /**
    * Formatea una fecha ISO a formato legible
@@ -69,9 +69,10 @@ const Utils = {
    * @param {string} dateString - Fecha en formato ISO
    * @returns {string} Fecha formateada según la localización
    */
-  formatDate(dateString) {
-    return new Date(dateString).toLocaleDateString();
-  },
+  static formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
+  }
 
   /**
    * Genera un ID único combinando timestamp y número aleatorio
@@ -79,40 +80,46 @@ const Utils = {
    *
    * @returns {string} ID único en base36
    */
-  generateUniqueId() {
+  static generateUniqueId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
-  },
+  }
 
-  getCollectionCounts(collections) {
-    const counts = {
-      mock: {},
-      api: {},
+  static getCollectionCounts(collections) {
+    if (!collections) return { mock: {}, api: {} };
+    
+    return {
+      mock: Utils.getSourceCounts(collections.mock || {}),
+      api: Utils.getSourceCounts(collections.api || {})
     };
+  }
 
-    // Count for each source and collection
-    ["mock", "api"].forEach((source) => {
-      ["wishlist", "toread", "reading", "read", "collections"].forEach(
-        (collection) => {
-          counts[source][collection] =
-            collections[source][collection]?.length || 0;
-        }
-      );
+  static getSourceCounts(sourceCollections) {
+    const counts = {};
+    Object.keys(sourceCollections).forEach(collection => {
+      counts[collection] = Array.isArray(sourceCollections[collection]) 
+        ? sourceCollections[collection].length 
+        : 0;
     });
-
     return counts;
-  },
+  }
 
-  getUniqueComicsCount(collections) {
-    // Get all comic IDs from all collections
-    const allIds = [];
-    ["mock", "api"].forEach((source) => {
-      Object.values(collections[source]).forEach((collectionIds) => {
-        allIds.push(...collectionIds);
-      });
+  static getUniqueComicsCount(collections) {
+    if (!collections) return 0;
+    
+    const source = localStorage.getItem('dataSourcePreference') || 'mock';
+    if (!collections[source]) return 0;
+    
+    const uniqueComics = new Set();
+    
+    Object.values(collections[source]).forEach(collectionArray => {
+      if (Array.isArray(collectionArray)) {
+        collectionArray.forEach(comicId => uniqueComics.add(comicId));
+      }
     });
+    
+    return uniqueComics.size;
+  }
+}
 
-    // Filter unique IDs
-    const uniqueIds = [...new Set(allIds)];
-    return uniqueIds.length;
-  },
-};
+// Exportar la clase Utils para uso global
+window.Utils = Utils;

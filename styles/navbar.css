@@ -335,3 +335,81 @@ main {
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+
+/* Estilos para los enlaces de autenticación */
+.auth-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.auth-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--secondary-color);
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.auth-link:hover {
+  color: var(--primary-color);
+  background-color: rgba(226, 54, 54, 0.1);
+}
+
+.auth-link.register {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+.auth-link.register:hover {
+  background-color: var(--hover-red);
+  color: var(--white);
+}
+
+/* Ajustes responsive */
+@media (max-width: 768px) {
+  .auth-section {
+    flex-direction: column;
+    width: 100%;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .auth-link {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.nav-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .nav-right .auth-section {
+    display: none;
+  }
+
+  .nav-menu.active .auth-section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+}

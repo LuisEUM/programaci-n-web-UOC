@@ -35,7 +35,19 @@ class Navbar {
   renderDataStatus() {
     const dataStatus = document.createElement("div");
     dataStatus.className = "data-status-bar";
-    dataStatus.innerHTML = `
+    const isAuthenticated =
+      localStorage.getItem("userToken") && localStorage.getItem("userName");
+
+    if (!isAuthenticated) {
+      dataStatus.innerHTML = `
+      <div class="data-status-container">
+        <button class="data-status-toggle hide">
+         <p>IMPORTANTE: Aquí tendremos un botón que permitirá cambiar la fuente de datos dentro de la aplicación</p>
+        </button>
+      </div>
+    `;
+    } else {
+      dataStatus.innerHTML = `
       <div class="data-status-container">
         <button class="data-status-toggle ${
           Config.USE_MOCK_DATA ? "" : "api-mode"
@@ -49,6 +61,8 @@ class Navbar {
         </button>
       </div>
     `;
+    }
+
     document.body.insertBefore(dataStatus, document.body.firstChild);
 
     // Añadir evento de click al botón
@@ -58,63 +72,85 @@ class Navbar {
 
   toggleDataSource() {
     const isUsingMock = Config.toggleDataSource();
-    // Actualizar el texto del botón
-    const toggleButton = document.querySelector(".data-status-toggle");
-    const statusText = toggleButton.querySelector(".data-status-text");
+    localStorage.setItem("dataSourcePreference", isUsingMock ? "mock" : "api");
 
-    if (toggleButton) {
-      toggleButton.classList.toggle("api-mode", !isUsingMock);
-      statusText.textContent = isUsingMock
-        ? "Usando Data Mockeada"
-        : "Usando Data de la API";
-    }
+    // Obtener la URL actual y mantener sus parámetros existentes
+    const currentUrl = new URL(window.location.href);
 
-    // Disparar un evento personalizado para notificar el cambio
-    window.dispatchEvent(
-      new CustomEvent("dataSourceChanged", {
-        detail: { isUsingMock },
-      })
-    );
+    // Recargar la página manteniendo la URL actual
+    window.location.href = currentUrl.toString();
   }
 
   renderNavbar() {
+    const isAuthenticated =
+      localStorage.getItem("userToken") && localStorage.getItem("userName");
     const navbar = document.createElement("nav");
     navbar.className = "navbar";
-    navbar.innerHTML = `
-      <div class="logo">
-        <a href="home.html" title="Ir a inicio">
-          <img src="images/marvel.svg" alt="Marvel Logo" class="marvel-logo">
-        </a>
-      </div>
-      <button class="hamburger-menu">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-      <div class="nav-menu">
-        <div class="nav-links">
-          <a href="comics.html" class="nav-link ${
-            window.location.pathname.includes("comics") ? "active" : ""
-          }">Comics</a>
-          <a href="heroes.html" class="nav-link ${
-            window.location.pathname.includes("heroes") ? "active" : ""
-          }">Héroes</a>
-          <a href="collections.html" class="nav-link ${
-            window.location.pathname.includes("collections") ? "active" : ""
-          }">Colecciones - </a>
+
+    if (!isAuthenticated) {
+      navbar.innerHTML = `
+        <div class="nav-content">
+          <div class="logo">
+            <a href="home.html" title="Ir a inicio">
+              <img src="images/marvel.svg" alt="Marvel Logo" class="marvel-logo">
+            </a>
+          </div>
+          <div class="nav-right">
+            <div class="auth-section">
+              <a href="login.html" class="auth-link">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Ingresar</span>
+              </a>
+              <a href="register.html" class="auth-link register">
+                <i class="fas fa-user-plus"></i>
+                <span>Registrarse</span>
+              </a>
+            </div>
+            <button class="hamburger-menu">
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          </div>
         </div>
-        <div class="user-section">
-          <span class="username">
-            <i class="fas fa-user"></i>
-            Hola, ${this.username}
-          </span>
-          <button class="logout-button" aria-label="Logout">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
-          </button>
+      `;
+    } else {
+      navbar.innerHTML = `
+        <div class="logo">
+          <a href="home.html" title="Ir a inicio">
+            <img src="images/marvel.svg" alt="Marvel Logo" class="marvel-logo">
+          </a>
         </div>
-      </div>
-    `;
+        <button class="hamburger-menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="nav-menu">
+          <div class="nav-links">
+            <a href="comics.html" class="nav-link ${
+              window.location.pathname.includes("comics") ? "active" : ""
+            }">Comics</a>
+            <a href="heroes.html" class="nav-link ${
+              window.location.pathname.includes("heroes") ? "active" : ""
+            }">Héroes</a>
+            <a href="collections.html" class="nav-link ${
+              window.location.pathname.includes("collections") ? "active" : ""
+            }">Colecciones - </a>
+          </div>
+          <div class="user-section">
+            <span class="username">
+              <i class="fas fa-user"></i>
+              Hola, ${this.username}
+            </span>
+            <button class="logout-button" aria-label="Logout">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }
 
     document.body.insertBefore(navbar, document.body.children[1]);
   }
