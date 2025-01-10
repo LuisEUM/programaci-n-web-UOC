@@ -1,22 +1,38 @@
-// Al inicio del archivo, importar los datos mock
+/**
+ * Controlador para la página de colecciones (collections.js)
+ * Este controlador maneja la gestión de colecciones de cómics, incluyendo:
+ * - Visualización de colecciones
+ * - Movimiento de cómics entre colecciones
+ * - Clonación de cómics
+ * - Eliminación de cómics de colecciones
+ * - Integración con modo mock/API
+ */
+
+// Variables globales para gestión de datos
 let mockComicsData;
 let collectionsManager;
 
-// Función para cargar los datos mock
+/**
+ * Carga los datos mock desde la configuración
+ * Se utiliza cuando la aplicación está en modo mock
+ */
 async function loadMockData() {
   try {
-    // Usar directamente los datos de Config.MOCK_DATA
     mockComicsData = { comics: Config.MOCK_DATA.comics };
   } catch (error) {
     console.error("Error loading mock data:", error);
   }
 }
 
-// Función para actualizar contadores
+/**
+ * Actualiza los contadores de cómics en cada colección
+ * Se ejecuta después de cada operación que modifica las colecciones
+ */
 function updateCollectionCounts() {
   const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
   const tabButtons = document.querySelectorAll(".tab-btn");
 
+  // Actualizar contador en cada pestaña
   tabButtons.forEach((button) => {
     const collection = button.dataset.collection;
     const collections =
@@ -28,39 +44,43 @@ function updateCollectionCounts() {
   });
 }
 
+// Inicialización del controlador
 document.addEventListener("DOMContentLoaded", async function () {
-  // Verificar autenticación
+  // Verificar autenticación del usuario
   const userToken = localStorage.getItem("userToken");
   const userName = localStorage.getItem("userName");
 
+  // Redirigir si no hay sesión activa
   if (!userToken || !userName) {
     window.location.href = "login.html";
     return;
   }
 
-  // Cargar datos mock primero si estamos en modo mock
+  // Cargar datos mock si es necesario
   if (Config.USE_MOCK_DATA) {
     await loadMockData();
   }
 
-  // Inicializar manejador de colecciones
+  // Inicializar y exponer el gestor de colecciones
   collectionsManager = new Collections();
-  window.collectionsManager = collectionsManager; // Make it globally available
-
-  // Dispatch event to notify collectionsManager is ready
+  window.collectionsManager = collectionsManager;
   window.dispatchEvent(new CustomEvent("collectionsManagerReady"));
 
   const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
 
-  // Cargar colecciones iniciales (Lista de Deseos por defecto)
+  // Cargar colección inicial (Lista de Deseos)
   loadCollections("wishlist", collectionsManager);
 
-  // Event Listeners
+  // Configurar listeners de eventos
   setupEventListeners(collectionsManager);
 });
 
+/**
+ * Configura todos los event listeners necesarios
+ * @param {Collections} collectionsManager - Instancia del gestor de colecciones
+ */
 function setupEventListeners(collectionsManager) {
-  // Logout
+  // Configurar botón de cierre de sesión
   const logoutButton = document.querySelector(".logout-button");
   logoutButton.addEventListener("click", function () {
     localStorage.removeItem("userToken");
@@ -68,35 +88,40 @@ function setupEventListeners(collectionsManager) {
     window.location.href = "login.html";
   });
 
-  // Update counts initially
+  // Inicializar contadores
   updateCollectionCounts();
 
-  // Listen for collection updates
+  // Escuchar actualizaciones de colecciones
   window.addEventListener("collectionsUpdated", updateCollectionCounts);
 
-  // Tabs
+  // Configurar navegación por pestañas
   const tabButtons = document.querySelectorAll(".tab-btn");
   tabButtons.forEach((button) => {
     button.addEventListener("click", async function () {
-      // Actualizar estado activo de los tabs
+      // Actualizar estado visual de las pestañas
       tabButtons.forEach((btn) => btn.classList.remove("active"));
       this.classList.add("active");
 
-      // Asegurarse de que los datos mock estén cargados si es necesario
+      // Asegurar datos mock si es necesario
       if (Config.USE_MOCK_DATA && !mockComicsData) {
         await loadMockData();
       }
 
-      // Cargar colecciones de la colección seleccionada
+      // Cargar colección seleccionada
       const collection = this.dataset.collection;
       loadCollections(collection, collectionsManager);
 
-      // Update counts after loading
+      // Actualizar contadores
       updateCollectionCounts();
     });
   });
 }
 
+/**
+ * Carga y muestra los cómics de una colección específica
+ * @param {string} collection - Nombre de la colección a cargar
+ * @param {Collections} collectionsManager - Instancia del gestor de colecciones
+ */
 async function loadCollections(collection, collectionsManager) {
   const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
   const collectionsGrid = document.querySelector(".collections-grid");
@@ -105,38 +130,40 @@ async function loadCollections(collection, collectionsManager) {
   );
 
   try {
-    // Obtener los IDs de los cómics de la colección
+    // Obtener IDs de cómics en la colección
     const collections =
       collectionsManager.getAllCollections(dataSource)[collection] || [];
 
-    // Limpiar grid
+    // Limpiar grid existente
     collectionsGrid.innerHTML = "";
 
+    // Mostrar mensaje si la colección está vacía
     if (collections.length === 0) {
       collectionsGrid.style.display = "none";
       noCollectionsMessage.style.display = "block";
       return;
     }
 
+    // Configurar visualización del grid
     collectionsGrid.style.display = "grid";
     noCollectionsMessage.style.display = "none";
 
-    // Cargar los datos completos de los cómics
+    // Cargar y mostrar cada cómic
     for (const comicId of collections) {
       try {
         let comic;
         if (Config.USE_MOCK_DATA) {
-          // Buscar en los datos mock
+          // Buscar en datos mock
           comic = mockComicsData?.comics?.find(
             (c) => c.id === parseInt(comicId)
           );
         } else {
-          // Obtener datos de la API
+          // Obtener de la API
           comic = await MarvelAPI.getComicById(parseInt(comicId));
         }
 
         if (comic) {
-          // Transformar los datos del cómic al formato necesario
+          // Formatear datos del cómic
           const formattedComic = {
             id: comic.id,
             title: comic.title || "Sin título",
@@ -148,6 +175,7 @@ async function loadCollections(collection, collectionsManager) {
             series: comic.series || "Serie no disponible",
           };
 
+          // Crear y añadir tarjeta del cómic
           const card = createComicCard(
             formattedComic,
             collection,
@@ -169,21 +197,29 @@ async function loadCollections(collection, collectionsManager) {
   }
 }
 
+/**
+ * Crea una tarjeta visual para un cómic
+ * @param {Object} comic - Datos del cómic
+ * @param {string} currentCollection - Colección actual del cómic
+ * @param {Collections} collectionsManager - Instancia del gestor de colecciones
+ * @returns {HTMLElement} Elemento DOM de la tarjeta
+ */
 function createComicCard(comic, currentCollection, collectionsManager) {
   const card = document.createElement("div");
   card.className = "comic-card";
   card.dataset.id = comic.id;
 
-  // Asegurarse de que el precio sea un número válido
+  // Formatear datos del cómic
   const price =
     typeof comic.price === "number" ? comic.price.toFixed(2) : "0.00";
   const description = comic.description || "Sin descripción disponible";
   const series = comic.series || "Serie no disponible";
 
-  // Imagen de respaldo en base64 (un placeholder gris simple)
+  // Imagen de respaldo para cómics sin imagen
   const fallbackImage =
     "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2VlZWVlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM5OTk5OTkiPkltYWdlbiBubyBkaXNwb25pYmxlPC90ZXh0Pjwvc3ZnPg==";
 
+  // Construir estructura HTML de la tarjeta
   card.innerHTML = `
     <div class="comic-image">
       <img src="${comic.image || fallbackImage}" alt="${
@@ -223,19 +259,31 @@ function createComicCard(comic, currentCollection, collectionsManager) {
   return card;
 }
 
-// Función para mover un cómic a otra colección
+/**
+ * Abre el modal para mover un cómic a otra colección
+ * @param {string|number} comicId - ID del cómic a mover
+ * @param {string} currentCollection - Colección actual del cómic
+ */
 function moveToCollection(comicId, currentCollection) {
   const modal = new CollectionModal();
   modal.open("move", comicId, currentCollection);
 }
 
-// Función para clonar un cómic a otra colección
+/**
+ * Abre el modal para clonar un cómic a otra colección
+ * @param {string|number} comicId - ID del cómic a clonar
+ * @param {string} currentCollection - Colección actual del cómic
+ */
 function cloneToCollection(comicId, currentCollection) {
   const modal = new CollectionModal();
   modal.open("clone", comicId, currentCollection);
 }
 
-// Función para remover un cómic de una colección
+/**
+ * Elimina un cómic de una colección
+ * @param {string|number} comicId - ID del cómic a eliminar
+ * @param {string} collection - Colección de la que eliminar
+ */
 function removeFromCollection(comicId, collection) {
   const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
 
@@ -259,7 +307,11 @@ function removeFromCollection(comicId, collection) {
   }
 }
 
-// Función para manejar la selección de colección en el modal
+/**
+ * Maneja la selección de una colección en el modal
+ * Permite mover o clonar un cómic entre colecciones
+ * @param {string} targetCollection - Colección destino para el cómic
+ */
 function handleModalSelection(targetCollection) {
   const modal = document.getElementById("collectionModal");
   const comicId = modal.dataset.comicId;
@@ -284,6 +336,11 @@ function handleModalSelection(targetCollection) {
   loadCollections(currentCollection, collectionsManager);
 }
 
+/**
+ * Muestra un mensaje toast en la interfaz
+ * @param {string} message - Mensaje a mostrar
+ * @param {string} type - Tipo de mensaje (info, success, error)
+ */
 function showToast(message, type = "info") {
   const toast = document.createElement("div");
   toast.className = `toast ${type}`;

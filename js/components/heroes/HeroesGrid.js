@@ -183,46 +183,38 @@ class HeroesGrid {
         } else {
           const { params: apiParams, hasLocalFilters } =
             this.getAPIFilterParams();
+
+          // Parámetros base para la API
           const searchParams = {
+            limit: this.itemsPerPage,
             offset: offset,
-            limit: hasLocalFilters ? 100 : this.itemsPerPage,
             ...apiParams,
           };
 
+          console.log("Requesting heroes with params:", searchParams);
           const response = await MarvelAPI.getHeroes(searchParams);
+
           // Verificar después de cada operación asíncrona
           if (searchId !== this.lastSearchId) return;
 
-          heroesData = response.data;
-
-          if (hasLocalFilters) {
-            const allResults = [];
-            let currentOffset = 0;
-            let totalResults = heroesData.total;
-
-            while (currentOffset < totalResults && currentOffset < 1000) {
-              if (currentOffset > 0) {
-                const nextResponse = await MarvelAPI.getHeroes({
-                  ...searchParams,
-                  offset: currentOffset,
-                });
-                // Verificar después de cada operación asíncrona
-                if (searchId !== this.lastSearchId) return;
-
-                allResults.push(...nextResponse.data.results);
-              } else {
-                allResults.push(...heroesData.results);
-              }
-              currentOffset += searchParams.limit;
-            }
-
-            const filteredResults = this.applyLocalFilters(allResults);
+          // Manejar los resultados según el tipo de filtro
+          if (Object.keys(this.currentFilters).length === 0) {
+            // Sin filtros: usar paginación de la API directamente
             heroesData = {
-              results: filteredResults.slice(
-                offset,
-                offset + this.itemsPerPage
-              ),
-              total: filteredResults.length,
+              results: response.data.results,
+              total: response.data.total,
+            };
+          } else {
+            // Con cualquier tipo de filtro
+            const filteredResults = this.applyLocalFilters(response.data.results);
+            
+            // Calcular el offset y limit para la paginación local
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            const end = start + this.itemsPerPage;
+            
+            heroesData = {
+              results: filteredResults.slice(start, end),
+              total: filteredResults.length
             };
           }
         }
@@ -277,6 +269,8 @@ class HeroesGrid {
           '<div class="error">Error al cargar los héroes. Por favor, intenta de nuevo más tarde.</div>';
         window.showToast("Error al cargar los héroes", "error");
       }
+    } finally {
+      Spinner.hide();
     }
   }
 

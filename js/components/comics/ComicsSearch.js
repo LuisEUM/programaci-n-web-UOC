@@ -1,4 +1,16 @@
+/**
+ * Clase para la búsqueda y filtrado de cómics (ComicsSearch.js)
+ * Esta clase maneja la funcionalidad de búsqueda y filtrado, incluyendo:
+ * - Gestión de filtros por nombre, ID, héroe y precio
+ * - Manejo de parámetros de URL para filtros iniciales
+ * - Integración con sistema de badges para filtros activos
+ * - Actualización dinámica de resultados
+ */
 class ComicsSearch {
+  /**
+   * Constructor de la clase ComicsSearch
+   * @param {HTMLElement} filterBadgesContainer - Contenedor para los badges de filtros
+   */
   constructor(filterBadgesContainer) {
     this.filterBadges = new FilterBadges(
       filterBadgesContainer,
@@ -8,6 +20,10 @@ class ComicsSearch {
     this.checkUrlParameters();
   }
 
+  /**
+   * Verifica y procesa los parámetros de URL para establecer filtros iniciales
+   * Prioridad de procesamiento: ID > héroe > precio > nombres
+   */
   async checkUrlParameters() {
     const urlParams = new URLSearchParams(window.location.search);
     const initialFilters = {};
@@ -57,8 +73,10 @@ class ComicsSearch {
     }
   }
 
+  /**
+   * Configura los event listeners para los botones de filtrado
+   */
   setupEventListeners() {
-    // Event Listeners para los filtros
     document
       .querySelector("#searchByNameBtn")
       .addEventListener("click", () => this.handleSearchByName());
@@ -73,6 +91,10 @@ class ComicsSearch {
       .addEventListener("click", () => this.handlePriceFilter());
   }
 
+  /**
+   * Maneja la búsqueda por nombre
+   * Elimina el filtro anterior si existe y añade el nuevo
+   */
   handleSearchByName() {
     const searchInput = document.querySelector("#searchByName");
     const searchTerm = searchInput.value.trim();
@@ -82,16 +104,17 @@ class ComicsSearch {
       return;
     }
 
-    // Eliminar filtro de nombre anterior si existe
     this.filterBadges.removeFilter("name");
-
-    // Añadir el nuevo filtro de nombre
     this.filterBadges.addFilter("name", searchTerm, `Nombre: ${searchTerm}`);
 
     searchInput.value = "";
     this.applyAllFilters();
   }
 
+  /**
+   * Maneja la búsqueda por ID
+   * Valida que el ID sea un número válido
+   */
   handleSearchById() {
     const searchInput = document.querySelector("#searchById");
     const comicId = parseInt(searchInput.value);
@@ -106,6 +129,10 @@ class ComicsSearch {
     this.applyAllFilters();
   }
 
+  /**
+   * Maneja el filtrado por precio máximo
+   * Valida que el precio sea un número válido
+   */
   handlePriceFilter() {
     const priceInput = document.querySelector("#priceFilter");
     const maxPrice = parseFloat(priceInput.value);
@@ -124,6 +151,10 @@ class ComicsSearch {
     this.applyAllFilters();
   }
 
+  /**
+   * Maneja la búsqueda por ID de héroe
+   * Valida que el ID sea un número válido
+   */
   handleSearchByHero() {
     const searchInput = document.querySelector("#searchByHero");
     const heroId = parseInt(searchInput.value);
@@ -138,6 +169,11 @@ class ComicsSearch {
     this.applyAllFilters();
   }
 
+  /**
+   * Maneja la eliminación de filtros
+   * Si se eliminan todos los filtros, limpia todos los inputs
+   * @param {string} type - Tipo de filtro a eliminar ('all' para todos)
+   */
   handleRemoveFilter(type) {
     if (type === "all") {
       document.querySelector("#searchByName").value = "";
@@ -152,6 +188,10 @@ class ComicsSearch {
     }
   }
 
+  /**
+   * Aplica todos los filtros activos y actualiza la vista
+   * Emite un evento con los resultados filtrados
+   */
   applyAllFilters() {
     const activeFilters = this.filterBadges.getActiveFilters();
 

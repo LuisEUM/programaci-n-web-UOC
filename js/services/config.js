@@ -1,29 +1,65 @@
 /**
- * Configuración global de la aplicación
- * Centraliza las constantes y parámetros de configuración
+ * Configuración global de la aplicación.
+ * Centraliza las constantes y parámetros de configuración.
+ * @namespace
  */
 const Config = {
-  // Endpoints y credenciales de la API de Marvel
+  /**
+   * URL base de la API de Marvel.
+   * @type {string}
+   * @constant
+   */
   MARVEL_API_BASE_URL: "https://gateway.marvel.com/v1/public",
+
+  /**
+   * Clave pública para autenticación con la API de Marvel.
+   * @type {string}
+   * @constant
+   */
   MARVEL_PUBLIC_KEY: "62c23e58785b432461842c6800f13478",
+
+  /**
+   * Clave privada para autenticación con la API de Marvel.
+   * @type {string}
+   * @constant
+   * @private
+   */
   MARVEL_PRIVATE_KEY: "4393a98a10f9c5a4f60b45a8eb2faf4453e8bc42",
 
-  // Modo de datos mock para desarrollo y pruebas
+  /**
+   * Flag que determina si se usan datos mock o la API real.
+   * @type {boolean}
+   */
   USE_MOCK_DATA: true,
 
-  // Configuración de paginación
+  /**
+   * Límite de elementos por página para paginación.
+   * @type {number}
+   * @constant
+   */
   LIMIT: 10,
 
-  // Colecciones predeterminadas para organizar cómics
+  /**
+   * Colecciones predeterminadas para organizar cómics.
+   * @type {Array<string>}
+   * @constant
+   */
   DEFAULT_COLLECTIONS: ["general", "reading", "wishlist"],
 
-  // Inicializar la configuración de la fuente de datos
+  /**
+   * Inicializa la configuración de la fuente de datos.
+   * Lee la preferencia almacenada en localStorage.
+   */
   init() {
     const storedPreference = localStorage.getItem("dataSourcePreference");
     this.USE_MOCK_DATA = storedPreference ? storedPreference === "mock" : true;
   },
 
-  // Cambiar la fuente de datos y persistir la preferencia
+  /**
+   * Cambia la fuente de datos entre mock y API.
+   * Persiste la preferencia en localStorage.
+   * @returns {boolean} Nuevo estado de USE_MOCK_DATA
+   */
   toggleDataSource() {
     this.USE_MOCK_DATA = !this.USE_MOCK_DATA;
     localStorage.setItem(
@@ -33,6 +69,15 @@ const Config = {
     return this.USE_MOCK_DATA;
   },
 
+  /**
+   * Datos mock para desarrollo y pruebas.
+   * @type {Object}
+   * @property {Array<Object>} comics - Lista de cómics mock
+   * @property {Array<Object>} heroes - Lista de héroes mock
+   * @property {Object} location - Datos de ubicación
+   * @property {Object} testUser - Usuario de prueba
+   * @property {Object} loginTestUser - Usuario de prueba para login
+   */
   MOCK_DATA: {
     comics: [
       {

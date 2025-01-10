@@ -71,26 +71,58 @@ class ComicsGrid {
         } else {
           // Búsqueda normal con filtros
           const { params, hasLocalFilters } = this.getAPIFilterParams();
-          const apiParams = {
-            offset: 0, // Traer más resultados cuando hay filtro de nombre
-            limit: this.currentFilters.name ? 100 : this.itemsPerPage,
-            ...params,
-          };
 
-          const response = await MarvelAPI.getComics(apiParams);
-          comicsData = response.data;
-          comicsData.results = comicsData.results.map((comic) =>
-            Comic.fromAPI(comic)
-          );
-
-          // Aplicar filtrado local si hay filtro de nombre o precio
+          // Si hay filtros locales o de nombre
           if (hasLocalFilters || this.currentFilters.name) {
-            comicsData.results = this.applyLocalFilters(comicsData.results);
-            comicsData.total = comicsData.results.length;
+            // Reducir el límite para mejorar el rendimiento
+            const apiParams = {
+              offset: 0,
+              limit: 20, // Reducido de 100 a 20
+              ...params,
+            };
 
+            // Añadir el filtro de nombre directamente en la API si es posible
+            if (this.currentFilters.name && !hasLocalFilters) {
+              apiParams.titleStartsWith = this.currentFilters.name.value;
+            }
+
+            const response = await MarvelAPI.getComics(apiParams);
+            let filteredResults = response.data.results.map((comic) =>
+              Comic.fromAPI(comic)
+            );
+
+            // Solo aplicar filtros locales si es necesario
+            if (hasLocalFilters) {
+              filteredResults = this.applyLocalFilters(filteredResults);
+            }
+
+            // Paginación local
             const startIndex = (this.currentPage - 1) * this.itemsPerPage;
             const endIndex = startIndex + this.itemsPerPage;
-            comicsData.results = comicsData.results.slice(startIndex, endIndex);
+
+            comicsData = {
+              results: filteredResults.slice(startIndex, endIndex),
+              total: filteredResults.length,
+            };
+          } else {
+            // Sin filtros locales, usar paginación de la API
+            const apiParams = {
+              offset: (this.currentPage - 1) * this.itemsPerPage,
+              limit: this.itemsPerPage,
+              orderBy: "title", // Añadimos ordenamiento consistente
+              ...params,
+            };
+
+            console.log("Requesting API with params:", apiParams); // Debug
+            const response = await MarvelAPI.getComics(apiParams);
+            console.log("API Response:", response.data); // Debug
+
+            comicsData = {
+              results: response.data.results.map((comic) =>
+                Comic.fromAPI(comic)
+              ),
+              total: response.data.total,
+            };
           }
         }
       }
@@ -212,19 +244,17 @@ class ComicsGrid {
 
   getAPIFilterParams() {
     const params = {};
+    let hasLocalFilters = false;
 
-    // Buscar filtro de nombre
-    if (this.currentFilters.name) {
+    // Verificar filtros que requieren procesamiento local
+    if (this.currentFilters.price) {
+      hasLocalFilters = true;
+    }
+
+    // Añadir filtros que la API puede manejar
+    if (this.currentFilters.name && !hasLocalFilters) {
       params.titleStartsWith = this.currentFilters.name.value;
     }
-
-    // Solo incluir ID en los parámetros si hay otros filtros activos
-    if (this.currentFilters.id) {
-      params.id = this.currentFilters.id.value;
-    }
-
-    // Nota: El filtro de precio se aplicará después ya que la API no soporta filtro por precio
-    const hasLocalFilters = this.currentFilters.price;
 
     return { params, hasLocalFilters };
   }

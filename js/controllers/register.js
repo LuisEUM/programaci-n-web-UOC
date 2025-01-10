@@ -1,75 +1,93 @@
+/**
+ * Controlador para la página de registro (register.js)
+ * Este controlador maneja el proceso de registro de usuarios, incluyendo:
+ * - Validación en tiempo real de campos
+ * - Gestión de datos geográficos de España
+ * - Verificación de disponibilidad de usuario
+ * - Manejo de datos de prueba
+ * - UI/UX mejorada con feedback visual
+ */
+
 document.addEventListener("DOMContentLoaded", async function () {
-  // Verificar si el usuario ya está logueado
+  // Verificar si existe una sesión activa
   const userToken = localStorage.getItem("userToken");
   const userName = localStorage.getItem("userName");
 
+  // Redirigir si ya hay una sesión activa
   if (userToken && userName) {
     window.location.href = "comics.html";
     return;
   }
 
+  // Variables para almacenar datos geográficos
   let codigosPostales = {};
   let comunidadesData = {};
 
-  // Agregar botón de validación de usuario
+  // Configuración del campo de usuario con validación
   const usuarioInput = document.getElementById("usuario");
   const usuarioGroup = usuarioInput.closest(".input-group");
+
+  // Crear botón de verificación de usuario
   const checkUserButton = document.createElement("button");
   checkUserButton.type = "button";
   checkUserButton.className = "check-user-btn";
   checkUserButton.textContent = "Verificar";
 
-  // Crear contenedor para el campo de usuario y sus elementos
+  // Crear estructura del contenedor de usuario
   const usuarioField = document.querySelector(".input-group:has(#usuario)");
   const usuarioContainer = document.createElement("div");
   usuarioContainer.className = "usuario-container";
 
-  // Crear wrapper para el input y el botón
+  // Crear wrapper para input y botón de verificación
   const inputWrapper = document.createElement("div");
   inputWrapper.className = "input-wrapper";
 
-  // Crear contenedor para el mensaje de validación
+  // Crear contenedor para mensajes de validación
   const validationMessage = document.createElement("div");
   validationMessage.className = "validation-message";
   validationMessage.id = "usuarioValidationMessage";
 
-  // Mover elementos a la nueva estructura
+  // Construir estructura DOM del campo de usuario
   usuarioField.parentNode.insertBefore(usuarioContainer, usuarioField);
   usuarioContainer.appendChild(inputWrapper);
   inputWrapper.appendChild(usuarioField);
   inputWrapper.appendChild(checkUserButton);
   usuarioContainer.appendChild(validationMessage);
 
-  // Agregar iconos de validación a los input groups
+  // Añadir iconos de validación a todos los campos
   document.querySelectorAll(".input-group").forEach((group) => {
-    // Agregar iconos de validación
+    // Crear iconos de éxito y error
     const successIcon = document.createElement("i");
     successIcon.className = "fas fa-check validation-icon success-icon";
     const errorIcon = document.createElement("i");
     errorIcon.className = "fas fa-times validation-icon error-icon";
 
+    // Añadir iconos al grupo
     group.appendChild(successIcon);
     group.appendChild(errorIcon);
   });
 
-  // Agregar clase especial para el campo de contraseña
+  // Configurar estilos especiales para campos específicos
   const passwordGroup = document
     .querySelector("#password")
     .closest(".input-group");
   passwordGroup.classList.add("with-toggle");
-
-  // Agregar clase especial para el campo de usuario
   usuarioGroup.classList.add("with-verification");
 
-  // Función para verificar disponibilidad de usuario
+  /**
+   * Verifica la disponibilidad del nombre de usuario
+   * @param {string} username - Nombre de usuario a verificar
+   * @returns {Promise<boolean>} True si el usuario está disponible
+   */
   async function checkUserAvailability(username) {
     const registeredUsers =
       JSON.parse(localStorage.getItem("registeredUsers")) || [];
     return !registeredUsers.some((user) => user.usuario === username);
   }
 
-  // Evento para detectar cambios en el campo de usuario
+  // Manejar cambios en el campo de usuario
   usuarioInput.addEventListener("input", function () {
+    // Resetear estado del botón y validación
     checkUserButton.disabled = false;
     checkUserButton.textContent = "Verificar";
     const inputGroup = this.closest(".input-group");
@@ -79,7 +97,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.getElementById("usuarioValidationMessage").innerHTML = "";
   });
 
-  // Evento para el botón de verificación de usuario
+  // Manejar verificación de disponibilidad de usuario
   checkUserButton.addEventListener("click", async function () {
     const username = usuarioInput.value.trim();
     const inputGroup = usuarioInput.closest(".input-group");
@@ -87,6 +105,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       "usuarioValidationMessage"
     );
 
+    // Validar campo vacío
     if (!username) {
       inputGroup.classList.remove("success");
       inputGroup.classList.add("error");
@@ -96,11 +115,12 @@ document.addEventListener("DOMContentLoaded", async function () {
       return;
     }
 
+    // Verificar disponibilidad
     const isAvailable = await checkUserAvailability(username);
-
     inputGroup.classList.remove("error", "success");
     validationMessage.className = "validation-message";
 
+    // Actualizar UI según resultado
     if (isAvailable) {
       inputGroup.classList.add("success");
       validationMessage.className = "validation-message success";
@@ -116,27 +136,16 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   });
 
-  // Botón de usuario de prueba
+  // Configurar botón de datos de prueba
   const testUserButton = document.getElementById("testUserButton");
   if (testUserButton) {
     testUserButton.addEventListener("click", function () {
       try {
+        // Obtener datos de prueba de la configuración
         const testUser = Config.MOCK_DATA.testUser;
 
-        // Rellenar los campos con los datos de prueba
-        document.getElementById("nombre").value = testUser.nombre;
-        document.getElementById("apellidos").value = testUser.apellidos;
-        document.getElementById("pais").value = testUser.pais;
-        document.getElementById("comunidadAutonoma").value =
-          testUser.comunidadAutonoma;
-        document.getElementById("codigoPostal").value = testUser.codigoPostal;
-        document.getElementById("direccion").value = testUser.direccion;
-        document.getElementById("email").value = testUser.email;
-        document.getElementById("usuario").value = testUser.usuario;
-        document.getElementById("password").value = testUser.password;
-
-        // Disparar eventos para validar los campos
-        [
+        // Rellenar formulario con datos de prueba
+        const fields = [
           "nombre",
           "apellidos",
           "pais",
@@ -146,8 +155,13 @@ document.addEventListener("DOMContentLoaded", async function () {
           "email",
           "usuario",
           "password",
-        ].forEach((fieldId) => {
+        ];
+
+        fields.forEach((fieldId) => {
           const input = document.getElementById(fieldId);
+          input.value = testUser[fieldId];
+
+          // Disparar evento de validación apropiado
           const event =
             input.tagName === "SELECT"
               ? new Event("change")
@@ -163,12 +177,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   }
 
-  // Cargar todos los datos necesarios
+  // Inicializar datos geográficos
   try {
-    // Usar datos directamente desde Config.MOCK_DATA.location.spain
+    // Cargar datos de comunidades autónomas
     const comunidadesData = Config.MOCK_DATA.location.spain.comunidades;
     const select = document.getElementById("comunidadAutonoma");
 
+    // Poblar select de comunidades autónomas
     comunidadesData.forEach((comunidad) => {
       const option = document.createElement("option");
       option.value = comunidad.nombreComunidad;
@@ -176,7 +191,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       select.appendChild(option);
     });
 
-    // Evento para autocompletar código postal cuando se selecciona comunidad
+    // Manejar autocompletado de código postal al seleccionar comunidad
     select.addEventListener("change", function () {
       const codigoPostalInput = document.getElementById("codigoPostal");
       const comunidadSeleccionada = this.value;
@@ -190,7 +205,10 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     });
 
-    // Función para validar código postal
+    /**
+     * Valida el formato y correspondencia del código postal
+     * @param {HTMLInputElement} input - Campo de código postal
+     */
     function validarCodigoPostal(input) {
       const cp = input.value;
       const inputGroup = input.closest(".input-group");
@@ -198,33 +216,38 @@ document.addEventListener("DOMContentLoaded", async function () {
         "cpValidationMessage"
       );
 
-      // Limpiar estados previos
+      // Limpiar estados previos de validación
       inputGroup.classList.remove("error", "success");
       cpValidationMessage.textContent = "";
       cpValidationMessage.className = "validation-message";
 
+      // Validar longitud y formato
       if (cp.length === 5) {
         if (validarCodigoPostalEspanol(cp)) {
           const resultado = encontrarComunidadYProvinciaPorCP(cp);
           if (resultado) {
+            // Código postal válido y encontrado
             select.value = resultado.comunidad;
             inputGroup.classList.add("success");
             cpValidationMessage.className = "validation-message success";
             cpValidationMessage.innerHTML =
               '<i class="fas fa-check"></i> Provincia: ' + resultado.provincia;
           } else {
+            // Código postal no corresponde a ninguna comunidad
             inputGroup.classList.add("error");
             cpValidationMessage.className = "validation-message error";
             cpValidationMessage.innerHTML =
               '<i class="fas fa-times"></i> El código postal no corresponde a ninguna comunidad autónoma';
           }
         } else {
+          // Formato inválido para España
           inputGroup.classList.add("error");
           cpValidationMessage.className = "validation-message error";
           cpValidationMessage.innerHTML =
             '<i class="fas fa-times"></i> Código postal inválido para España';
         }
       } else if (cp.length > 0) {
+        // Longitud incorrecta
         inputGroup.classList.add("error");
         cpValidationMessage.className = "validation-message error";
         cpValidationMessage.innerHTML =
@@ -232,10 +255,10 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     }
 
-    // Evento para validar código postal
+    // Configurar validación en tiempo real del código postal
     const codigoPostalInput = document.getElementById("codigoPostal");
     codigoPostalInput.addEventListener("input", function () {
-      // Validar que solo se ingresen números
+      // Permitir solo dígitos
       if (!/^\d*$/.test(this.value)) {
         this.value = this.value.replace(/\D/g, "");
         return;
@@ -243,10 +266,15 @@ document.addEventListener("DOMContentLoaded", async function () {
       validarCodigoPostal(this);
     });
 
-    // Función para encontrar comunidad y provincia por CP
+    /**
+     * Busca la comunidad y provincia correspondiente a un código postal
+     * @param {string} cp - Código postal a buscar
+     * @returns {Object|null} Objeto con comunidad y provincia o null si no se encuentra
+     */
     function encontrarComunidadYProvinciaPorCP(cp) {
       const cpNum = parseInt(cp, 10);
 
+      // Buscar en datos de comunidades
       for (const comunidad of comunidadesData) {
         for (const provincia of comunidad.provincias) {
           if (cpNum >= provincia.minCP && cpNum <= provincia.maxCP) {
@@ -437,8 +465,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     });
   } catch (error) {
-    console.error("Error cargando datos:", error);
-    showToast("Error cargando datos necesarios", "error");
+    console.error("Error inicializando datos geográficos:", error);
+    showToast("Error cargando datos geográficos", "error");
   }
 
   // Toggle password visibility

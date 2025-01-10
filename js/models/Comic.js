@@ -1,3 +1,13 @@
+/**
+ * Clase que representa un cómic en la aplicación.
+ *
+ * Usos principales:
+ * - ComicsGrid: Para mostrar la lista de cómics y su información
+ * - ComicModal: Para mostrar detalles del cómic en modal
+ * - ComicDetailsModal: Para mostrar información detallada del cómic
+ * - DataService: Para transformar datos de la API
+ * - Collections: Para gestionar cómics en colecciones
+ */
 class Comic {
   #id;
   #title;
@@ -9,6 +19,21 @@ class Comic {
   #creators;
   #characters;
 
+  /**
+   * Crea una nueva instancia de cómic.
+   * Usado en: fromAPI
+   * Estado: Activo y en uso
+   *
+   * @param {number} id - ID único del cómic
+   * @param {string} title - Título del cómic
+   * @param {number} issueNumber - Número de edición
+   * @param {string} description - Descripción del cómic
+   * @param {number} pageCount - Número de páginas
+   * @param {Object} thumbnail - Objeto con información de la imagen
+   * @param {number} price - Precio del cómic
+   * @param {Array} creators - Array de creadores
+   * @param {Array} characters - Array de personajes
+   */
   constructor(
     id,
     title,
@@ -50,47 +75,28 @@ class Comic {
     this.#characters = characters;
   }
 
-  // Getters
-  get id() {
-    return this.#id;
-  }
-  get title() {
-    return this.#title;
-  }
-  get issueNumber() {
-    return this.#issueNumber;
-  }
-  get description() {
-    return this.#description;
-  }
-  get pageCount() {
-    return this.#pageCount;
-  }
-  get thumbnail() {
-    return this.#thumbnail;
-  }
-  get price() {
-    return this.#price;
-  }
-  get creators() {
-    return [...this.#creators];
-  }
-  get characters() {
-    return [...this.#characters];
-  }
-
-  // Setters
-  set price(newPrice) {
-    if (typeof newPrice !== "number" || newPrice < 0)
-      throw new Error("Precio inválido");
-    this.#price = newPrice;
-  }
-
-  // Métodos
+  /**
+   * Obtiene la URL completa de la imagen del cómic.
+   * Usado en: ComicsGrid, ComicModal, ComicDetailsModal
+   * Estado: Activo y en uso
+   *
+   * @returns {string} URL completa de la imagen o imagen por defecto
+   */
   getThumbnailURL() {
-    return `${this.#thumbnail.path}.${this.#thumbnail.extension}`;
+    if (this.#thumbnail && this.#thumbnail.path && this.#thumbnail.extension) {
+      return `${this.#thumbnail.path}.${this.#thumbnail.extension}`;
+    }
+    return "assets/images/default-comic.png";
   }
 
+  /**
+   * Crea una instancia de Comic a partir de datos de la API de Marvel.
+   * Usado en: ComicsGrid, DataService
+   * Estado: Activo y en uso
+   *
+   * @param {Object} apiComic - Datos del cómic en formato API
+   * @returns {Comic} Nueva instancia de Comic
+   */
   static fromAPI(apiComic) {
     // console.log("Raw API Comic:", apiComic); // Debug log
 
@@ -122,4 +128,140 @@ class Comic {
       apiComic.characters?.items?.map((char) => char.name) || []
     );
   }
+
+  /**
+   * Crea una instancia de Comic a partir de datos mock.
+   * Usado en: DataService
+   * Estado: Activo y en uso
+   *
+   * @param {Object} mockComic - Datos del cómic en formato mock
+   * @returns {Comic} Nueva instancia de Comic
+   */
+  static fromMockData(mockComic) {
+    return new Comic(
+      mockComic.id,
+      mockComic.title,
+      mockComic.issueNumber,
+      mockComic.description,
+      mockComic.pageCount,
+      mockComic.thumbnail,
+      mockComic.price,
+      mockComic.creators,
+      mockComic.characters
+    );
+  }
+
+  // Getters
+  /**
+   * Obtiene el ID del cómic.
+   * Usado en: A través de toda la aplicación
+   * Estado: Activo y en uso
+   *
+   * @returns {number} ID del cómic
+   */
+  get id() {
+    return this.#id;
+  }
+
+  /**
+   * Obtiene el título del cómic.
+   * Usado en: A través de toda la aplicación
+   * Estado: Activo y en uso
+   *
+   * @returns {string} Título del cómic
+   */
+  get title() {
+    return this.#title;
+  }
+
+  /**
+   * Obtiene el número de edición del cómic.
+   * Usado en: A través de toda la aplicación
+   * Estado: Activo y en uso
+   *
+   * @returns {number} Número de edición
+   */
+  get issueNumber() {
+    return this.#issueNumber;
+  }
+
+  /**
+   * Obtiene la descripción del cómic.
+   * Usado en: A través de toda la aplicación
+   * Estado: Activo y en uso
+   *
+   * @returns {string} Descripción del cómic
+   */
+  get description() {
+    return this.#description;
+  }
+
+  /**
+   * Obtiene el número de páginas del cómic.
+   * Usado en: A través de toda la aplicación
+   * Estado: Activo y en uso
+   *
+   * @returns {number} Número de páginas
+   */
+  get pageCount() {
+    return this.#pageCount;
+  }
+
+  /**
+   * Obtiene el objeto thumbnail del cómic.
+   * Usado en: A través de toda la aplicación
+   * Estado: Activo y en uso
+   *
+   * @returns {Object} Objeto con información de la imagen
+   */
+  get thumbnail() {
+    return this.#thumbnail;
+  }
+
+  /**
+   * Obtiene el precio del cómic.
+   * Usado en: A través de toda la aplicación
+   * Estado: Activo y en uso
+   *
+   * @returns {number} Precio del cómic
+   */
+  get price() {
+    return this.#price;
+  }
+
+  /**
+   * Establece el precio del cómic.
+   * Usado en: Para actualizar precios
+   * Estado: Activo y en uso
+   *
+   * @param {number} newPrice - Nuevo precio del cómic
+   */
+  set price(newPrice) {
+    if (typeof newPrice !== "number" || newPrice < 0)
+      throw new Error("Precio inválido");
+    this.#price = newPrice;
+  }
+
+  /**
+   * Obtiene los creadores del cómic.
+   * Usado en: A través de toda la aplicación
+   * Estado: Activo y en uso
+   *
+   * @returns {Array} Array de creadores
+   */
+  get creators() {
+    return [...this.#creators];
+  }
+
+  /**
+   * Obtiene los personajes del cómic.
+   * Usado en: A través de toda la aplicación
+   * Estado: Activo y en uso
+   *
+   * @returns {Array} Array de personajes
+   */
+  get characters() {
+    return [...this.#characters];
+  }
 }
+

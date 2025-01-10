@@ -1,26 +1,20 @@
 /**
- * Servicio que maneja la persistencia y recuperación de datos
- * Utiliza localStorage como mecanismo de almacenamiento
+ * Servicio que maneja la persistencia y recuperación de datos.
+ * Actúa como capa intermedia entre la API/datos mock y los componentes.
+ * Proporciona métodos para obtener y gestionar datos de cómics y héroes.
  */
 class DataService {
   /**
-   * Guarda datos en localStorage con encriptación básica
-   * @param {string} key - Clave para identificar los datos
-   * @param {any} data - Datos a almacenar
+   * Obtiene una lista de elementos (cómics o héroes) con paginación y filtros.
+   * @param {string} type - Tipo de elementos a obtener ('comics' o 'heroes')
+   * @param {Object} params - Parámetros de la petición
+   * @param {number} [params.limit=Config.LIMIT] - Límite de resultados por página
+   * @param {number} [params.offset=0] - Número de resultados a saltar
+   * @param {string} [params.titleStartsWith] - Filtro por título (solo para cómics)
+   * @param {string} [params.nameStartsWith] - Filtro por nombre (solo para héroes)
+   * @returns {Promise<Object>} Objeto con resultados y metadata de paginación
+   * @throws {Error} Si hay un error en la petición o el tipo es inválido
    */
-  static save(key, data) {
-    // ... código existente ...
-  }
-
-  /**
-   * Recupera y desencripta datos desde localStorage
-   * @param {string} key - Clave de los datos a recuperar
-   * @returns {any} Datos almacenados o null si no existen
-   */
-  static load(key) {
-    // ... código existente ...
-  }
-
   static async fetchItems(type, params = {}) {
     try {
       let response;
@@ -89,6 +83,13 @@ class DataService {
     }
   }
 
+  /**
+   * Obtiene un elemento específico por su ID.
+   * @param {string} type - Tipo de elemento ('comics' o 'heroes')
+   * @param {number} id - ID del elemento a buscar
+   * @returns {Promise<Object>} Datos del elemento
+   * @throws {Error} Si hay un error en la petición o el tipo es inválido
+   */
   static async fetchItemById(type, id) {
     try {
       switch (type) {
@@ -105,45 +106,11 @@ class DataService {
     }
   }
 
-  static createCardOptions(type, item, selectedItems, collectionsManager) {
-    console.log("Creating card options for:", item);
-
-    const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
-    const isSelected = selectedItems?.has(item.id);
-    const isCollection =
-      type === "comics"
-        ? collectionsManager.isCollection(dataSource, null, item.id)
-        : false;
-
-    return {
-      showId: true,
-      selectable: type === "comics",
-      isSelected,
-      showMetadata: true,
-      onSelect: () => UI.toggleSelect(item.id),
-      actions: this.getCardActions(type, item, isCollection),
-    };
-  }
-
-  static getCardActions(type, item, isCollection) {
-    if (type !== "comics") return [];
-
-    return [
-      {
-        className: `add-collection-btn ${isCollection ? "added" : ""}`,
-        icon: `${isCollection ? "fas" : "far"} fa-heart`,
-        text: isCollection ? "Añadido a Colecciones" : "Añadir a Colecciones",
-        onClick: () => UI.toggleIndividualCollection(item.id),
-      },
-      {
-        className: "remove-collection-btn",
-        icon: "fas fa-trash-alt",
-        text: "Remover de Colecciones",
-        onClick: () => UI.removeIndividualCollection(item.id),
-      },
-    ];
-  }
-
+  /**
+   * Carga los elementos de todas las colecciones.
+   * @param {Collections} collectionsManager - Instancia del gestor de colecciones
+   * @returns {Promise<Array>} Array de colecciones con sus elementos
+   */
   static async loadCollectionItems(collectionsManager) {
     const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
     const collections = collectionsManager.getAllCollections(dataSource);
@@ -164,6 +131,12 @@ class DataService {
     return results;
   }
 
+  /**
+   * Obtiene los elementos de una colección por sus IDs.
+   * @param {string} dataSource - Fuente de datos ('mock' o 'api')
+   * @param {Array<number>} ids - Array de IDs de los elementos
+   * @returns {Promise<Array>} Array de elementos encontrados
+   */
   static async getCollectionItems(dataSource, ids) {
     if (!ids || ids.length === 0) return [];
 
