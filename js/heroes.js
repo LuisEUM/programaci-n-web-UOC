@@ -4,6 +4,40 @@ let heroesGrid;
 let heroesSearch;
 let heroesActionsBar;
 
+// Función para configurar la paginación
+function setupPagination() {
+  // Event listeners para los botones de paginación
+  document.getElementById("firstPage").addEventListener("click", () => {
+    heroesGrid.goToPage(1);
+  });
+
+  document.getElementById("prevPage").addEventListener("click", () => {
+    heroesGrid.goToPage(heroesGrid.currentPage - 1);
+  });
+
+  document.getElementById("nextPage").addEventListener("click", () => {
+    heroesGrid.goToPage(heroesGrid.currentPage + 1);
+  });
+
+  document.getElementById("lastPage").addEventListener("click", () => {
+    const totalPages = Math.ceil(
+      heroesGrid.totalItems / heroesGrid.itemsPerPage
+    );
+    heroesGrid.goToPage(totalPages);
+  });
+
+  // Event listener para el input de página
+  const pageInput = document.getElementById("pageInput");
+  if (pageInput) {
+    pageInput.addEventListener("change", (e) => {
+      const page = parseInt(e.target.value);
+      if (page && page > 0) {
+        heroesGrid.goToPage(page);
+      }
+    });
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   // Verificar autenticación
   const userToken = localStorage.getItem("userToken");
@@ -14,21 +48,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
+  // Inicializar preferencia de fuente de datos si no existe
+  if (!localStorage.getItem("dataSourcePreference")) {
+    localStorage.setItem("dataSourcePreference", "mock");
+    Config.USE_MOCK_DATA = true;
+  }
+
   // Inicializar manejador de coleccionables
   collectionsManager = new Collections();
-  window.collectionsManager = collectionsManager; // Make it globally available
+  window.collectionsManager = collectionsManager;
 
   // Dispatch event to notify collectionsManager is ready
   window.dispatchEvent(new CustomEvent("collectionsManagerReady"));
 
-  // Inicializar componentes
+  // Inicializar componentes necesarios para la página de héroes
   heroesGrid = new HeroesGrid(".heroes-grid");
-  window.heroesGrid = heroesGrid;
-
   heroesSearch = new HeroesSearch(
     document.getElementById("filterBadgesContainer")
   );
-  heroesActionsBar = new HeroesActionsBar();
 
   // Configurar paginación
   setupPagination();

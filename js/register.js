@@ -524,8 +524,20 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       // Crear lista de colecciones vacía
       const userCollections = {
-        comics: [],
-        heroes: [],
+        mock: {
+          wishlist: [],
+          toread: [],
+          reading: [],
+          read: [],
+          collections: [],
+        },
+        api: {
+          wishlist: [],
+          toread: [],
+          reading: [],
+          read: [],
+          collections: [],
+        },
       };
       localStorage.setItem(
         `collections_${userData.usuario}`,

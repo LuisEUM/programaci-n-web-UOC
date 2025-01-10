@@ -27,59 +27,60 @@ class Collections {
   static COPY_SUFFIX = " copia";
 
   constructor() {
-    // Intentar cargar datos existentes primero
-    const savedCollections = localStorage.getItem("collections");
+    const userName = localStorage.getItem("userName");
 
-    if (savedCollections) {
-      // Si hay datos guardados, usarlos
-      this.#collections = JSON.parse(savedCollections);
-      this.#collectionComics = [];
+    // Intentar cargar las colecciones específicas del usuario
+    const userCollections = localStorage.getItem(`collections_${userName}`);
 
-      // Inicializar estadísticas para los datos existentes
-      this.#collectionStats = {
-        mock: {},
-        api: {},
-      };
-
-      ["mock", "api"].forEach((dataSource) => {
-        Collections.DEFAULT_COLLECTIONS.forEach((collection) => {
-          this.#collectionStats[dataSource][collection] = {
-            total: 0,
-            totalPrice: 0,
-            averagePrice: 0,
-          };
-        });
-      });
-
-      // Actualizar estadísticas con los datos cargados
-      this.#updateAllCollectionStats();
+    if (userCollections) {
+      this.#collections = JSON.parse(userCollections);
     } else {
-      // Si no hay datos guardados, inicializar desde cero
-      this.#collectionComics = [];
-      this.#collections = {
-        mock: {},
-        api: {},
-      };
+      // Si no hay colecciones del usuario, intentar migrar las colecciones antiguas
+      const oldCollections = localStorage.getItem("collections");
 
-      this.#collectionStats = {
-        mock: {},
-        api: {},
-      };
+      if (oldCollections && userName) {
+        this.#collections = JSON.parse(oldCollections);
+        // Guardar las colecciones antiguas en el nuevo formato
+        localStorage.setItem(
+          `collections_${userName}`,
+          JSON.stringify(this.#collections)
+        );
+        // Limpiar las colecciones antiguas
+        localStorage.removeItem("collections");
+      } else {
+        // Inicializar colecciones vacías
+        this.#collections = {
+          mock: {},
+          api: {},
+        };
 
-      ["mock", "api"].forEach((dataSource) => {
-        Collections.DEFAULT_COLLECTIONS.forEach((collection) => {
-          this.#collections[dataSource][collection] = [];
-          this.#collectionStats[dataSource][collection] = {
-            total: 0,
-            totalPrice: 0,
-            averagePrice: 0,
-          };
+        ["mock", "api"].forEach((dataSource) => {
+          Collections.DEFAULT_COLLECTIONS.forEach((collection) => {
+            this.#collections[dataSource][collection] = [];
+          });
         });
-      });
-
-      // Guardar el estado inicial
-      this.saveCollections();
+      }
     }
+
+    // Inicializar el resto de las propiedades
+    this.#collectionComics = [];
+    this.#collectionStats = {
+      mock: {},
+      api: {},
+    };
+
+    ["mock", "api"].forEach((dataSource) => {
+      Collections.DEFAULT_COLLECTIONS.forEach((collection) => {
+        this.#collectionStats[dataSource][collection] = {
+          total: 0,
+          totalPrice: 0,
+          averagePrice: 0,
+        };
+      });
+    });
+
+    // Actualizar estadísticas
+    this.#updateAllCollectionStats();
   }
 
   #validateDataSource(dataSource) {
@@ -154,13 +155,22 @@ class Collections {
   }
 
   saveCollections() {
-    localStorage.setItem("collections", JSON.stringify(this.#collections));
+    const userName = localStorage.getItem("userName");
+    if (userName) {
+      localStorage.setItem(
+        `collections_${userName}`,
+        JSON.stringify(this.#collections)
+      );
+    }
   }
 
   loadCollections() {
-    const savedCollections = localStorage.getItem("collections");
-    if (savedCollections) {
-      this.#collections = JSON.parse(savedCollections);
+    const userName = localStorage.getItem("userName");
+    if (userName) {
+      const savedCollections = localStorage.getItem(`collections_${userName}`);
+      if (savedCollections) {
+        this.#collections = JSON.parse(savedCollections);
+      }
     }
   }
 
@@ -264,20 +274,27 @@ class Collections {
 
   // Método para actualizar las estadísticas de una colección específica
   async #updateCollectionStats(dataSource, collection) {
+    // Si estamos en modo mock y tratamos de actualizar stats de API, ignorar
+    if (dataSource === "api" && Config.USE_MOCK_DATA) {
+      return;
+    }
+
     const comicIds = this.#collections[dataSource][collection];
     let totalPrice = 0;
     let validComics = 0;
 
-    for (const comicId of comicIds) {
-      try {
-        const comic = await DataService.fetchItemById("comics", comicId);
+    // Solo hacer peticiones si estamos en modo API
+    if (dataSource === "api") {
+      for (const comicId of comicIds) {
+        const comic = await this.#fetchWithDelay(comicId);
         if (comic && typeof comic.price === "number") {
           totalPrice += comic.price;
           validComics++;
         }
-      } catch (error) {
-        console.error(`Error loading comic ${comicId}:`, error);
       }
+    } else {
+      // En modo mock, simplemente contar los comics
+      validComics = comicIds.length;
     }
 
     this.#collectionStats[dataSource][collection] = {
@@ -311,21 +328,42 @@ class Collections {
   }
 
   getTotalUniqueComics() {
-    const collections = JSON.parse(localStorage.getItem("collections")) || {
-      mock: {},
-      api: {}
-    };
-    
-    // Usar solo la fuente actual
-    const source = localStorage.getItem('dataSourcePreference') || 'mock';
-    const currentCollections = {
-      [source]: collections[source] || {}
-    };
-    
-    return Utils.getUniqueComicsCount(currentCollections);
+    const userName = localStorage.getItem("userName");
+    const collections = localStorage.getItem(`collections_${userName}`);
+
+    if (!collections) {
+      return 0;
+    }
+
+    const parsedCollections = JSON.parse(collections);
+    const source = Config.USE_MOCK_DATA ? "mock" : "api";
+
+    if (!parsedCollections[source]) {
+      return 0;
+    }
+
+    const uniqueComics = new Set();
+    Object.values(parsedCollections[source]).forEach((collectionArray) => {
+      if (Array.isArray(collectionArray)) {
+        collectionArray.forEach((comicId) => uniqueComics.add(comicId));
+      }
+    });
+
+    return uniqueComics.size;
   }
 
   #notifyCollectionUpdate() {
     window.dispatchEvent(new CustomEvent("collectionsUpdated"));
+  }
+
+  async #fetchWithDelay(comicId, delayMs = 1000) {
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+    try {
+      const comic = await DataService.fetchItemById("comics", comicId);
+      return comic;
+    } catch (error) {
+      console.error(`Error loading comic ${comicId}:`, error);
+      return null;
+    }
   }
 }

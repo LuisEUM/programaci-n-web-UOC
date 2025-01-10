@@ -92,7 +92,7 @@ class Comic {
   }
 
   static fromAPI(apiComic) {
-    console.log("Raw API Comic:", apiComic); // Debug log
+    // console.log("Raw API Comic:", apiComic); // Debug log
 
     // Si estamos en modo mock, los datos ya vienen en el formato correcto
     if (Config.USE_MOCK_DATA) {

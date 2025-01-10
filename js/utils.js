@@ -85,38 +85,54 @@ class Utils {
   }
 
   static getCollectionCounts(collections) {
-    if (!collections) return { mock: {}, api: {} };
-    
+    const userName = localStorage.getItem("userName");
+    if (!collections) {
+      const userCollections = localStorage.getItem(`collections_${userName}`);
+      if (userCollections) {
+        collections = JSON.parse(userCollections);
+      } else {
+        return { mock: {}, api: {} };
+      }
+    }
+
     return {
       mock: Utils.getSourceCounts(collections.mock || {}),
-      api: Utils.getSourceCounts(collections.api || {})
+      api: Utils.getSourceCounts(collections.api || {}),
     };
   }
 
   static getSourceCounts(sourceCollections) {
     const counts = {};
-    Object.keys(sourceCollections).forEach(collection => {
-      counts[collection] = Array.isArray(sourceCollections[collection]) 
-        ? sourceCollections[collection].length 
+    Object.keys(sourceCollections).forEach((collection) => {
+      counts[collection] = Array.isArray(sourceCollections[collection])
+        ? sourceCollections[collection].length
         : 0;
     });
     return counts;
   }
 
   static getUniqueComicsCount(collections) {
-    if (!collections) return 0;
-    
-    const source = localStorage.getItem('dataSourcePreference') || 'mock';
+    const userName = localStorage.getItem("userName");
+    if (!collections) {
+      const userCollections = localStorage.getItem(`collections_${userName}`);
+      if (userCollections) {
+        collections = JSON.parse(userCollections);
+      } else {
+        return 0;
+      }
+    }
+
+    const source = localStorage.getItem("dataSourcePreference") || "mock";
     if (!collections[source]) return 0;
-    
+
     const uniqueComics = new Set();
-    
-    Object.values(collections[source]).forEach(collectionArray => {
+
+    Object.values(collections[source]).forEach((collectionArray) => {
       if (Array.isArray(collectionArray)) {
-        collectionArray.forEach(comicId => uniqueComics.add(comicId));
+        collectionArray.forEach((comicId) => uniqueComics.add(comicId));
       }
     });
-    
+
     return uniqueComics.size;
   }
 }
