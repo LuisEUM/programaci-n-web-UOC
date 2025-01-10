@@ -1,9 +1,10 @@
 // Variables globales
+let collectionsManager;
 let heroesGrid;
 let heroesSearch;
-let heroModal;
+let heroesActionsBar;
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   // Verificar autenticación
   const userToken = localStorage.getItem("userToken");
   const userName = localStorage.getItem("userName");
@@ -13,28 +14,30 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Inicializar preferencia de fuente de datos si no existe
-  if (!localStorage.getItem("dataSourcePreference")) {
-    localStorage.setItem("dataSourcePreference", "mock");
-    Config.USE_MOCK_DATA = true;
-  }
+  // Inicializar manejador de coleccionables
+  collectionsManager = new Collections();
+  window.collectionsManager = collectionsManager; // Make it globally available
 
-  // Inicializar el modal primero
-  heroModal = new HeroModal();
-  window.heroModal = heroModal; // Hacer el modal disponible globalmente
+  // Dispatch event to notify collectionsManager is ready
+  window.dispatchEvent(new CustomEvent("collectionsManagerReady"));
 
   // Inicializar componentes
-  heroesGrid = new HeroesGrid();
-  window.heroesGrid = heroesGrid; // Para acceso global (necesario para los filtros)
+  heroesGrid = new HeroesGrid(".heroes-grid");
+  window.heroesGrid = heroesGrid;
 
-  // Inicializar el componente de búsqueda
-  heroesSearch = new HeroesSearch(heroesGrid);
+  heroesSearch = new HeroesSearch(
+    document.getElementById("filterBadgesContainer")
+  );
+  heroesActionsBar = new HeroesActionsBar();
 
-  // Configurar event listeners para eventos personalizados
-  setupCustomEventListeners();
+  // Configurar paginación
+  setupPagination();
 
   // Cargar datos iniciales
   heroesGrid.loadHeroes();
+
+  // Event Listeners para eventos personalizados
+  setupCustomEventListeners();
 });
 
 function setupCustomEventListeners() {

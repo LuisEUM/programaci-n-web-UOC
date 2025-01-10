@@ -1,5 +1,6 @@
 // Al inicio del archivo, importar los datos mock
 let mockComicsData;
+let collectionsManager;
 
 // Función para cargar los datos mock
 async function loadMockData() {
@@ -11,8 +12,21 @@ async function loadMockData() {
   }
 }
 
-// Variables globales
-let collectionsManager;
+// Función para actualizar contadores
+function updateCollectionCounts() {
+  const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
+  const tabButtons = document.querySelectorAll(".tab-btn");
+
+  tabButtons.forEach((button) => {
+    const collection = button.dataset.collection;
+    const collections =
+      collectionsManager.getAllCollections(dataSource)[collection] || [];
+    const countSpan = button.querySelector(".collection-count");
+    if (countSpan) {
+      countSpan.textContent = `(${collections.length})`;
+    }
+  });
+}
 
 document.addEventListener("DOMContentLoaded", async function () {
   // Verificar autenticación
@@ -31,6 +45,11 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // Inicializar manejador de colecciones
   collectionsManager = new Collections();
+  window.collectionsManager = collectionsManager; // Make it globally available
+
+  // Dispatch event to notify collectionsManager is ready
+  window.dispatchEvent(new CustomEvent("collectionsManagerReady"));
+
   const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
 
   // Cargar colecciones iniciales (Lista de Deseos por defecto)
@@ -49,6 +68,12 @@ function setupEventListeners(collectionsManager) {
     window.location.href = "login.html";
   });
 
+  // Update counts initially
+  updateCollectionCounts();
+
+  // Listen for collection updates
+  window.addEventListener("collectionsUpdated", updateCollectionCounts);
+
   // Tabs
   const tabButtons = document.querySelectorAll(".tab-btn");
   tabButtons.forEach((button) => {
@@ -65,6 +90,9 @@ function setupEventListeners(collectionsManager) {
       // Cargar colecciones de la colección seleccionada
       const collection = this.dataset.collection;
       loadCollections(collection, collectionsManager);
+
+      // Update counts after loading
+      updateCollectionCounts();
     });
   });
 }
@@ -210,9 +238,25 @@ function cloneToCollection(comicId, currentCollection) {
 // Función para remover un cómic de una colección
 function removeFromCollection(comicId, collection) {
   const dataSource = Config.USE_MOCK_DATA ? "mock" : "api";
-  collectionsManager.removeCollection(dataSource, collection, comicId);
-  loadCollections(collection, collectionsManager);
-  showToast("Cómic removido de la colección", "success");
+
+  try {
+    // Convertir comicId a número si es string
+    comicId = parseInt(comicId);
+
+    // Remover el cómic de la colección
+    collectionsManager.removeCollection(dataSource, collection, comicId);
+
+    // Guardar cambios
+    collectionsManager.saveCollections();
+
+    // Recargar la vista actual
+    loadCollections(collection, collectionsManager);
+
+    showToast("Cómic removido de la colección", "success");
+  } catch (error) {
+    console.error("Error removing comic:", error);
+    showToast("Error al remover el cómic", "error");
+  }
 }
 
 // Función para manejar la selección de colección en el modal

@@ -5,6 +5,11 @@ class CollectionsTabs {
     this.collections = Collections.DEFAULT_COLLECTIONS;
     this.activeCollection = this.collections[0];
     this.init();
+
+    // Add event listener for collection updates
+    window.addEventListener("collectionsUpdated", () => {
+      this.render();
+    });
   }
 
   init() {
@@ -19,13 +24,17 @@ class CollectionsTabs {
     tabsContainer.className = "collections-tabs";
 
     this.collections.forEach((collection) => {
+      const counts = this.collectionsManager.getCollectionCount(collection);
       const tab = document.createElement("button");
       tab.className = `tab-btn ${
         collection === this.activeCollection ? "active" : ""
       }`;
       tab.dataset.collection = collection;
-      tab.textContent =
-        this.collectionsManager.getCollectionDisplayName(collection);
+      tab.innerHTML = `
+        <i class="fas ${this.getCollectionIcon(collection)}"></i>
+        ${this.collectionsManager.getCollectionDisplayName(collection)}
+        <span class="collection-count">(${counts.total})</span>
+      `;
       tabsContainer.appendChild(tab);
     });
 
@@ -132,5 +141,16 @@ class CollectionsTabs {
     }
 
     contentContainer.appendChild(grid);
+  }
+
+  getCollectionIcon(collection) {
+    const icons = {
+      wishlist: "fa-star",
+      toread: "fa-bookmark",
+      reading: "fa-book-open",
+      read: "fa-check",
+      collections: "fa-heart",
+    };
+    return icons[collection] || "fa-folder";
   }
 }

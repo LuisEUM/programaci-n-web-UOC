@@ -7,6 +7,7 @@
   <title>Collections - Marvel Comics API - UOC</title>
   <link rel="stylesheet" href="styles/collections.css">
   <link rel="stylesheet" href="styles/navbar.css">
+  <link rel="stylesheet" href="styles/collection-modal.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="icon" type="image/png" href="assets/images/marvel-logo.png">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
@@ -16,47 +17,90 @@
 
   <!-- Main Content -->
   <main>
-    <section class="collections-section">
-      <div class="section-header">
-        <h2>Mis Colecciones</h2>
-      </div>
+    <div class="container">
+      <h1 class="main-title">Colecciones</h1>
+      <section class="collections-section">
+        <div class="section-header">
+          <h2>Mis Colecciones</h2>
+        </div>
 
-      <!-- Tabs -->
-      <div class="collections-tabs">
-        <button class="tab-btn active" data-collection="wishlist">
+        <!-- Tabs -->
+        <div class="collections-tabs">
+          <button class="tab-btn active" data-collection="wishlist">
+            <i class="fas fa-star"></i>
+            Lista de Deseos
+            <span class="collection-count"></span>
+          </button>
+          <button class="tab-btn" data-collection="toread">
+            <i class="fas fa-bookmark"></i>
+            Por Leer
+            <span class="collection-count"></span>
+          </button>
+          <button class="tab-btn" data-collection="reading">
+            <i class="fas fa-book-open"></i>
+            Leyendo
+            <span class="collection-count"></span>
+          </button>
+          <button class="tab-btn" data-collection="read">
+            <i class="fas fa-check-circle"></i>
+            Leídos
+            <span class="collection-count"></span>
+          </button>
+          <button class="tab-btn" data-collection="collections">
+            <i class="fas fa-heart"></i>
+            Favoritos
+            <span class="collection-count"></span>
+          </button>
+        </div>
+
+        <!-- Content -->
+        <div class="collections-content">
+          <div class="collections-grid">
+            <!-- Collections will be loaded here dynamically -->
+          </div>
+          <div class="no-collections-message" style="display: none;">
+            <i class="fas fa-heart-broken"></i>
+            <p>No hay cómics en esta colección</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- Collection Modal -->
+  <div id="collectionModal" class="collection-modal">
+    <div class="collection-modal-content">
+      <div class="collection-modal-header">
+        <h2 class="collection-modal-title">Selecciona una colección</h2>
+        <button class="close-modal" id="closeModal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="collection-buttons">
+        <button class="collection-btn" data-collection="wishlist">
           <i class="fas fa-star"></i>
           Lista de Deseos
         </button>
-        <button class="tab-btn" data-collection="toread">
+        <button class="collection-btn" data-collection="toread">
           <i class="fas fa-bookmark"></i>
           Por Leer
         </button>
-        <button class="tab-btn" data-collection="reading">
+        <button class="collection-btn" data-collection="reading">
           <i class="fas fa-book-open"></i>
           Leyendo
         </button>
-        <button class="tab-btn" data-collection="read">
+        <button class="collection-btn" data-collection="read">
           <i class="fas fa-check-circle"></i>
           Leídos
         </button>
-        <button class="tab-btn" data-collection="collections">
+        <button class="collection-btn" data-collection="collections">
           <i class="fas fa-heart"></i>
           Favoritos
         </button>
       </div>
-
-      <!-- Content -->
-      <div class="collections-content">
-        <div class="collections-grid">
-          <!-- Collections will be loaded here dynamically -->
-        </div>
-        <div class="no-collections-message" style="display: none;">
-          <i class="fas fa-heart-broken"></i>
-          <p>No hay cómics en esta colección</p>
-        </div>
-      </div>
-    </section>
-  </main>
+    </div>
+  </div>
 
   <!-- Scripts -->
   <!-- Dependencias externas -->
@@ -78,6 +122,7 @@
   <!-- Componentes -->
   <script src="js/components/Navbar.js"></script>
   <script src="js/components/Card.js"></script>
+  <script src="js/components/CollectionModal.js"></script>
 
   <!-- Script principal -->
   <script src="js/collections.js"></script>

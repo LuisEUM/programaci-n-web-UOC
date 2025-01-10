@@ -7,7 +7,7 @@ let comicsCollectionModal;
 let heroesCarousel;
 let comicModal;
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   // Verificar autenticación
   const userToken = localStorage.getItem("userToken");
   const userName = localStorage.getItem("userName");
@@ -25,10 +25,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Inicializar manejador de coleccionables
   collectionsManager = new Collections();
+  window.collectionsManager = collectionsManager; // Make it globally available
+
+  // Dispatch event to notify collectionsManager is ready
+  window.dispatchEvent(new CustomEvent("collectionsManagerReady"));
 
   // Inicializar componentes
   comicsGrid = new ComicsGrid(".comics-grid");
-  window.comicsGrid = comicsGrid; // Para acceso global (necesario para los filtros)
+  window.comicsGrid = comicsGrid;
 
   comicsSearch = new ComicsSearch(
     document.getElementById("filterBadgesContainer")
@@ -37,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
   comicsCollectionModal = new ComicsCollectionModal();
   heroesCarousel = new HeroesCarousel(".carousel-wrapper");
   comicModal = new ComicModal();
-  window.comicModal = comicModal; // Para acceso global
+  window.comicModal = comicModal;
 
   // Configurar paginación
   setupPagination();

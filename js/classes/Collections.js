@@ -1,5 +1,5 @@
 /**
- * Clase Collections que gestiona una colección de cómics 
+ * Clase Collections que gestiona una colección de cómics
  * Implementa las operaciones básicas de gestión de una lista de colecciones
  * @class
  */
@@ -99,10 +99,15 @@ class Collections {
     this.#validateDataSource(dataSource);
     this.#validateCollection(collection);
 
+    // Asegurarse de que comicId sea un número
+    comicId = parseInt(comicId);
+
+    // Verificar que el cómic no esté ya en la colección
     if (!this.#collections[dataSource][collection].includes(comicId)) {
       this.#collections[dataSource][collection].push(comicId);
       await this.#updateCollectionStats(dataSource, collection);
       this.saveCollections();
+      this.#notifyCollectionUpdate();
     }
   }
 
@@ -110,15 +115,24 @@ class Collections {
     this.#validateDataSource(dataSource);
     this.#validateCollection(collection);
 
+    // Asegurarse de que comicId sea un número
+    comicId = parseInt(comicId);
+
+    // Filtrar el ID del cómic de la colección
     this.#collections[dataSource][collection] = this.#collections[dataSource][
       collection
-    ].filter((id) => id !== comicId);
+    ].filter((id) => parseInt(id) !== comicId);
+
     await this.#updateCollectionStats(dataSource, collection);
     this.saveCollections();
+    this.#notifyCollectionUpdate();
   }
 
   isCollection(dataSource, collection, comicId) {
     this.#validateDataSource(dataSource);
+
+    // Asegurarse de que comicId sea un número
+    comicId = parseInt(comicId);
 
     if (!collection) {
       return Object.values(this.#collections[dataSource]).some(
@@ -230,6 +244,15 @@ class Collections {
   getCollectionStats(dataSource, collection) {
     this.#validateDataSource(dataSource);
     this.#validateCollection(collection);
+
+    if (!this.#collectionStats[dataSource][collection]) {
+      this.#collectionStats[dataSource][collection] = {
+        total: 0,
+        totalPrice: 0,
+        averagePrice: 0,
+      };
+    }
+
     return this.#collectionStats[dataSource][collection];
   }
 
@@ -271,5 +294,31 @@ class Collections {
         await this.#updateCollectionStats(dataSource, collection);
       }
     }
+  }
+
+  getCollectionCount(collection) {
+    const collections = JSON.parse(localStorage.getItem("collections")) || {
+      mock: { [collection]: [] },
+      api: { [collection]: [] },
+    };
+
+    const counts = Utils.getCollectionCounts(collections);
+    return {
+      mock: counts.mock[collection] || 0,
+      api: counts.api[collection] || 0,
+      total: (counts.mock[collection] || 0) + (counts.api[collection] || 0),
+    };
+  }
+
+  getTotalUniqueComics() {
+    const collections = JSON.parse(localStorage.getItem("collections")) || {
+      mock: {},
+      api: {},
+    };
+    return Utils.getUniqueComicsCount(collections);
+  }
+
+  #notifyCollectionUpdate() {
+    window.dispatchEvent(new CustomEvent("collectionsUpdated"));
   }
 }

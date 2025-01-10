@@ -12,6 +12,16 @@ class Navbar {
     }
     this.isMenuOpen = false;
     this.init();
+
+    // Wait for collectionsManager to be initialized
+    window.addEventListener("collectionsManagerReady", () => {
+      this.updateCollectionsCount();
+    });
+
+    // Listen for collection updates
+    window.addEventListener("collectionsUpdated", () => {
+      this.updateCollectionsCount();
+    });
   }
 
   init() {
@@ -91,7 +101,7 @@ class Navbar {
           }">Héroes</a>
           <a href="collections.html" class="nav-link ${
             window.location.pathname.includes("collections") ? "active" : ""
-          }">Colecciones</a>
+          }">Colecciones - </a>
         </div>
         <div class="user-section">
           <span class="username">
@@ -135,6 +145,25 @@ class Navbar {
       localStorage.removeItem("userName");
       window.location.href = "login.html";
     });
+  }
+
+  updateCollectionsCount() {
+    if (!window.collectionsManager) return; // Guard clause
+
+    const totalUnique = window.collectionsManager.getTotalUniqueComics();
+    const collectionsLink = document.querySelector(
+      '.nav-link[href="collections.html"]'
+    );
+    if (collectionsLink) {
+      const countBadge =
+        collectionsLink.querySelector(".count-badge") ||
+        document.createElement("span");
+      countBadge.className = "count-badge";
+      countBadge.textContent = totalUnique;
+      if (!collectionsLink.querySelector(".count-badge")) {
+        collectionsLink.appendChild(countBadge);
+      }
+    }
   }
 }
 
