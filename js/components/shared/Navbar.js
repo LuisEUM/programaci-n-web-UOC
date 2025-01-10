@@ -137,6 +137,9 @@ class Navbar {
             <a href="collections.html" class="nav-link ${
               window.location.pathname.includes("collections") ? "active" : ""
             }">Colecciones - </a>
+            <a href="video.html" class="nav-link ${
+              window.location.pathname.includes("video") ? "active" : ""
+            }">Video</a>
           </div>
           <div class="user-section">
             <span class="username">
